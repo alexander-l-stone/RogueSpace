@@ -6,6 +6,7 @@ class Entity:
         self.y:int = y
         self.char:str = char
         self.color:tuple = color
+        self.curr_area = None
         if flags == None:
             self.flags:dict = {}
         else:
