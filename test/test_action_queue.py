@@ -128,4 +128,4 @@ def test_can_resolve_move_action(area, entity, collidable_entity):
     action_queue = ActionQueue()
     action_queue.push(MoveAction(entity, 1, 1, 0, area))
     results = action_queue.resolve_actions(1)
-    assert results[0] is str
+    assert isinstance(results[0], str)
