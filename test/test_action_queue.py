@@ -1,5 +1,6 @@
 from source.action.action_queue import ActionQueue
 from source.action.action import Action
+from source.action.move_action import MoveAction
 import random
 
 def test_can_instantiate_action():
@@ -9,6 +10,11 @@ def test_can_instantiate_action():
     assert Action
     action = Action('test', 1)
     assert isinstance(action, Action)
+
+def test_can_instantiate_move_action(area):
+    assert MoveAction
+    move_action = MoveAction('test', 1, 1, 1, area)
+    assert isinstance(move_action, MoveAction)
 
 def test_can_instantiate_action_queue():
     """
@@ -115,3 +121,11 @@ def test_multiple_resolve():
     for time,length in ((2,7),(4,5),(8,1),(10,0)):
         action_queue.resolve_actions(time)
         assert len(action_queue.heap) == length
+
+def test_can_resolve_move_action(area, entity, collidable_entity):
+    area.add_entity(entity)
+    area.add_entity(collidable_entity)
+    action_queue = ActionQueue()
+    action_queue.push(MoveAction(entity, 1, 1, 0, area))
+    results = action_queue.resolve_actions(1)
+    assert results[0] is str

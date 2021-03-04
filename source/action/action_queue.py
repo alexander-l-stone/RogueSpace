@@ -21,7 +21,7 @@ class ActionQueue:
         except(AttributeError):
             pass
         heapq.heappush(self.heap, action)
-    
+
     def pop(self):
         """
         Take the top item of the queue
@@ -33,10 +33,12 @@ class ActionQueue:
         action_list = []
         while len(self.heap) > 0 and self.heap[0].time <= time:
             action_list.append(self.pop())
+        result_list = []
         for action in action_list:
             try:
                 if(action.originator.kwargs['is_player'] == True):
                     self.player_actions_count -= 1
             except(AttributeError):
                 pass
-            action.resolve_action()
+            result_list.append(action.resolve_action())
+        return result_list

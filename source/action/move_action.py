@@ -15,7 +15,7 @@ class MoveAction(Action):
         entity_at_target = self.area.get_entity_at_coordinates(self.originator.x + self.dx, self.originator.y + self.dy)
         if entity_at_target is not None:
             try:
-                return entity_at_target.on_collide()
+                return entity_at_target.on_collide(entity_at_target, self.originator)
             except:
                 self.area.transfer_entity_between_coordinates(self.originator.x, self.originator.y, self.originator.x + self.dx, self.originator.y + self.dy)
                 return True
