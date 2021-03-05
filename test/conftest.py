@@ -4,6 +4,7 @@ import pytest
 from source.action.action import Action
 from source.entity.entity import Entity
 from source.area.area import Area
+from source.planet.planet import Planet
 
 @pytest.fixture
 def action():
@@ -34,3 +35,8 @@ def area_with_entity():
     area = Area()
     area.add_entity(Entity(1, 1, '@', (30, 60, 150)))
     return area
+
+@pytest.fixture
+def planet():
+    planet = Planet(4, 5, 'o', (0, 0, 200), 'Test Planet', 'test', None, 5)
+    return planet

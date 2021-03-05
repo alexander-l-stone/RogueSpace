@@ -122,7 +122,25 @@ def test_multiple_resolve():
         action_queue.resolve_actions(time)
         assert len(action_queue.heap) == length
 
-def test_can_resolve_move_action(area, entity, collidable_entity):
+def test_can_resolve_move_action(area, entity):
+    """"
+    Test that move actions can resolve and move an entity.
+    """
+    dx = 0
+    dy = 1
+    oldx = entity.x
+    oldy = entity.y
+    area.add_entity(entity)
+    action_queue = ActionQueue()
+    action_queue.push(MoveAction(entity, 1, dx, dy, area))
+    results = action_queue.resolve_actions(1)
+    assert results[0] is True
+    assert (entity.x == oldx + dx) and (entity.y == oldy + dy)
+
+def test_can_resolve_move_action_with_collision(area, entity, collidable_entity):
+    """
+    Test that move actions can resolve when collisions are involved
+    """
     area.add_entity(entity)
     area.add_entity(collidable_entity)
     action_queue = ActionQueue()
