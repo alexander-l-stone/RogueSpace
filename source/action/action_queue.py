@@ -15,8 +15,9 @@ class ActionQueue:
         Append an action to the queue
         This always assumes action is an Action
         """
+
         try:
-            if(action.originator.kwargs['is_player'] == True):
+            if(action.originator.flags['is_player'] == True):
                 self.player_actions_count += 1
         except(AttributeError):
             pass
@@ -36,7 +37,7 @@ class ActionQueue:
         result_list = []
         for action in action_list:
             try:
-                if(action.originator.kwargs['is_player'] == True):
+                if(action.originator.flags['is_player'] == True):
                     self.player_actions_count -= 1
             except(AttributeError):
                 pass

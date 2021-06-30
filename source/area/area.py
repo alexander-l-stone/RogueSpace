@@ -41,8 +41,7 @@ class Area:
     
     def draw(self, playerx, playery, screen_width, screen_height, **config) -> None:
         corner_x = playerx - screen_width//2
-        corner_y = playery - screen_height//2
-        
+        corner_y = playery - screen_height//2        
         for drawx in range(playerx - screen_width//2, playerx + screen_width//2):
             for drawy in range(playery - screen_height//2, playery + screen_height//2):
                 entity_at_point = self.get_entity_at_coordinates(drawx, drawy)
