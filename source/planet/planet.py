@@ -11,12 +11,12 @@ class Planet:
         self.planet_type:str = planet_type
         self.moons = moons
         self.name = name
-        self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide'})
+        self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide': self.on_collide_system_level})
         self.system = system
         self.planetary_radius:int = planetary_radius
 
     def on_collide_system_level(target, initiator):
-        return {'type' : 'enter', 'entering_entity' : initiator, 'entering': target}
+        return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': target}
 
     def on_collide(target, initiator):
         return {'type': 'stop'}

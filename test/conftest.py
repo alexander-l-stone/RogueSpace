@@ -6,6 +6,8 @@ from source.entity.entity import Entity
 from source.area.area import Area
 from source.planet.planet import Planet
 
+#TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
+
 @pytest.fixture
 def action():
     return Action('me', 1)
