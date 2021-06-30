@@ -1,4 +1,3 @@
-from test.conftest import area
 from source.area.area import Area
 from source.entity.entity import Entity
 

@@ -136,14 +136,3 @@ def test_can_resolve_move_action(area, entity):
     results = action_queue.resolve_actions(1)
     assert results[0] is True
     assert (entity.x == oldx + dx) and (entity.y == oldy + dy)
-
-def test_can_resolve_move_action_with_collision(area, entity, collidable_entity):
-    """
-    Test that move actions can resolve when collisions are involved
-    """
-    area.add_entity(entity)
-    area.add_entity(collidable_entity)
-    action_queue = ActionQueue()
-    action_queue.push(MoveAction(entity, 1, 1, 0, area))
-    results = action_queue.resolve_actions(1)
-    assert isinstance(results[0], str)

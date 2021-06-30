@@ -19,14 +19,6 @@ def entity():
     return Entity(1, 1, '@', (255, 255, 255))
 
 @pytest.fixture
-def collidable_entity():
-    
-    def on_collide(target, initiator):
-        return f"{target} collided with {initiator}"
-    
-    return Entity(2, 1, '#', (255, 255, 255), {'on_collide': on_collide})
-
-@pytest.fixture
 def area():
     return Area()
 

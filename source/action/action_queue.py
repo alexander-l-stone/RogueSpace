@@ -21,6 +21,8 @@ class ActionQueue:
                 self.player_actions_count += 1
         except(AttributeError):
             pass
+        except(KeyError):
+            pass
         heapq.heappush(self.heap, action)
 
     def pop(self):
@@ -40,6 +42,8 @@ class ActionQueue:
                 if(action.originator.flags['is_player'] == True):
                     self.player_actions_count -= 1
             except(AttributeError):
+                pass
+            except(KeyError):
                 pass
             result_list.append(action.resolve_action())
         return result_list
