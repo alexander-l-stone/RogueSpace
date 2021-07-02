@@ -14,6 +14,10 @@ class Planet:
         self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide': self.on_collide_system_level})
         self.system = system
         self.planetary_radius:int = planetary_radius
+        self.entity_list = []
+
+    def generate_planetary_entity(self):
+        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level})
 
     def on_collide_system_level(target, initiator):
         return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': target}
@@ -32,6 +36,8 @@ class Planet:
         planetary_area = Area()
         for moon in self.moons:
             planetary_area.add_entity(moon)
+        for planetary_entity in self.entity_list:
+            planetary_area.add_entity(planetary_entity)
         for entity in entity_list:
             planetary_area.add_entity(entity)
         for theta in range(0,360):
