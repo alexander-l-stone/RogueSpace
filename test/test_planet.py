@@ -19,3 +19,7 @@ def test_exit_planetary_area_works(planet):
     area.add_entity(entity)
     result = planet.test_for_exit_planetary_area(area)
     assert result == [{'type': 'exit', 'exiting_entity': entity, 'exiting_too': None}]
+    second_entity = Entity(1, 1, 'e', (255, 0, 0))
+    area.add_entity(second_entity)
+    result = planet.test_for_exit_planetary_area(area)
+    assert result == [{'type': 'exit', 'exiting_entity': entity, 'exiting_too': None}]
