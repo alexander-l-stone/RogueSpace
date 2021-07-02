@@ -40,3 +40,8 @@ def planet():
 def system():
     system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50)
     return system
+
+def system_with_planet():
+    system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50)
+    planet = Planet(4, 5, 'o', (0, 0, 200), 'Test Planet', 'test', None, 5)
+    system.add_planet(planet)

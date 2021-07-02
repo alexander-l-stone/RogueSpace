@@ -22,16 +22,23 @@ class System:
         for entity in entity_list:
             system_area.add_entity(entity)
         for theta in range(0,360):
-            x = int(self.planetary_radius*math.cos(theta))
-            y = int(self.planetary_radius*math.sin(theta))
-            radius_marker = Entity(x, y, '*', (255, 255, 255))
+            x = int(self.hyperlimit*math.cos(theta))
+            y = int(self.hyperlimit*math.sin(theta))
+            radius_marker = Entity(x, y, '*', (100, 0,0))
             if (x, y) not in system_area.entity_dict:
                 system_area.add_entity(radius_marker)
         system_area.add_entity(Entity(0, 0, self.char, self.color, {'on_collide': self.on_collide}))
         return system_area
 
-    def on_collide_sector_level(target, initiator):
-        return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': target}
+    def add_planet(self, planet):
+        self.planet_list.append(planet)
+        planet.system = self
+
+    def on_collide_sector_level(self, target, initiator):
+        return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': self}
+
+    def on_collide(self, target, initiator):
+        return {'type': 'stop'}
 
     def generate_star_entity(self):
         return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_sector_level})

@@ -12,3 +12,10 @@ def test_can_instantiate_planet():
 
 def test_can_generate_planetary_area(planet):
     assert isinstance(planet.generate_planetary_area(), Area)
+
+def test_exit_planetary_area_works(planet):
+    entity = Entity(4, 4, 'e', (0, 255, 0))
+    area = planet.generate_planetary_area()
+    area.add_entity(entity)
+    result = planet.test_for_exit_planetary_area(area)
+    assert result == [{'type': 'exit', 'exiting_entity': entity, 'exiting_too': None}]

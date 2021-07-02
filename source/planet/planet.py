@@ -19,10 +19,10 @@ class Planet:
     def generate_planetary_entity(self):
         return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level})
 
-    def on_collide_system_level(target, initiator):
-        return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': target}
+    def on_collide_system_level(self, target, initiator):
+        return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': self}
 
-    def on_collide(target, initiator):
+    def on_collide(self, target, initiator):
         return {'type': 'stop'}
 
     def test_for_exit_planetary_area(self, area):
