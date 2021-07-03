@@ -6,6 +6,7 @@ from source.entity.entity import Entity
 from source.area.area import Area
 from source.planet.planet import Planet
 from source.system.system import System
+from source.action.action_queue import ActionQueue
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
 
@@ -45,3 +46,7 @@ def system_with_planet():
     system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50)
     planet = Planet(4, 5, 'o', (0, 0, 200), 'Test Planet', 'test', None, 5)
     system.add_planet(planet)
+    
+@pytest.fixture
+def action_queue():
+    return ActionQueue()
