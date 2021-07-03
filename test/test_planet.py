@@ -35,7 +35,7 @@ def test_system_level_collide(planet, action_queue):
     action_queue.push(move_action)
     result = action_queue.resolve_actions(1)
     assert result == [{
-        'type' : 'enter',
-        'entering_entity' : moving_entity,
+        'type': 'enter',
+        'entering_entity': moving_entity,
         'target_entity': planet
     }]
