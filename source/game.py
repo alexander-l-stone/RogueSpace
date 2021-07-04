@@ -11,6 +11,7 @@ from source.handlers.input_handler import InputHandler
 from source.action.move_action import MoveAction
 from source.planet.planet import Planet
 from source.player.player import Player
+from source.ring.ring import Ring
 from source.helper_functions.colliders import stop_collision
 from source.system.system import System
 
@@ -18,7 +19,7 @@ class Game:
     def __init__(self, config:Dict={}):
         self.config = config
         #set up font
-        tcod.console_set_custom_font("terminal8x12_gs_ro.png", tcod.FONT_LAYOUT_ASCII_INROW | tcod.FONT_TYPE_GREYSCALE,)
+        tcod.console_set_custom_font("terminal12x12_gs_ro.png", tcod.FONT_LAYOUT_ASCII_INROW | tcod.FONT_TYPE_GREYSCALE,)
         self.SCREEN_WIDTH:int = 50
         self.SCREEN_HEIGHT:int = 50
         self.global_time:int = 0
@@ -26,9 +27,15 @@ class Game:
         self.InputHandler:InputHandler = InputHandler()
         player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
         self.player = Player(player_entity)
-        self.current_location = System(0, 0, 'O', (255, 0, 0), 'test', 'test', 30)
+        
+        #Generic test code
+        self.current_location = System(0, 0, 'O', (255, 0, 0), 'test', 'test', 30, sector=None, bgcolor=(0, 30, 0))
+        asteroid_ring = Ring(12, '*', (129, 69, 19))
         test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10)
+        planet_ring = Ring(3, '*', (56, 255, 255))
+        test_planet.entity_list.append(planet_ring)
         self.current_location.add_planet(test_planet)
+        self.current_location.add_planet(asteroid_ring)
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(player_entity)

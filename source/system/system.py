@@ -1,9 +1,10 @@
 from source.area.area import Area
 from source.entity.entity import Entity
+from source.ring.ring import Ring
 import math
 
 class System:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, sector=None):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, sector=None, bgcolor=(0,0,0)):
         self.x = x
         self.y = y
         self.char = char
@@ -14,11 +15,15 @@ class System:
         self.sector = sector
         self.planet_list = []
         self.entity_list = []
+        self.bgcolor = bgcolor
     
     def generate_area(self, entity_list=[]):
-        system_area = Area()
+        system_area = Area(self.bgcolor)
         for planet in self.planet_list:
-            system_area.add_entity(planet.generate_planetary_entity())
+            if (isinstance(planet, Ring)):
+                planet.generate_entities(system_area)
+            else:
+                system_area.add_entity(planet.generate_planetary_entity())
         for entity in entity_list:
             system_area.add_entity(entity)
         for theta in range(0,360):

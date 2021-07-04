@@ -12,10 +12,11 @@ class Entity:
         else:
             self.flags:dict = flags
     
-    def draw(self, topx, topy, override_color=None) -> None:
+    def draw(self, topx, topy, bgcolor, override_color=None,) -> None:
+        tcod.console_set_default_background(0, bgcolor)
         if(override_color is None):
             tcod.console_set_default_foreground(0, self.color)
         else:
             tcod.console_set_default_foreground(0, override_color)
         #find the offset coordinates and draw on that point
-        tcod.console_put_char(0, self.x-topx, self.y-topy, self.char, tcod.BKGND_NONE)
+        tcod.console_put_char(0, self.x-topx, self.y-topy, self.char, tcod.BKGND_DEFAULT)
