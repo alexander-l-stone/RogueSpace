@@ -15,15 +15,15 @@ class System:
         self.planet_list = []
         self.entity_list = []
     
-    def generate_system_area(self, entity_list=[]):
+    def generate_area(self, entity_list=[]):
         system_area = Area()
-        for system_entity in self.entity_list:
-            system_area.add_entity(system_entity)
+        for planet in self.planet_list:
+            system_area.add_entity(planet.generate_planetary_entity())
         for entity in entity_list:
             system_area.add_entity(entity)
         for theta in range(0,360):
-            x = int(self.hyperlimit*math.cos(theta))
-            y = int(self.hyperlimit*math.sin(theta))
+            x = int(float(self.hyperlimit)*math.cos(theta))
+            y = int(float(self.hyperlimit)*math.sin(theta))
             radius_marker = Entity(x, y, '*', (100, 0,0))
             if (x, y) not in system_area.entity_dict:
                 system_area.add_entity(radius_marker)

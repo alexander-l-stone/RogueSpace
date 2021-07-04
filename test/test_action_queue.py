@@ -134,5 +134,5 @@ def test_can_resolve_move_action(area, entity):
     action_queue = ActionQueue()
     action_queue.push(MoveAction(entity, 1, dx, dy, area))
     results = action_queue.resolve_actions(1)
-    assert results[0] is True
+    assert results[0] == {'type': 'move'}
     assert (entity.x == oldx + dx) and (entity.y == oldy + dy)

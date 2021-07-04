@@ -27,12 +27,13 @@ class Planet:
 
     def test_for_exit_planetary_area(self, area):
         exit_list = []
-        for coord, entity in area.entity_dict.items():
+        for coord, entities in area.entity_dict.items():
             if math.sqrt(coord[0]**2 + coord[1]**2) > self.planetary_radius:
-                exit_list.append({'type': 'exit', 'exiting_entity': entity, 'exiting_too': self.system})
+                for entity in entities:
+                    exit_list.append({'type': 'exit', 'exiting_entity': entity, 'exiting_too': self.system})
         return exit_list
 
-    def generate_planetary_area(self, entity_list=[]):
+    def generate_area(self, entity_list=[]):
         planetary_area = Area()
         for moon in self.moons:
             planetary_area.add_entity(moon)

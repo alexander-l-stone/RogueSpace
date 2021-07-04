@@ -13,7 +13,7 @@ def test_can_instantiate_system():
     assert isinstance(system, System)
 
 def test_can_generate_system_area(system):
-    assert isinstance(system.generate_system_area(), Area)
+    assert isinstance(system.generate_area(), Area)
 
 def test_sector_level_collide(system, action_queue):
     area = Area()
