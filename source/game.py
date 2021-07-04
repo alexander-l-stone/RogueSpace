@@ -36,6 +36,7 @@ class Game:
     def generate_current_area(self):
         self.current_area = self.current_location.generate_area()
 
+    #TODO: Figure out why entities exiting planets(and presumably systems) don't appear until they move
     def render(self) -> None:
         self.current_area.draw(self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         tcod.console_flush()
@@ -48,7 +49,6 @@ class Game:
 
     def resolve_enter(self, result):
     #TODO: figure out what to do for non-player entities
-        print(result)
         if (result['entering_entity'].flags['is_player']) is True:
             self.current_location = result['target_entity']
             dx, dy = result['entering_entity'].x - result['target_entity'].x, result['entering_entity'].y - result['target_entity'].y
@@ -61,10 +61,10 @@ class Game:
             self.generate_current_area()
 
     def resolve_exit(self, result):
-        if (result['exiting_entity'].flags['isplayer'] is True):
+        if ('is_player' in result['exiting_entity'].flags and result['exiting_entity'].flags['is_player'] is True):
             theta = convert_delta_to_theta(result['exiting_entity'].x, result['exiting_entity'].y)
             delta = convert_theta_to_delta(theta)
-            result['exiting_entity'].x, result['exiting_entity'].y = self.current_location.x + delta[0], self.current_location.y + delta[1]
+            result['exiting_entity'].x, result['exiting_entity'].y = self.current_location.x, self.current_location.y
             if(isinstance(self.current_location, Planet)):
                 self.current_location = self.current_location.system
             self.current_location.entity_list.append(result['exiting_entity'])
@@ -86,8 +86,6 @@ class Game:
                 if self.global_queue.player_actions_count > 0:
                     self.resolve_actions()
                     self.global_time += 1
-                    root_console.clear()
-                    self.render()
                 else:
                     for event in tcod.event.wait():
                         if event.type == "KEYDOWN":
@@ -95,3 +93,5 @@ class Game:
                             self.resolve_keyboard_input(result)
                         if event.type == "QUIT":
                             raise SystemExit()
+                root_console.clear()
+                self.render()

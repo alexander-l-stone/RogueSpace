@@ -20,12 +20,10 @@ def test_exit_planetary_area_works(planet):
     area = planet.generate_area()
     area.add_entity(entity)
     result = planet.test_for_exit_planetary_area(area)
-    print(result)
     assert result == [{'type': 'exit', 'exiting_entity': entity, 'exiting_too': None}]
     second_entity = Entity(1, 1, 'e', (255, 0, 0))
     area.add_entity(second_entity)
     result = planet.test_for_exit_planetary_area(area)
-    print(result)
     assert result == [{'type': 'exit', 'exiting_entity': entity, 'exiting_too': None}]
 
 def test_system_level_collide(planet, action_queue):
@@ -36,7 +34,6 @@ def test_system_level_collide(planet, action_queue):
     move_action = MoveAction(moving_entity, 1, 1, 0, area)
     action_queue.push(move_action)
     result = action_queue.resolve_actions(1)
-    print(result)
     assert result == [{
         'type': 'enter',
         'entering_entity': moving_entity,

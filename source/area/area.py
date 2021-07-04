@@ -27,8 +27,6 @@ class Area:
     def delete_entity_at_coordinates(self, entity, x, y) -> Entity:
         if (x,y) in self.entity_dict:
             self.entity_dict[(x,y)].remove(entity)
-            if len(self.entity_dict[(x,y)]) == 0:
-                self.entity_dict[(x,y)] = None
             entity.curr_area = None
         return entity
     
@@ -55,6 +53,6 @@ class Area:
         corner_y = playery - screen_height//2        
         for drawx in range(playerx - screen_width//2, playerx + screen_width//2):
             for drawy in range(playery - screen_height//2, playery + screen_height//2):
-                entities_at_point = self.get_entity_at_coordinates(drawx, drawy)
+                entities_at_point = self.get_entities_at_coordinates(drawx, drawy)
                 if entities_at_point is not None and len(entities_at_point) > 0:
                     entities_at_point[-1].draw(corner_x, corner_y)

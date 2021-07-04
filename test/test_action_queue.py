@@ -99,7 +99,6 @@ def test_pop_order():
     action_queue = ActionQueue()
     rand_order = list(range(0,10))
     random.shuffle(rand_order)
-    print(rand_order)
     for i in rand_order:
         action = Action('test', i)
         action_queue.push(action)
