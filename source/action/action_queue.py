@@ -45,5 +45,6 @@ class ActionQueue:
                 pass
             except(KeyError):
                 pass
-            result_list.append(action.resolve_action())
+            for result in action.resolve_action():
+                result_list.append(result)
         return result_list

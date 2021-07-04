@@ -12,13 +12,16 @@ class MoveAction(Action):
         """
         Resolve this action by running any collision functions entities in the new sqaure have.
         """
-        entity_at_target = self.area.get_entity_at_coordinates(self.originator.x + self.dx, self.originator.y + self.dy)
-        if entity_at_target is not None:
-            try:
-                return entity_at_target.flags["on_collide"](entity_at_target, self.originator)
-            except:
-                self.area.transfer_entity_between_coordinates(self.originator.x, self.originator.y, self.originator.x + self.dx, self.originator.y + self.dy)
-                return True
+        entities_at_target = self.area.get_entities_at_coordinates(self.originator.x + self.dx, self.originator.y + self.dy)
+        if entities_at_target is not None and len(entities_at_target) > 0:
+            result_list = []
+            for target_entity in entities_at_target:
+                try:
+                    result_list.append(target_entity.flags["on_collide"](target_entity, self.originator))
+                except:
+                    self.area.transfer_entity_between_coordinates(self.originator, self.originator.x, self.originator.y, self.originator.x + self.dx, self.originator.y + self.dy)
+                    result_list.append({"type": "move"})
+            return result_list
         else:
-            self.area.transfer_entity_between_coordinates(self.originator.x, self.originator.y, self.originator.x + self.dx, self.originator.y + self.dy)
-            return True
+            self.area.transfer_entity_between_coordinates(self.originator, self.originator.x, self.originator.y, self.originator.x + self.dx, self.originator.y + self.dy)
+            return [{"type": "move"}]

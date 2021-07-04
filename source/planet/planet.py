@@ -11,27 +11,34 @@ class Planet:
         self.planet_type:str = planet_type
         self.moons = moons
         self.name = name
-        self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide'})
+        self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide': self.on_collide_system_level})
         self.system = system
         self.planetary_radius:int = planetary_radius
+        self.entity_list = []
 
-    def on_collide_system_level(target, initiator):
-        return {'type' : 'enter', 'entering_entity' : initiator, 'entering': target}
+    def generate_planetary_entity(self):
+        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level})
 
-    def on_collide(target, initiator):
+    def on_collide_system_level(self, target, initiator):
+        return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': self}
+
+    def on_collide(self, target, initiator):
         return {'type': 'stop'}
 
     def test_for_exit_planetary_area(self, area):
         exit_list = []
-        for coord, entity in area.entity_dict.items():
+        for coord, entities in area.entity_dict.items():
             if math.sqrt(coord[0]**2 + coord[1]**2) > self.planetary_radius:
-                exit_list.append({'type': 'exit', 'exiting_entity': entity, 'exiting_too': self.system})
+                for entity in entities:
+                    exit_list.append({'type': 'exit', 'exiting_entity': entity, 'exiting_too': self.system})
         return exit_list
 
-    def generate_planetary_area(self, entity_list=[]):
+    def generate_area(self, entity_list=[]):
         planetary_area = Area()
         for moon in self.moons:
             planetary_area.add_entity(moon)
+        for planetary_entity in self.entity_list:
+            planetary_area.add_entity(planetary_entity)
         for entity in entity_list:
             planetary_area.add_entity(entity)
         for theta in range(0,360):

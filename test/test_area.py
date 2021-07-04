@@ -14,7 +14,7 @@ def test_can_add_entity(entity, area):
     Test that you can add an entity to an area
     """
     area.add_entity(entity)
-    assert area.entity_dict[(entity.x, entity.y)] is entity
+    assert area.entity_dict[(entity.x, entity.y)][0] is entity
     assert entity.curr_area is area
 
 def test_can_add_entity_to_coordinates(entity, area):
@@ -27,17 +27,16 @@ def test_can_add_entity_to_coordinates(entity, area):
     assert entity.x == new_x
     assert entity.y == new_y
     assert entity.curr_area is area
-    assert area.entity_dict[(new_x, new_y)] is entity
+    assert area.entity_dict[(new_x, new_y)][0] is entity
 
-def test_can_delete_entity(area_with_entity):
+def test_can_delete_entity(area, entity):
     """
     Test that you can delete an entity from an area
-    
-    area_with_entity has an Entity at 1,1
     """
-    deleted_entity = area_with_entity.delete_entity_at_coordinates(1, 1)
+    area.add_entity(entity)
+    deleted_entity = area.delete_entity_at_coordinates(entity, entity.x, entity.y)
     assert deleted_entity.curr_area is None
-    assert (deleted_entity.x, deleted_entity.y) not in area_with_entity.entity_dict
+    assert area.entity_dict[(deleted_entity.x, deleted_entity.y)] is None
 
 def test_can_transfer_entity(entity, area):
     """
@@ -46,10 +45,10 @@ def test_can_transfer_entity(entity, area):
     new_x = 2
     new_y = 2
     area.add_entity(entity)
-    area.transfer_entity_between_coordinates(entity.x, entity.y, new_x, new_y)
+    area.transfer_entity_between_coordinates(entity, entity.x, entity.y, new_x, new_y)
     assert entity.x == new_x
     assert entity.y == new_y
-    assert area.entity_dict[(new_x, new_y)] is entity
+    assert area.entity_dict[(new_x, new_y)][0] is entity
 
 def test_can_get_entity_at_coordiantes(area_with_entity):
     """
@@ -57,8 +56,8 @@ def test_can_get_entity_at_coordiantes(area_with_entity):
     
     area_with_entity has an Entity at 1,1
     """
-    actual_entity = area_with_entity.get_entity_at_coordinates(1, 1)
-    not_an_entity = area_with_entity.get_entity_at_coordinates(2, 2)
+    actual_entity = area_with_entity.get_entities_at_coordinates(1, 1)[0]
+    not_an_entity = area_with_entity.get_entities_at_coordinates(2, 2)
     assert isinstance(actual_entity, Entity)
     assert actual_entity.curr_area == area_with_entity
-    assert not_an_entity is None
+    assert not_an_entity == []

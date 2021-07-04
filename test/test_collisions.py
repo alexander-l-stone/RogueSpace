@@ -21,5 +21,5 @@ def test_stop_collision_in_area_with_queue(area, entity):
     action_queue = ActionQueue()
     move_action = MoveAction(entity, 1, -1, 0, area)
     action_queue.push(move_action)
-    action_queue.resolve_actions(1)
+    result_list = action_queue.resolve_actions(1)
     assert entity.x == oldx and entity.y == oldy
