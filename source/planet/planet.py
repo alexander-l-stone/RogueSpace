@@ -19,7 +19,7 @@ class Planet:
         self.bgcolor = bgcolor
 
     def generate_planetary_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level})
+        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level, 'bg_color': self.bgcolor})
 
     def on_collide_system_level(self, target, initiator):
         return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': self}

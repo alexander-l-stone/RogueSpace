@@ -25,13 +25,15 @@ class Game:
         self.global_time:int = 0
         self.global_queue = ActionQueue()
         self.InputHandler:InputHandler = InputHandler()
+        
+        #Code to generate player
         player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
         self.player = Player(player_entity)
         
-        #Generic test code
-        self.current_location = System(0, 0, 'O', (255, 0, 0), 'test', 'test', 30, sector=None, bgcolor=(0, 30, 0))
+        #Code to generate initial system
+        self.current_location = System(0, 0, 'O', (255, 0, 0), 'test', 'test', 30)
         asteroid_ring = Ring(12, '*', (129, 69, 19))
-        test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10)
+        test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10, bgcolor=(0, 30, 0))
         planet_ring = Ring(3, '*', (56, 255, 255))
         test_planet.entity_list.append(planet_ring)
         self.current_location.add_planet(test_planet)

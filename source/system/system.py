@@ -4,7 +4,7 @@ from source.ring.ring import Ring
 import math
 
 class System:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, sector=None, bgcolor=(0,0,0)):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, bgcolor=(0,0,0)):
         self.x = x
         self.y = y
         self.char = char
@@ -12,7 +12,6 @@ class System:
         self.name = name
         self.system_type = system_type
         self.hyperlimit = hyperlimit
-        self.sector = sector
         self.planet_list = []
         self.entity_list = []
         self.bgcolor = bgcolor
@@ -46,4 +45,4 @@ class System:
         return {'type': 'stop'}
 
     def generate_star_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_sector_level})
+        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_sector_level, 'bg_color': self.bgcolor})
