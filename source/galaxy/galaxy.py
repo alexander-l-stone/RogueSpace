@@ -23,6 +23,7 @@ class Galaxy:
             for drawy in range(y - self.sector_size//2, y + self.sector_size//2):
                 if (drawx, drawy) in self.system_dict:
                     new_area.add_entity(self.system_dict[(drawx, drawy)].generate_star_entity())
+        return new_area
     
     def generate_new_sector(self, x, y):
         #round down to the nearest sector size

@@ -15,7 +15,7 @@ class GalaxyGenerator:
                 self.generate_cluster(item['x'], item['y'], item['radius'])
 
     def generate_sector(self, x, y):
-        
+        pass
 
     def generate_cluster(self, x, y, radius):
         cluster_area = int(math.pi*radius**2)
