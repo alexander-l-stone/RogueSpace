@@ -4,6 +4,7 @@ import pytest
 from source.action.action import Action
 from source.entity.entity import Entity
 from source.area.area import Area
+from source.galaxy.galaxy import Galaxy
 from source.planet.planet import Planet
 from source.system.system import System
 from source.action.action_queue import ActionQueue
@@ -50,3 +51,7 @@ def system_with_planet():
 @pytest.fixture
 def action_queue():
     return ActionQueue()
+
+@pytest.fixture
+def galaxy():
+    return Galaxy()

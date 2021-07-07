@@ -13,8 +13,6 @@ class Entity:
             self.flags:dict = flags
     
     def draw(self, topx, topy, bgcolor, override_color=None,) -> None:
-        if('bg_color' in self.flags):
-            print(f"bg color: {self.flags['bg_color']}")
         if ('bg_color' not in self.flags):
             tcod.console_set_default_background(0, bgcolor)
         else:

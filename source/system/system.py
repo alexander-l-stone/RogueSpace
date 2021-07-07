@@ -28,7 +28,7 @@ class System:
         for theta in range(0,360):
             x = int(float(self.hyperlimit)*math.cos(theta))
             y = int(float(self.hyperlimit)*math.sin(theta))
-            radius_marker = Entity(x, y, '*', (100, 0,0))
+            radius_marker = Entity(x, y, 'x', (100, 0,0))
             if (x, y) not in system_area.entity_dict:
                 system_area.add_entity(radius_marker)
         system_area.add_entity(Entity(0, 0, self.char, self.color, {'on_collide': self.on_collide}))

@@ -31,9 +31,9 @@ class Game:
         self.player = Player(player_entity)
         
         #Code to generate initial system
-        self.current_location = System(0, 0, 'O', (255, 0, 0), 'test', 'test', 30)
+        self.current_location = System(0, 0, 'O', (130, 0, 0), 'test', 'test', 30)
         asteroid_ring = Ring(12, '*', (129, 69, 19))
-        test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10, bgcolor=(0, 30, 0))
+        test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10)
         planet_ring = Ring(3, '*', (56, 255, 255))
         test_planet.entity_list.append(planet_ring)
         self.current_location.add_planet(test_planet)
