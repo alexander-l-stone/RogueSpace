@@ -8,7 +8,7 @@ def test_can_instantiate_galaxy():
 
 def test_galaxy_exploration(galaxy):
     galaxy.explored_dict = {(0,0): True, (1,0): True, (-1,0): True}
-    assert galaxy.check_if_coordinate_is_explored(1, 499) == True
+    assert galaxy.check_if_coordinate_is_explored(1, galaxy.sector_size - 1) == True
     assert galaxy.check_if_coordinate_is_explored(1, -1) == False
 
 def test_galaxy_create_area(galaxy):
