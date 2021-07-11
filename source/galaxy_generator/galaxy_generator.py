@@ -1,6 +1,6 @@
 import math
 from source.system.system import System
-from random import seed, randint
+from random import seed, randint, random
 
 class GalaxyGenerator:
     def __init__(self):
@@ -36,8 +36,8 @@ class GalaxyGenerator:
         if (y < 0):
             rounded_y = rounded_y - 1
         rounded_y = rounded_y * galaxy.sector_size
-        num_clusters = randint(0, galaxy.sector_size//5)
-        num_additional_systems = randint(0, galaxy.sector_size//25)
+        num_clusters = randint(0, galaxy.sector_size//25)
+        num_additional_systems = randint(0, galaxy.sector_size//100)
         for cluster in range(0, num_clusters):
             cluster_radius = randint(3, 20)
             cluster_x = randint(rounded_x + cluster_radius + 1, rounded_x + galaxy.sector_size - cluster_radius - 1)
@@ -50,10 +50,12 @@ class GalaxyGenerator:
 
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
-        num_system_to_generate = randint(1, cluster_area//4)
+        num_system_to_generate = randint(1, cluster_area//10)
         for i in range(0, num_system_to_generate):
-            randx = randint(x - radius, x + radius)
-            randy = randint(y - radius, y + radius)
+            randtheta = randint(0,360)*math.pi/180
+            randradius = randint(0, radius)
+            randx = int(randradius*math.cos(randtheta))
+            randy = int(randradius*math.sin(randtheta))
             galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
 
     def generate_solar_system(self, x, y):

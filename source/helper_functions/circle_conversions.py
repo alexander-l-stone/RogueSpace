@@ -17,6 +17,7 @@ def convert_delta_to_theta(dx, dy):
             raise ValueError
 
 def convert_theta_to_delta(theta):
+    theta = theta % (2*math.pi)
     if ((theta <= 0 + halfangle and theta > 0 - halfangle ) or (theta <= 2*math.pi + halfangle and theta > 2*math.pi - halfangle)):
         return (1,0)
     elif (theta <= math.pi/4 + halfangle and theta > math.pi/4 - halfangle ):

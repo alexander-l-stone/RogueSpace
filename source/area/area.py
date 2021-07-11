@@ -4,9 +4,10 @@ from typing import List, Dict
 from source.entity.entity import Entity
 
 class Area:
-    def __init__(self, bg=(0,0,0)):
+    def __init__(self, bg=(0,0,0), **kwargs):
         self.entity_dict: Dict = {}
         self.background_color = bg
+        self.kwargs = kwargs
 
     def add_entity(self, new_entity) -> None:
         if (new_entity.x, new_entity.y) in self.entity_dict:
