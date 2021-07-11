@@ -1,9 +1,10 @@
 from source.entity.entity import Entity
 from source.area.area import Area
+from source.ring.ring import Ring
 import math
 
 class Planet:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, planet_type:str, system, planetary_radius:int, moons = []):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, planet_type:str, system, planetary_radius:int, moons = [], bgcolor=(0,0,0)):
         self.char:str = char
         self.x = x
         self.y = y
@@ -15,9 +16,10 @@ class Planet:
         self.system = system
         self.planetary_radius:int = planetary_radius
         self.entity_list = []
+        self.bgcolor = bgcolor
 
     def generate_planetary_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level})
+        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_system_level, 'bg_color': self.bgcolor})
 
     def on_collide_system_level(self, target, initiator):
         return {'type' : 'enter', 'entering_entity' : initiator, 'target_entity': self}
@@ -34,17 +36,20 @@ class Planet:
         return exit_list
 
     def generate_area(self, entity_list=[]):
-        planetary_area = Area()
+        planetary_area = Area(self.bgcolor)
         for moon in self.moons:
             planetary_area.add_entity(moon)
         for planetary_entity in self.entity_list:
-            planetary_area.add_entity(planetary_entity)
+            if (isinstance(planetary_entity, Ring)):
+                planetary_entity.generate_entities(planetary_area)
+            else:
+                planetary_area.add_entity(planetary_entity)
         for entity in entity_list:
             planetary_area.add_entity(entity)
         for theta in range(0,360):
             x = int(self.planetary_radius*math.cos(theta))
             y = int(self.planetary_radius*math.sin(theta))
-            radius_marker = Entity(x, y, '*', (255, 255, 255))
+            radius_marker = Entity(x, y, 'x', (255, 255, 255))
             if (x, y) not in planetary_area.entity_dict:
                 planetary_area.add_entity(radius_marker)
         planetary_area.add_entity(Entity(0, 0, self.char, self.color, {'on_collide': self.on_collide}))
