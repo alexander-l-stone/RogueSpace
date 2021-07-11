@@ -11,6 +11,7 @@ class Galaxy:
     def check_if_coordinate_is_explored(self, x, y) -> bool:
         rounded_x = int(x/self.sector_size)
         rounded_y = int(y/self.sector_size)
+        print(f"Coordinates: {x}, {y}. These round too: {rounded_x}, {rounded_y}")
         if (x < 0):
             rounded_x = rounded_x - 1
         if (y < 0):
@@ -38,13 +39,4 @@ class Galaxy:
         return new_area
     
     def generate_new_sector(self, x, y):
-        #round down to the nearest sector size
-        rounded_x = int(x/self.sector_size)
-        #reduce negatives by 1
-        if (x < 0):
-            rounded_x = rounded_x - 1
-        rounded_y = int(y/self.sector_size)
-        if (y < 0):
-            rounded_y = rounded_y - 1
-        self.explored_dict[(rounded_x, rounded_y)] = True
-        self.galaxy_generator.generate_sector(self, rounded_x, rounded_y)
+        self.explored_dict[self.galaxy_generator.generate_sector(self, x, y)] = True

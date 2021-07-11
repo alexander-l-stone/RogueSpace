@@ -35,7 +35,7 @@ class Game:
         
         #Code to generate initial system
         self.galaxy = Galaxy()
-        self.current_location = System(0, 0, 'O', (130, 0, 0), 'test', 'test', 30)
+        self.current_location = System(50, 50, 'O', (130, 0, 0), 'test', 'test', 30)
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
         asteroid_ring = Ring(12, '*', (129, 69, 19))
         test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10)
@@ -77,7 +77,6 @@ class Game:
                 ):
                     self.current_area = self.current_location.generate_local_area(self.player.current_entity.x, self.player.current_entity.y)
                     self.current_area.add_entity(self.player.current_entity)
-                print(f"galaxy bg color: {self.current_area.background_color}")
         if(isinstance(self.current_location, Planet)):
             for result in self.current_location.test_for_exit_planetary_area(self.current_area):
                 if result["type"] == 'exit':

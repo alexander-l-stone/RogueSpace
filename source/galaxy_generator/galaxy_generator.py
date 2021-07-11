@@ -31,23 +31,24 @@ class GalaxyGenerator:
         rounded_x = int(x/galaxy.sector_size)
         if (x < 0):
             rounded_x = rounded_x - 1
-        rounded_x = rounded_x * galaxy.sector_size
+        adjusted_x = rounded_x * galaxy.sector_size
         rounded_y = int(y/galaxy.sector_size)
         if (y < 0):
             rounded_y = rounded_y - 1
-        rounded_y = rounded_y * galaxy.sector_size
-        num_clusters = randint(0, galaxy.sector_size)
+        adjusted_y = rounded_y * galaxy.sector_size
+        num_clusters = randint(0, galaxy.sector_size//50)
         num_additional_systems = randint(0, galaxy.sector_size)
         for cluster in range(0, num_clusters):
-            cluster_radius = randint(3, 7)
-            cluster_x = randint(rounded_x + cluster_radius + 1, rounded_x + galaxy.sector_size - cluster_radius - 1)
-            cluster_y = randint(rounded_y + cluster_radius + 1, rounded_y + galaxy.sector_size - cluster_radius - 1)
+            cluster_radius = randint(3, galaxy.sector_size//14)
+            cluster_x = randint(adjusted_x + cluster_radius + 1, adjusted_x + galaxy.sector_size - cluster_radius - 1)
+            cluster_y = randint(adjusted_y + cluster_radius + 1, adjusted_y + galaxy.sector_size - cluster_radius - 1)
             self.generate_cluster(galaxy, cluster_x, cluster_y, cluster_radius)
         for system in range(0, num_additional_systems):
-            system_x = randint(rounded_x, rounded_x + galaxy.sector_size)
-            system_y = randint(rounded_y, rounded_y + galaxy.sector_size)
+            system_x = randint(adjusted_x, adjusted_x + galaxy.sector_size)
+            system_y = randint(adjusted_y, adjusted_y + galaxy.sector_size)
             if ((system_x, system_y not in galaxy.system_dict)):
                 galaxy.system_dict[(system_x, system_y)] = self.generate_solar_system(system_x, system_y)
+        return (rounded_x, rounded_y)
 
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
@@ -61,4 +62,17 @@ class GalaxyGenerator:
                 galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
 
     def generate_solar_system(self, x, y):
+        # dieroll = randint(0, 100)
+        # if dieroll < 60:
+        #     #normal(white, yellow, orange, red)
+        #     d4 = dieroll(1, 4)
+        #     if d4 == 1:
+        #         #white
+                
+        # elif dieroll < 70:
+        #     #dwarf
+        # elif dieroll < 90:
+        #     #supergiant
+        # else:
+        #     #anomaly(for now brown dwarf)
         return System(x, y, 'O', (0, 0, 255), f"Placeholder: {x}, {y}", "placeholder", 10)
