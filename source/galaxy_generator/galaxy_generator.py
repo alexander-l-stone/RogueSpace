@@ -36,27 +36,29 @@ class GalaxyGenerator:
         if (y < 0):
             rounded_y = rounded_y - 1
         rounded_y = rounded_y * galaxy.sector_size
-        num_clusters = randint(0, galaxy.sector_size//25)
-        num_additional_systems = randint(0, galaxy.sector_size//100)
+        num_clusters = randint(0, galaxy.sector_size)
+        num_additional_systems = randint(0, galaxy.sector_size)
         for cluster in range(0, num_clusters):
-            cluster_radius = randint(3, 20)
+            cluster_radius = randint(3, 7)
             cluster_x = randint(rounded_x + cluster_radius + 1, rounded_x + galaxy.sector_size - cluster_radius - 1)
             cluster_y = randint(rounded_y + cluster_radius + 1, rounded_y + galaxy.sector_size - cluster_radius - 1)
             self.generate_cluster(galaxy, cluster_x, cluster_y, cluster_radius)
         for system in range(0, num_additional_systems):
             system_x = randint(rounded_x, rounded_x + galaxy.sector_size)
             system_y = randint(rounded_y, rounded_y + galaxy.sector_size)
-            galaxy.system_dict[(system_x, system_y)] = self.generate_solar_system(system_x, system_y)
+            if ((system_x, system_y not in galaxy.system_dict)):
+                galaxy.system_dict[(system_x, system_y)] = self.generate_solar_system(system_x, system_y)
 
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
-        num_system_to_generate = randint(1, cluster_area//10)
+        num_system_to_generate = randint(1, max(2,cluster_area//10))
         for i in range(0, num_system_to_generate):
             randtheta = randint(0,360)*math.pi/180
             randradius = randint(0, radius)
-            randx = int(randradius*math.cos(randtheta))
-            randy = int(randradius*math.sin(randtheta))
-            galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
+            randx = int(randradius*math.cos(randtheta)) + x
+            randy = int(randradius*math.sin(randtheta)) + y
+            if ((randx, randy not in galaxy.system_dict)):
+                galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
 
     def generate_solar_system(self, x, y):
         return System(x, y, 'O', (0, 0, 255), f"Placeholder: {x}, {y}", "placeholder", 10)

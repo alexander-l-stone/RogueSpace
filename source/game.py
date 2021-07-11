@@ -66,7 +66,6 @@ class Game:
                 for key, value in self.current_location.check_explored_corners(self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT).items():
                     if (value == False):
                         self.current_location.generate_new_sector(key[0], key[1])
-                print(self.current_area.kwargs)
                 if (
                 self.player.current_entity.x <= self.current_area.kwargs['center_x'] - self.SCREEN_WIDTH//2
                 or
@@ -78,6 +77,11 @@ class Game:
                 ):
                     self.current_area = self.current_location.generate_local_area(self.player.current_entity.x, self.player.current_entity.y)
                     self.current_area.add_entity(self.player.current_entity)
+                print(f"galaxy bg color: {self.current_area.background_color}")
+        if(isinstance(self.current_location, Planet)):
+            for result in self.current_location.test_for_exit_planetary_area(self.current_area):
+                if result["type"] == 'exit':
+                    self.resolve_exit(result)
 
     def resolve_enter(self, result):
     #TODO: figure out what to do for non-player entities
@@ -97,7 +101,7 @@ class Game:
         if ('is_player' in result['exiting_entity'].flags and result['exiting_entity'].flags['is_player'] is True):
             theta = convert_delta_to_theta(result['exiting_entity'].x, result['exiting_entity'].y)
             delta = convert_theta_to_delta(theta)
-            result['exiting_entity'].x, result['exiting_entity'].y = self.current_location.x, self.current_location.y
+            result['exiting_entity'].x, result['exiting_entity'].y = self.current_location.x + delta[0], self.current_location.y + delta[1]
             if(isinstance(self.current_location, Planet)):
                 self.current_location = self.current_location.system
             self.current_location.entity_list.append(result['exiting_entity'])
@@ -109,9 +113,7 @@ class Game:
             return False
         else:
             if ((self.player.current_entity.x**2) + (self.player.current_entity.y**2)) > self.current_location.hyperlimit:
-                print(f"theta: {convert_delta_to_theta(result['x'], result['y'])*180/math.pi}")
                 delta = convert_theta_to_delta(convert_delta_to_theta(result['x'], result['y']))
-                print(f"result: {result}, delta: {delta}")
                 new_x = self.current_location.x + delta[0]
                 new_y = self.current_location.y + delta[1]
                 self.current_location = self.galaxy
@@ -131,10 +133,6 @@ class Game:
             self.global_queue.push(MoveAction(self.player.current_entity, self.global_time+1, result["value"][0], result["value"][1], self.current_area))
         elif(result["type"] == "jump"):
             self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area))
-        if(isinstance(self.current_location, Planet)):
-            for result in self.current_location.test_for_exit_planetary_area(self.current_area):
-                if result["type"] == 'exit':
-                    self.resolve_exit(result)
     
     def game_loop(self) -> None:
         with tcod.console_init_root(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F', vsync=False) as root_console:
