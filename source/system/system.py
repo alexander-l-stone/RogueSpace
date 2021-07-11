@@ -15,6 +15,7 @@ class System:
         self.planet_list = []
         self.entity_list = []
         self.bgcolor = bgcolor
+        self.explored = False
     
     def generate_area(self, entity_list=[]):
         system_area = Area(self.bgcolor)

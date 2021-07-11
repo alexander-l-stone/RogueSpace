@@ -1,4 +1,6 @@
 import math
+from source.planet.planet import Planet
+from source.ring.ring import Ring
 from source.system.system import System
 from random import seed, randint, random
 
@@ -127,3 +129,10 @@ class GalaxyGenerator:
             star_type = "dwarf-brown"
             hyperlimit = randint(15, 25)
         return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit)
+    
+    def generate_planets(self, system):
+        
+        system.add_planet(Planet(3, 3, 'o', (0, 255, 0), 'test', 'placeholder', system, 5))
+    
+    def titus_bode(self, a, b, n):
+        return int(a + ((b - a) * 2 * (n-2)))
