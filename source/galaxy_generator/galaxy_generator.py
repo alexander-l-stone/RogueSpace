@@ -52,7 +52,7 @@ class GalaxyGenerator:
 
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
-        num_system_to_generate = randint(1, max(2,cluster_area//10))
+        num_system_to_generate = randint(1, max(2,cluster_area//20))
         for i in range(0, num_system_to_generate):
             randtheta = randint(0,360)*math.pi/180
             randradius = randint(0, radius)
@@ -62,17 +62,68 @@ class GalaxyGenerator:
                 galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
 
     def generate_solar_system(self, x, y):
-        # dieroll = randint(0, 100)
-        # if dieroll < 60:
-        #     #normal(white, yellow, orange, red)
-        #     d4 = dieroll(1, 4)
-        #     if d4 == 1:
-        #         #white
-                
-        # elif dieroll < 70:
-        #     #dwarf
-        # elif dieroll < 90:
-        #     #supergiant
-        # else:
-        #     #anomaly(for now brown dwarf)
-        return System(x, y, 'O', (0, 0, 255), f"Placeholder: {x}, {y}", "placeholder", 10)
+        dieroll = randint(0, 100)
+        if dieroll < 60:
+            #normal(white, yellow, orange, red)
+            d4 = randint(1, 4)
+            if d4 == 1:
+                #white
+                character = 'O'
+                color = (randint(200, 255), randint(200, 255), randint(150, 200))
+                star_type = "normal-white"
+                hyperlimit = randint(90, 120)
+            elif d4 == 2:
+                #yellow
+                character = 'O'
+                color = (randint(200, 255), randint(200, 255), 0)
+                star_type = "normal-yellow"
+                hyperlimit = randint(90, 120)
+            elif d4 == 3:
+                #orange
+                character = 'O'
+                color = (randint(200, 255), randint(120, 165), 0)
+                star_type = "normal-orange"
+                hyperlimit = randint(90, 120)
+            elif d4 == 4:
+                #red
+                character = 'O'
+                color = (randint(130, 190), 0, 0)
+                star_type = "normal-red"
+                hyperlimit = randint(90, 120)
+        elif dieroll < 80:
+            #dwarf
+            d6 = randint(1, 6)
+            if d6 == 6:
+                #white
+                character = 'o'
+                color = (randint(200, 255), randint(200, 255), randint(150, 200))
+                star_type = "dwarf-white"
+                hyperlimit = randint(60, 90)
+            else:
+                #red
+                character = 'o'
+                color = (randint(130, 190), 0, 0)
+                star_type = "dwarf-red"
+                hyperlimit = randint(60, 90)
+        elif dieroll < 99:
+            #supergiant
+            d2 = randint(1, 2)
+            if d2 == 1:
+                #red
+                character = 'O'
+                color = (randint(200, 255), 0, 0)
+                star_type = "giant-red"
+                hyperlimit = randint(180, 250)
+            else:
+                #blue
+                character = 'O'
+                color = (0, 0, randint(200, 255))
+                star_type = "giant-blue"
+                hyperlimit = randint(180, 250)
+        else:
+            #anomaly(for now brown dwarf)
+            character = 'o'
+            color = (randint(120,145), randint(60, 70), randint(12, 18))
+            star_type = "dwarf-brown"
+            hyperlimit = randint(15, 25)
+        return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit)

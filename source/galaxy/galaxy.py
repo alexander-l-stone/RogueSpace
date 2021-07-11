@@ -11,7 +11,6 @@ class Galaxy:
     def check_if_coordinate_is_explored(self, x, y) -> bool:
         rounded_x = int(x/self.sector_size)
         rounded_y = int(y/self.sector_size)
-        print(f"Coordinates: {x}, {y}. These round too: {rounded_x}, {rounded_y}")
         if (x < 0):
             rounded_x = rounded_x - 1
         if (y < 0):

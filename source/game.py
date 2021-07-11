@@ -35,14 +35,8 @@ class Game:
         
         #Code to generate initial system
         self.galaxy = Galaxy()
-        self.current_location = System(50, 50, 'O', (130, 0, 0), 'test', 'test', 30)
+        self.current_location = self.galaxy.galaxy_generator.generate_solar_system(50, 50)
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
-        asteroid_ring = Ring(12, '*', (129, 69, 19))
-        test_planet = Planet(4, 4, 'o', (0, 100, 200), 'test', 'test', self.current_location, 10)
-        planet_ring = Ring(3, '*', (56, 255, 255))
-        test_planet.entity_list.append(planet_ring)
-        self.current_location.add_planet(test_planet)
-        self.current_location.add_planet(asteroid_ring)
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(player_entity)
@@ -111,7 +105,7 @@ class Game:
         if(not isinstance(self.current_location, System) ==True):
             return False
         else:
-            if ((self.player.current_entity.x**2) + (self.player.current_entity.y**2)) > self.current_location.hyperlimit:
+            if (((self.player.current_entity.x**2) + (self.player.current_entity.y**2))**(1/2)) > self.current_location.hyperlimit:
                 delta = convert_theta_to_delta(convert_delta_to_theta(result['x'], result['y']))
                 new_x = self.current_location.x + delta[0]
                 new_y = self.current_location.y + delta[1]
