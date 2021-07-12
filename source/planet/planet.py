@@ -1,16 +1,20 @@
 from source.entity.entity import Entity
 from source.area.area import Area
+from source.planet.moon import Moon
 from source.ring.ring import Ring
 import math
 
 class Planet:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, planet_type:str, system, planetary_radius:int, moons = [], bgcolor=(0,0,0)):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, planet_type:str, system, planetary_radius:int, moons = None, bgcolor=(0,0,0)):
         self.char:str = char
         self.x = x
         self.y = y
         self.color:tuple = color
         self.planet_type:str = planet_type
-        self.moons = moons
+        if moons is None:
+            self.moons = []
+        else:
+            self.moons = moons
         self.name = name
         self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide': self.on_collide_system_level})
         self.system = system
@@ -38,7 +42,7 @@ class Planet:
     def generate_area(self, entity_list=[]):
         planetary_area = Area(self.bgcolor)
         for moon in self.moons:
-            planetary_area.add_entity(moon)
+            planetary_area.add_entity(moon.generate_entity())
         for planetary_entity in self.entity_list:
             if (isinstance(planetary_entity, Ring)):
                 planetary_entity.generate_entities(planetary_area)

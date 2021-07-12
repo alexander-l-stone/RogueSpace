@@ -88,10 +88,10 @@ class Game:
             if (isinstance(self.current_location, Planet)):
                 result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.planetary_radius*math.cos(theta)), int(self.current_location.planetary_radius*math.sin(theta))
             elif (isinstance(self.current_location, System)):
-                result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.hyperlimit*math.cos(theta)), int(self.current_location.hyperlimit*math.sin(theta))
                 if(self.current_location.explored == False):
                     self.galaxy.galaxy_generator.generate_planets(self.current_location)
                     self.current_location.explored = True
+                result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.hyperlimit*math.cos(theta)), int(self.current_location.hyperlimit*math.sin(theta))
             self.generate_current_area()
             self.current_area.add_entity(self.player.current_entity)
 
