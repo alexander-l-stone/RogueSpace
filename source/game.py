@@ -36,6 +36,8 @@ class Game:
         #Code to generate initial system
         self.galaxy = Galaxy()
         self.current_location = self.galaxy.galaxy_generator.generate_solar_system(50, 50)
+        self.galaxy.galaxy_generator.generate_planets(self.current_location)
+        self.current_location.explored = True
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
         self.current_area:Area = None
         self.generate_current_area()
@@ -86,6 +88,9 @@ class Game:
             if (isinstance(self.current_location, Planet)):
                 result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.planetary_radius*math.cos(theta)), int(self.current_location.planetary_radius*math.sin(theta))
             elif (isinstance(self.current_location, System)):
+                if(self.current_location.explored == False):
+                    self.galaxy.galaxy_generator.generate_planets(self.current_location)
+                    self.current_location.explored = True
                 result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.hyperlimit*math.cos(theta)), int(self.current_location.hyperlimit*math.sin(theta))
             self.generate_current_area()
             self.current_area.add_entity(self.player.current_entity)
