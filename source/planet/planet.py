@@ -53,7 +53,7 @@ class Planet:
         for theta in range(0,360):
             x = int(self.planetary_radius*math.cos(theta))
             y = int(self.planetary_radius*math.sin(theta))
-            radius_marker = Entity(x, y, 'x', (255, 255, 255))
+            radius_marker = Entity(x, y, 'x', (0, 255, 0))
             if (x, y) not in planetary_area.entity_dict:
                 planetary_area.add_entity(radius_marker)
         planetary_area.add_entity(Entity(0, 0, self.char, self.color, {'on_collide': self.on_collide}))

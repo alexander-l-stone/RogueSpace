@@ -17,6 +17,7 @@ from source.ring.ring import Ring
 from source.helper_functions.colliders import stop_collision
 from source.helper_functions.circle_conversions import *
 from source.system.system import System
+from source.ui.ui_panel import UIPanel
 
 class Game:
     def __init__(self, config:Dict={}):
@@ -28,6 +29,7 @@ class Game:
         self.global_time:int = 0
         self.global_queue = ActionQueue()
         self.InputHandler:InputHandler = InputHandler()
+        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH)
         
         #Code to generate player
         player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
@@ -49,6 +51,16 @@ class Game:
     #TODO: Figure out why entities exiting planets(and presumably systems) don't appear until they move
     def render(self) -> None:
         self.current_area.draw(self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        self.bot_ui.draw()
+        self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"{self.player.current_entity.x}, {-self.player.current_entity.y}")//2, 1, f"{self.player.current_entity.x}, {-self.player.current_entity.y}")
+        if not isinstance(self.current_location, Galaxy):
+            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(self.current_location.name)//2, 2, self.current_location.name, )
+        if isinstance(self.current_location, Planet):
+            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Planetary Radius: {self.current_location.planetary_radius}")//2, 3, f"Planetary Radius: {self.current_location.planetary_radius}", (0, 255, 0))
+            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Moons: {len(self.current_location.moons)}")//2, 4, f"Moons: {len(self.current_location.moons)}")
+        elif isinstance(self.current_location, System):
+            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Hyperlimit: {self.current_location.hyperlimit}")//2, 3, f"Hyperlimit: {self.current_location.hyperlimit}", (255, 0, 0))
+            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Planets: {len(self.current_location.planet_list)}")//2, 4, f"Planets: {len(self.current_location.planet_list)}")
         tcod.console_flush()
 
     def resolve_actions(self):
