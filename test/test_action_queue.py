@@ -9,12 +9,12 @@ def test_can_instantiate_action():
     """
     assert Action
     action = Action('test', 1)
-    assert isinstance(action, Action)
+    assert type(action) is Action
 
 def test_can_instantiate_move_action(area):
     assert MoveAction
     move_action = MoveAction('test', 1, 1, 1, area)
-    assert isinstance(move_action, MoveAction)
+    assert type(move_action) is MoveAction
 
 def test_can_instantiate_action_queue():
     """
@@ -22,7 +22,7 @@ def test_can_instantiate_action_queue():
     """
     assert ActionQueue
     action_queue = ActionQueue()
-    assert isinstance(action_queue, ActionQueue)
+    assert type(action_queue) is ActionQueue
 
 def test_can_pop_empty_queue_for_no_effect():
     """

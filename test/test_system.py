@@ -10,7 +10,7 @@ def test_can_instantiate_system():
     """
     assert System
     system = System(1, 1, 'o', (255, 0, 0), 'test', 'test', None, 5)
-    assert isinstance(system, System)
+    assert type(system) is System
 
 def test_can_generate_system_area(system):
     assert isinstance(system.generate_area(), Area)
