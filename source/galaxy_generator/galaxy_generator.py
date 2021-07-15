@@ -40,7 +40,7 @@ class GalaxyGenerator:
         if (y < 0):
             rounded_y = rounded_y - 1
         adjusted_y = rounded_y * galaxy.sector_size
-        num_clusters = randint(0, galaxy.sector_size//50)
+        num_clusters = randint(0, galaxy.sector_size//25)
         num_additional_systems = randint(0, galaxy.sector_size)
         for cluster in range(0, num_clusters):
             cluster_radius = randint(3, galaxy.sector_size//14)
@@ -56,7 +56,7 @@ class GalaxyGenerator:
 
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
-        num_system_to_generate = randint(1, max(2,cluster_area//20))
+        num_system_to_generate = randint(1, max(2,cluster_area//120))
         for i in range(0, num_system_to_generate):
             randtheta = randint(0,360)*math.pi/180
             randradius = randint(0, radius)

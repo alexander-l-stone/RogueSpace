@@ -10,10 +10,11 @@ from source.entity.entity import Entity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.action.jump_action import JumpAction
+from source.menu.menu import Menu
+from source.menu.menu_item import MenuItem
 from source.action.move_action import MoveAction
 from source.planet.planet import Planet
 from source.player.player import Player
-from source.ring.ring import Ring
 from source.helper_functions.colliders import stop_collision
 from source.helper_functions.circle_conversions import *
 from source.system.system import System
@@ -30,7 +31,21 @@ class Game:
         self.global_queue = ActionQueue()
         self.InputHandler:InputHandler = InputHandler()
         self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH)
-        
+        self.game_state = 'main_menu'
+
+        #generate main menu
+        self.main_menu = Menu()
+        new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
+        load_game = MenuItem('Load Game', disabled=True, select=lambda: {'type': 'game', 'value': 'load'})
+        exit = MenuItem('Exit', select=lambda: {'type': 'exit'})
+        self.main_menu.menu_items.extend([new_game, load_game, exit])
+
+        #generate game menu
+        self.game_menu = Menu()
+        save_game = MenuItem('Save Game')
+        self.game_menu.menu_items.extend([save_game, load_game, exit])
+
+    def start_new_game(self):
         #Code to generate player
         player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
         self.player = Player(player_entity)
@@ -144,20 +159,45 @@ class Game:
         elif(result["type"] == "jump"):
             self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area))
     
-    def game_loop(self) -> None:
+    def resolve_menu_kb_input(self, result):
+        if result['type'] == 'exit':
+            raise SystemExit()
+        elif result['type'] == 'game':
+            if result['value'] == 'new':
+                self.start_new_game()
+            self.game_state = 'game'
+
+    def menu_loop(self, root_console, menu):
+            for event in tcod.event.wait():
+                if event.type == "KEYDOWN":
+                    result = menu.handle_key_presses(event)
+                    self.resolve_menu_kb_input(result)
+                if event.type == "QUIT":
+                    raise SystemExit()
+            root_console.clear()
+            menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
+
+
+    def console_loop(self) -> None:
         with tcod.console_init_root(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F', vsync=False) as root_console:
+            while not tcod.console_is_window_closed():
+                root_console.clear()
+                if (self.game_state == 'game'):
+                    self.game_loop(root_console)
+                elif (self.game_state == 'main_menu'):
+                    self.menu_loop(root_console, self.main_menu)
+
+    def game_loop(self, root_console) -> None:
+            self.render()
+            if self.global_queue.player_actions_count > 0:
+                self.resolve_actions()
+                self.global_time += 1
+            else:
+                for event in tcod.event.wait():
+                    if event.type == "KEYDOWN":
+                        result = self.InputHandler.handle_keypress(event)
+                        self.resolve_keyboard_input(result)
+                    if event.type == "QUIT":
+                        raise SystemExit()
             root_console.clear()
             self.render()
-            while not tcod.console_is_window_closed():
-                if self.global_queue.player_actions_count > 0:
-                    self.resolve_actions()
-                    self.global_time += 1
-                else:
-                    for event in tcod.event.wait():
-                        if event.type == "KEYDOWN":
-                            result = self.InputHandler.handle_keypress(event)
-                            self.resolve_keyboard_input(result)
-                        if event.type == "QUIT":
-                            raise SystemExit()
-                root_console.clear()
-                self.render()
