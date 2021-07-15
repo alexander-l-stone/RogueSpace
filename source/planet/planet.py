@@ -16,7 +16,6 @@ class Planet:
         else:
             self.moons = moons
         self.name = name
-        self.planet_entity = Entity(self.x, self.y, self.char, self.color, {'on_collide': self.on_collide_system_level})
         self.system = system
         self.planetary_radius:int = planetary_radius
         self.entity_list = []
@@ -53,7 +52,7 @@ class Planet:
         for theta in range(0,360):
             x = int(self.planetary_radius*math.cos(theta))
             y = int(self.planetary_radius*math.sin(theta))
-            radius_marker = Entity(x, y, 'x', (0, 255, 0))
+            radius_marker = Entity(x, y, '.', (0, 255, 0))
             if (x, y) not in planetary_area.entity_dict:
                 planetary_area.add_entity(radius_marker)
         planetary_area.add_entity(Entity(0, 0, self.char, self.color, {'on_collide': self.on_collide}))
