@@ -1,5 +1,9 @@
 from source.helper_functions.circle_conversions import *
 
+def test_can_instantiate_circle_conversion():
+    assert convert_delta_to_theta
+    assert convert_theta_to_delta
+
 def test_can_convert_delta_to_theta():
     assert convert_delta_to_theta(1,0) == 0 or 2*math.pi
     assert convert_delta_to_theta(1,1) == math.pi/4

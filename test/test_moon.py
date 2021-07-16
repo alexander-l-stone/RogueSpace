@@ -3,7 +3,7 @@ from source.planet.moon import Moon
 def test_can_instantiate_moon():
     assert Moon
     new_moon = Moon(0, 0, 'o', (255, 255, 255), 'test', 'test', None)
-    assert isinstance(new_moon, Moon)
+    assert type(new_moon) is Moon
 
 def test_can_create_moon_entity():
     new_moon = Moon(0, 0, 'o', (255, 255, 255), 'test', 'test', None)

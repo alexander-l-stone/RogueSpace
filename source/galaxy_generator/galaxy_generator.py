@@ -40,7 +40,7 @@ class GalaxyGenerator:
         if (y < 0):
             rounded_y = rounded_y - 1
         adjusted_y = rounded_y * galaxy.sector_size
-        num_clusters = randint(0, galaxy.sector_size//50)
+        num_clusters = randint(0, galaxy.sector_size//25)
         num_additional_systems = randint(0, galaxy.sector_size)
         for cluster in range(0, num_clusters):
             cluster_radius = randint(3, galaxy.sector_size//14)
@@ -56,7 +56,7 @@ class GalaxyGenerator:
 
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
-        num_system_to_generate = randint(1, max(2,cluster_area//20))
+        num_system_to_generate = randint(1, max(2,cluster_area//120))
         for i in range(0, num_system_to_generate):
             randtheta = randint(0,360)*math.pi/180
             randradius = randint(0, radius)
@@ -75,25 +75,25 @@ class GalaxyGenerator:
                 character = 'O'
                 color = (randint(200, 255), randint(200, 255), randint(150, 200))
                 star_type = "normal-white"
-                hyperlimit = randint(30, 60)
+                hyperlimit = randint(10, 20)
             elif d4 == 2:
                 #yellow
                 character = 'O'
                 color = (randint(200, 255), randint(200, 255), 0)
                 star_type = "normal-yellow"
-                hyperlimit = randint(30, 60)
+                hyperlimit = randint(10, 20)
             elif d4 == 3:
                 #orange
                 character = 'O'
                 color = (randint(200, 255), randint(120, 165), 0)
                 star_type = "normal-orange"
-                hyperlimit = randint(30, 60)
+                hyperlimit = randint(10, 20)
             elif d4 == 4:
                 #red
                 character = 'O'
                 color = (randint(130, 190), 0, 0)
                 star_type = "normal-red"
-                hyperlimit = randint(30, 60)
+                hyperlimit = randint(10, 20)
         elif dieroll < 80:
             #dwarf
             d6 = randint(1, 6)
@@ -102,13 +102,13 @@ class GalaxyGenerator:
                 character = chr(7)
                 color = (randint(200, 255), randint(200, 255), randint(150, 200))
                 star_type = "dwarf-white"
-                hyperlimit = randint(20, 45)
+                hyperlimit = randint(5, 15)
             else:
                 #red
                 character = chr(7)
                 color = (randint(130, 190), 0, 0)
                 star_type = "dwarf-red"
-                hyperlimit = randint(20, 45)
+                hyperlimit = randint(5, 15)
         elif dieroll < 99:
             #supergiant
             d2 = randint(1, 2)
@@ -117,19 +117,19 @@ class GalaxyGenerator:
                 character = 'O'
                 color = (randint(200, 255), 0, 0)
                 star_type = "giant-red"
-                hyperlimit = randint(180, 250)
+                hyperlimit = randint(50, 70)
             else:
                 #blue
                 character = 'O'
                 color = (0, 0, randint(200, 255))
                 star_type = "giant-blue"
-                hyperlimit = randint(180, 250)
+                hyperlimit = randint(5, 70)
         else:
             #anomaly(for now brown dwarf)
             character = chr(7)
             color = (randint(120,145), randint(60, 70), randint(12, 18))
             star_type = "dwarf-brown"
-            hyperlimit = randint(5, 12)
+            hyperlimit = randint(3, 8)
         return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit)
     
     def generate_planets(self, system):
@@ -185,6 +185,11 @@ class GalaxyGenerator:
                 self.generate_frozen_zone_planet(system, planet_radius)
             else:
                 self.generate_oort_cloud_planet(system, planet_radius)
+        if len(system.planet_list) > 0:
+            try:
+                system.hyperlimit += int((system.planet_list[-1].x**2 + system.planet_list[-1].y**2)**(1/2))
+            except AttributeError:
+                system.hyperlimit += system.planet_list[-1].radius
         return True
     
     #TODO: add big asteroids as planets inside the belt
@@ -193,7 +198,7 @@ class GalaxyGenerator:
         xy = self.get_random_point_on_circle(orbital_radius)
         if d100 <= 40:
             #mercury type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(120,180),randint(120,180),randint(120,180)), f"Mercurial {orbital_radius}", "mercurial", system, randint(3,5))
+            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(120,180),randint(120,180),randint(120,180)), f"Mercurial {orbital_radius}", "mercurial", system, randint(5,8))
         elif d100 <= 60:
             #venus type
             new_planet = Planet(xy['x'], xy['y'], 'o', (randint(125, 175),randint(190,220),randint(40,60)), f"Venusian {orbital_radius}", "venusian", system, randint(5,10))
@@ -207,7 +212,6 @@ class GalaxyGenerator:
         else:
             new_planet = Ring(orbital_radius, '*', (randint(210, 230), randint(170, 190), randint(130, 140)))
         system.add_planet(new_planet)
-        system.hyperlimit += orbital_radius//4
 
     def generate_hot_zone_moons(self, planet:Planet, radius:int):
         xy = self.get_random_point_on_circle(radius)
@@ -270,7 +274,6 @@ class GalaxyGenerator:
         else:
             new_planet = Ring(orbital_radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90)))
         system.add_planet(new_planet)
-        system.hyperlimit += orbital_radius//4
 
     def generate_bio_zone_moons(self, planet:Planet, radius:int):
         xy = self.get_random_point_on_circle(radius)
@@ -288,7 +291,7 @@ class GalaxyGenerator:
         d100 = randint(1, 100)
         xy = self.get_random_point_on_circle(orbital_radius)
         if d100 <= 80:
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(170,190),randint(35,45),randint(45,55)), f"Martian {orbital_radius}", "martian", system, randint(4,8))
+            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(170,190),randint(35,45),randint(45,55)), f"Martian {orbital_radius}", "martian", system, randint(5,8))
             num_moons = randint(-2, 3)
             prev_radius = 0
             if num_moons > 0:
@@ -299,7 +302,6 @@ class GalaxyGenerator:
         else:
             new_planet = Ring(orbital_radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90)))
         system.add_planet(new_planet)
-        system.hyperlimit += orbital_radius//4
 
     def generate_cold_zone_moons(self, planet:Planet, radius:int):
         #TODO: Add more cold zone moon types
@@ -323,7 +325,6 @@ class GalaxyGenerator:
                     new_moon_radius = randint(prev_radius+1, prev_radius+4)
                     prev_radius = new_moon_radius
                     self.generate_cold_zone_moons(new_planet, new_moon_radius)
-            system.hyperlimit += orbital_radius//4
         elif d100 <= 80:
             new_planet = Planet(xy['x'], xy['y'], 'O', (randint(100, 255),randint(50, 150),randint(0, 100)), f"Gas {orbital_radius}", "gas", system, randint(10,15))
             num_moons = randint(0, 15)
@@ -333,7 +334,6 @@ class GalaxyGenerator:
                     new_moon_radius = randint(prev_radius+1, prev_radius+4)
                     prev_radius = new_moon_radius
                     self.generate_gas_zone_moons(new_planet, new_moon_radius)
-            system.hyperlimit += orbital_radius
         else:
             new_planet = Ring(orbital_radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90)))
         system.add_planet(new_planet)
@@ -368,7 +368,6 @@ class GalaxyGenerator:
                     new_moon_radius = randint(prev_radius+1, prev_radius+4)
                     prev_radius = new_moon_radius
                     self.generate_frozen_zone_moons(new_planet, new_moon_radius)
-            system.hyperlimit += orbital_radius//4
         elif d100 <= 80:
             new_planet = Planet(xy['x'], xy['y'], 'O', (0,randint(50, 255),randint(150, 255)), f"Liquid {orbital_radius}", "liquid", system, randint(10,15))
             num_moons = randint(0, 8)
@@ -378,7 +377,6 @@ class GalaxyGenerator:
                     new_moon_radius = randint(prev_radius+1, prev_radius+4)
                     prev_radius = new_moon_radius
                     self.generate_frozen_zone_moons(new_planet, new_moon_radius)
-            system.hyperlimit += orbital_radius//2
         else:
             new_planet = Ring(orbital_radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255)))
         system.add_planet(new_planet)

@@ -10,7 +10,7 @@ def test_can_instantiate_planet():
     """
     assert Planet
     planet = Planet(1, 1, 'o', (255, 0, 0), 'test', 'test', None, 5)
-    assert isinstance(planet, Planet)
+    assert type(planet) is Planet
 
 def test_can_generate_planetary_area(planet):
     assert isinstance(planet.generate_area(), Area)

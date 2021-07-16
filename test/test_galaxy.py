@@ -4,7 +4,7 @@ from source.system.system import System
 def test_can_instantiate_galaxy():
     assert Galaxy
     new_galaxy = Galaxy()
-    assert isinstance(new_galaxy, Galaxy)
+    assert type(new_galaxy) is Galaxy
 
 def test_galaxy_exploration(galaxy):
     galaxy.explored_dict = {(0,0): True, (1,0): True, (-1,0): True}

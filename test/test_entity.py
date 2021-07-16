@@ -6,4 +6,4 @@ def test_can_instantiate_entity():
     """
     assert Entity
     new_entity = Entity(1, 1, '@', (255, 255, 255))
-    assert isinstance(new_entity, Entity)
+    assert type(new_entity) is Entity

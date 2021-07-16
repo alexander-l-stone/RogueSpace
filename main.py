@@ -10,4 +10,4 @@ if __name__ == "__main__":
     
     game = Game(config)
     
-    game.game_loop()
+    game.console_loop()
