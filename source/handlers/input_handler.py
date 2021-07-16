@@ -26,5 +26,7 @@ class InputHandler:
             return {"type": "move", "value": (1, 1)}
         elif(event.sym == tcod.event.K_j):
             return {"type": "jump"}
+        elif(event.sym == tcod.event.K_ESCAPE):
+            return {"type": "menu", "value": "open"}
         else:
             return {"type": "none"}
