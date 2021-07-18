@@ -33,6 +33,14 @@ class ActionQueue:
             return heapq.heappop(self.heap)
     
     def resolve_actions(self, time):
+        """Resolve all the actions in the queue that are at time equal to time or earlier.
+
+        Args:
+            time (int): An integer for the time you should advance the queue too.
+
+        Returns:
+            list: This will be a list of resolved actions. Should be a list of dictionaries.
+        """
         action_list = []
         while len(self.heap) > 0 and self.heap[0].time <= time:
             action_list.append(self.pop())

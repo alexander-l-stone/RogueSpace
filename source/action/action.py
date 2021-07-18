@@ -45,4 +45,4 @@ class Action:
         """
         Resolve this action
         """
-        return [True]
+        return [{'type': 'null'}]

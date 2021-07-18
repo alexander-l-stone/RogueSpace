@@ -10,7 +10,7 @@ class MoveAction(Action):
     
     def resolve_action(self):
         """
-        Resolve this action by running any collision functions entities in the new sqaure have.
+        Resolve this action by running any collision functions entities in the new sqaure have. Otherwise just send move.
         """
         entities_at_target = self.area.get_entities_at_coordinates(self.originator.x + self.dx, self.originator.y + self.dy)
         if entities_at_target is not None and len(entities_at_target) > 0:
