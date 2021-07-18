@@ -2,11 +2,12 @@ from source.action.action import Action
 from source.area.area import Area
 
 class MoveAction(Action):
-    def __init__(self, originator, time_remaining:int, dx:int, dy:int, area:Area, **kwargs):
-        Action.__init__(self, originator, time_remaining)
+    def __init__(self, originator, time_remaining:int, dx:int, dy:int, area:Area, resolution_function=lambda: None, **flags):
+        Action.__init__(self, originator, time_remaining, resolution_function)
         self.area = area
         self.dx = dx
         self.dy = dy
+        self.flags = flags
     
     def resolve_action(self):
         """

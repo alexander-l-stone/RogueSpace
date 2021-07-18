@@ -17,7 +17,7 @@ class ActionQueue:
         """
 
         try:
-            if(action.originator.flags['is_player'] == True):
+            if(action.flags['is_player'] == True):
                 self.player_actions_count += 1
         except(AttributeError):
             pass

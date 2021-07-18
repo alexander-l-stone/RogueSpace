@@ -4,10 +4,11 @@ class Action:
     """
     Class for holding an action, extend this to make new actions
     """
-    def __init__(self, originator, time_remaining:int, **kwargs):
+    def __init__(self, originator, time_remaining:int, resolution_function: lambda: None, **flags):
         self.originator = originator
         self.time:int = time_remaining
-        self.kwargs:dict = kwargs
+        self.resolution_function = resolution_function
+        self.flags:dict = flags
     
     def __add__(self, o:int):
         # Raise a type error if there is not an int being added here
@@ -40,9 +41,3 @@ class Action:
         if isinstance(obj, Action):
             return self.time < obj.time
         raise TypeError(f"incomparable types Action < {type(obj)}")
-
-    def resolve_action(self):
-        """
-        Resolve this action
-        """
-        return [{'type': 'null'}]
