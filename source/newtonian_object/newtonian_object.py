@@ -10,7 +10,7 @@ class NewtonianObject:
             char (str): Character to display on the screen.
             color (tuple): Color of the character
             area (Area): Area the object is in
-            vector (dict): Vector the object is on. Will be of the form {dx: int, dy: int}
+            vector (dict): Vector the object is on. Will be of the form {x: int, y: int}
         """
         self.x = x
         self.y = y
@@ -29,14 +29,14 @@ class NewtonianObject:
             self.area.delete_entity_at_coordinates(entity, entity.x, entity.y)
         #Figure out wich of x or y is greater and store the value of the lesser divided by the greater. This is guaranteed to not be more than 1
         if self.vector['x'] > self.vector['y']:
-            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': self.vector_entities['y']/self.vector_entities['x']}
+            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': self.vector['y']/self.vector['x']}
         else:
-            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': self.vector_entities['x']/self.vector_entities['y']}
-        coordinate_dict = {'dx': 0, 'dy': 0}
-        for i in range(0, self.vector_entities[normalized_dict['greater']]):
+            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': self.vector['x']/self.vector['y']}
+        coordinate_dict = {'x': 0, 'y': 0}
+        for i in range(0, self.vector[normalized_dict['greater']]):
             coordinate_dict[normalized_dict['greater']] += 1
             coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great']
-            vector_entity = Entity(self.x + round(coordinate_dict['dx']), self.y + round(coordinate_dict['dy']), '.', self.color)
+            vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '.', self.color)
             self.area.add_entity(vector_entity)
             self.vector_entities.append(vector_entity)
     
@@ -55,5 +55,5 @@ class NewtonianObject:
             dx (int): The x part of the vector to add
             dy (int): The y part of the vector to add
         """
-        self.vector['dx'] += dx
-        self.vector['dy'] += dy
+        self.vector['x'] += dx
+        self.vector['y'] += dy

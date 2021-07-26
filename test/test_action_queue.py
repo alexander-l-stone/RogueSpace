@@ -8,7 +8,7 @@ def test_can_instantiate_action():
     Tests that Action imports properly and its constructor works.
     """
     assert Action
-    action = Action('test', 1)
+    action = Action('test', 1, lambda: [])
     assert type(action) is Action
 
 def test_can_instantiate_move_action(area):
@@ -74,7 +74,7 @@ def test_multiple_actions_resolve_at_once(action):
     """
     action_queue = ActionQueue()
     action_queue.push(action)
-    second_action = Action('action_queue', 1)
+    second_action = Action('action_queue', 1, lambda:[])
     action_queue.push(second_action)
     action_queue.resolve_actions(1)
     assert action not in action_queue.heap 
@@ -84,7 +84,7 @@ def test_actions_of_different_times_handled_properly(action, long_action):
     """
     This tests to see if this can handle actions of different times
     """
-    second_action = Action('action_queue', 1)
+    second_action = Action('action_queue', 1, lambda:[])
     action_queue = ActionQueue()
     action_queue.push(second_action)
     action_queue.push(long_action)
@@ -100,7 +100,7 @@ def test_pop_order():
     rand_order = list(range(0,10))
     random.shuffle(rand_order)
     for i in rand_order:
-        action = Action('test', i)
+        action = Action('test', i, lambda:[])
         action_queue.push(action)
     for i in range(0,10):
         action = action_queue.pop()
@@ -114,7 +114,7 @@ def test_multiple_resolve():
     rand_order = list(range(0,10))
     random.shuffle(rand_order)
     for i in rand_order:
-        action = Action(f'test {i}', i)
+        action = Action(f'test {i}', i, lambda:[])
         action_queue.push(action)
     assert len(action_queue.heap) == 10
     for time,length in ((2,7),(4,5),(8,1),(10,0)):

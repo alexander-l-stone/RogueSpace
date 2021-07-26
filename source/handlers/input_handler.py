@@ -24,6 +24,8 @@ class InputHandler:
             return {"type": "move", "value": (-1, 1)}
         elif(event.sym == tcod.event.K_KP_3):
             return {"type": "move", "value": (1, 1)}
+        elif(event.sym == tcod.event.K_KP_5):
+            return {"type": "wait"}
         elif(event.sym == tcod.event.K_j):
             return {"type": "jump"}
         elif(event.sym == tcod.event.K_ESCAPE):

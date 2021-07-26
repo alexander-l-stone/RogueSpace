@@ -4,7 +4,7 @@ class Action:
     """
     Class for holding an action, extend this to make new actions
     """
-    def __init__(self, originator, time_remaining:int, resolution_function: lambda: None, **flags):
+    def __init__(self, originator, time_remaining:int, resolution_function: lambda: [], **flags):
         self.originator = originator
         self.time:int = time_remaining
         self.resolution_function = resolution_function
@@ -41,3 +41,6 @@ class Action:
         if isinstance(obj, Action):
             return self.time < obj.time
         raise TypeError(f"incomparable types Action < {type(obj)}")
+    
+    def resolve_action(self):
+        return self.resolution_function()

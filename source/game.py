@@ -184,10 +184,13 @@ class Game:
                 return False
 
     def resolve_keyboard_input(self, result):
+        print(f"result: {result}")
         if(result["type"] == "move"):
             self.global_queue.push(MoveAction(self.player.current_entity, self.global_time+1, result["value"][0], result["value"][1], self.current_area, is_player=True))
         elif(result["type"] == "jump"):
             self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area, is_player=True))
+        elif(result["type"] == "wait"):
+            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, lambda: [], is_player=True))
         elif(result["type"] == "menu"):
             self.game_state = "game_menu"
 

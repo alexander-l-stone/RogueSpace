@@ -24,3 +24,6 @@ def resolve_move_action(originator, area, flags):
     else:
         area.transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
         return [{"type": "move"}]
+
+def resolve_thrust_action(originator, area, flags):
+    return [{"type": "thrust", "value": {"dx": flags['dx'], "dy": flags['dy']}}]

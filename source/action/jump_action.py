@@ -2,8 +2,8 @@ from source.action.action import Action
 
 #TODO: Remove this
 class JumpAction(Action):
-    def __init__(self, originator, time_remaining:int, x, y, area, resolution_function: lambda: True, **flags):
-        Action.__init__(self, originator, time_remaining, resolution_function)
+    def __init__(self, originator, time_remaining:int, x, y, area, **flags):
+        Action.__init__(self, originator, time_remaining, self.resolve_action)
         self.x = x
         self.y = y
         self.area = area
