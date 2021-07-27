@@ -8,6 +8,12 @@ class Area:
         self.entity_dict: Dict = {}
         self.background_color = bg
         self.kwargs = kwargs
+    
+    def __str__(self):
+        return f"[Area]"
+    
+    def __repr__(self) -> str:
+        return f"[Area]"
 
     def add_entity(self, new_entity) -> None:
         """Adds an entity to the area at the entities x, y coordinates. Make sure they are set correctly.

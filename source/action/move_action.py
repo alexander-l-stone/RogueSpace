@@ -3,12 +3,18 @@ from source.area.area import Area
 
 class MoveAction(Action):
     def __init__(self, originator, time_remaining:int, dx:int, dy:int, area:Area, resolution_function=lambda: None, **flags):
-        Action.__init__(self, originator, time_remaining, resolution_function)
+        Action.__init__(self, originator, time_remaining, self.resolve_action)
         self.area = area
         self.dx = dx
         self.dy = dy
         self.flags = flags
     
+    def __str__(self):
+        return f"[Originator: {self.originator} | Area: {self.area} | dx: {self.dx} | dy {self.dy} | Time {self.time}]"
+    
+    def __repr__(self) -> str:
+        return f"[Originator: {self.originator} | Area: {self.area} | dx: {self.dx} | dy {self.dy} | Time {self.time}]"
+
     def resolve_action(self):
         """
         Resolve this action by running any collision functions entities in the new sqaure have. Otherwise just send move.

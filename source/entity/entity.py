@@ -13,6 +13,12 @@ class Entity:
         else:
             self.flags:dict = flags
     
+    def __str__(self):
+        return f"[Char: {self.char} | {self.x}, {self.y}]"
+    
+    def __repr__(self) -> str:
+        return f"[Char: {self.char} | {self.x}, {self.y}]"
+    
     def draw(self, topx, topy, bgcolor, override_color=None,) -> None:
         """Draw this entity onto the screen.
 

@@ -1,6 +1,7 @@
 from source.entity.entity import Entity
+from source.action.move_action import MoveAction
 
-class NewtonianObject:
+class NewtonianEntity(Entity):
     def __init__(self, x:int, y:int, char:str, color:tuple, area, vector:dict, **flags):
         """Constructor for the NewtonianObject
 
@@ -12,13 +13,9 @@ class NewtonianObject:
             area (Area): Area the object is in
             vector (dict): Vector the object is on. Will be of the form {x: int, y: int}
         """
-        self.x = x
-        self.y = y
-        self.char = char
-        self.color = color
-        self.area = area
+        Entity.__init__(self, x, y, char, color, flags)
+        self.curr_area = area
         self.vector = vector
-        self.flags = flags
         self.vector_entities = [] #A list of entities that compose this objects vector path
 
     def generate_vector_path(self) -> None:
@@ -26,7 +23,7 @@ class NewtonianObject:
         """
         #Delete the previous Entities
         for entity in self.vector_entities:
-            self.area.delete_entity_at_coordinates(entity, entity.x, entity.y)
+            self.curr_area.delete_entity_at_coordinates(entity, entity.x, entity.y)
         #Figure out wich of x or y is greater and store the value of the lesser divided by the greater. This is guaranteed to not be more than 1
         if self.vector['x'] > self.vector['y']:
             normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': self.vector['y']/self.vector['x']}
@@ -37,16 +34,30 @@ class NewtonianObject:
             coordinate_dict[normalized_dict['greater']] += 1
             coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great']
             vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '.', self.color)
-            self.area.add_entity(vector_entity)
+            self.curr_area.add_entity(vector_entity)
             self.vector_entities.append(vector_entity)
     
-    def generate_object_entity(self) -> Entity:
-        """Generate the Entity that represents this object
-
-        Returns:
-            Entity: The entity that represents this object
+    def generate_move_actions(self, time) -> list:
         """
-        return Entity(self.x, self.y, self.char, self.color)
+            Generates a list of MoveActions based upon this objects vector.
+
+            time [int] - The time these move actions should be generated at.
+
+            This should never be called until all the previous move actions from it have been resolved
+        """
+        if self.vector['x'] > self.vector['y']:
+            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': self.vector['y']/self.vector['x']}
+        else:
+            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': self.vector['x']/self.vector['y']}
+        coordinate_dict = {'x': 0, 'y': 0}
+        move_actions = []
+        for i in range(0, self.vector[normalized_dict['greater']]):
+            coordinate_dict[normalized_dict['greater']] = 1
+            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great']
+            move_actions.append(MoveAction(self, time, round(coordinate_dict['x']), round(coordinate_dict['y']), self.curr_area))
+            if round(coordinate_dict[normalized_dict['lesser']]) == 1:
+                coordinate_dict[normalized_dict['lesser']] = 0
+        return move_actions
 
     def thrust(self, dx:int, dy:int) -> None:
         """Add values to this object vector.
@@ -57,3 +68,4 @@ class NewtonianObject:
         """
         self.vector['x'] += dx
         self.vector['y'] += dy
+        self.generate_vector_path()

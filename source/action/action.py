@@ -10,6 +10,13 @@ class Action:
         self.resolution_function = resolution_function
         self.flags:dict = flags
     
+    def __str__(self):
+        return f"[Originator: {self.originator} | Time {self.time}]"
+    
+    def __repr__(self) -> str:
+        return f"[Originator: {self.originator} | Time {self.time}]"
+
+    
     def __add__(self, o:int):
         # Raise a type error if there is not an int being added here
         if not isinstance(o, int):

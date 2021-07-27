@@ -8,6 +8,7 @@ from source.action.action_queue import ActionQueue
 from source.area.area import Area
 from source.helper_functions.circle_conversions import *
 from source.entity.entity import Entity
+from source.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.action.jump_action import JumpAction
@@ -49,7 +50,9 @@ class Game:
 
     def start_new_game(self):
         #Code to generate player
-        player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
+        # None,{'x': 1, 'y': 1}
+        player_entity = NewtonianEntity(1, 1, '@', (255,255,255), None, {'x': 1, 'y': 1}, is_player=True)
+        # player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
         self.player = Player(player_entity)
         
         #Code to generate initial system
@@ -61,6 +64,7 @@ class Game:
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(player_entity)
+        # self.player.current_entity.generate_vector_path()
 
     def save_game(self):
         save_dict = {
@@ -184,7 +188,6 @@ class Game:
                 return False
 
     def resolve_keyboard_input(self, result):
-        print(f"result: {result}")
         if(result["type"] == "move"):
             self.global_queue.push(MoveAction(self.player.current_entity, self.global_time+1, result["value"][0], result["value"][1], self.current_area, is_player=True))
         elif(result["type"] == "jump"):
@@ -218,7 +221,6 @@ class Game:
                     raise SystemExit()
             root_console.clear()
             menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
-
 
     def console_loop(self) -> None:
         with tcod.console_init_root(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F', vsync=False) as root_console:
