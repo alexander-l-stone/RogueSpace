@@ -49,17 +49,24 @@ class NewtonianEntity(Entity):
 
             This should never be called until all the previous move actions from it have been resolved
         """
-        if abs(self.vector['x']) > abs(self.vector['y']):
-            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': abs(self.vector['y']/self.vector['x'])}
-        else:
-            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': abs(self.vector['x']/self.vector['y'])}
-        coordinate_dict = {'x': 0, 'y': 0}
         move_actions = []
+        try:
+            if abs(self.vector['x']) > abs(self.vector['y']):
+                normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': abs(self.vector['y']/self.vector['x'])}
+            else:
+                normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': abs(self.vector['x']/self.vector['y'])}
+        except ZeroDivisionError:
+            return move_actions
+        coordinate_dict = {'x': 0, 'y': 0}
+        coordinate_dict[normalized_dict['greater']] = 1 * is_negative(self.vector[normalized_dict['greater']])
+        if 'is_player' in self.flags:
+            is_player = True
+        else:
+            is_player = False
         for i in range(0, abs(self.vector[normalized_dict['greater']])):
-            coordinate_dict[normalized_dict['greater']] += 1 * is_negative(self.vector[normalized_dict['greater']])
             coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector[normalized_dict['lesser']])
-            move_actions.append(MoveAction(self, time, round(coordinate_dict['x']), round(coordinate_dict['y']), self.curr_area))
-            if round(coordinate_dict[normalized_dict['lesser']]) == 1:
+            move_actions.append(MoveAction(self, time, round(coordinate_dict['x']), round(coordinate_dict['y']), self.curr_area, is_player=is_player))
+            if round(coordinate_dict[normalized_dict['lesser']]) >= 1:
                 coordinate_dict[normalized_dict['lesser']] = 0
         return move_actions
 
