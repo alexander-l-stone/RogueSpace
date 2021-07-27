@@ -10,10 +10,10 @@ class Area:
         self.kwargs = kwargs
     
     def __str__(self):
-        return f"[Area]"
+        return f"[Area | kwargs: {self.kwargs}]"
     
     def __repr__(self) -> str:
-        return f"[Area]"
+        return f"[Area | kwargs: {self.kwargs}]"
 
     def add_entity(self, new_entity) -> None:
         """Adds an entity to the area at the entities x, y coordinates. Make sure they are set correctly.
@@ -54,11 +54,14 @@ class Area:
 
         Returns:
             Entity: [description]
-        """
-        if (x,y) in self.entity_dict:
-            self.entity_dict[(x,y)].remove(entity)
-            entity.curr_area = None
-        return entity
+        """,
+        try:
+            if (x,y) in self.entity_dict:
+                self.entity_dict[(x,y)].remove(entity)
+                entity.curr_area = None
+            return entity
+        except ValueError:
+            return None
     
     def transfer_entity_between_coordinates(self, entity, x1, y1, x2, y2) -> None:
         """Moves the entity at x1, y1 to x2, y2

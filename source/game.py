@@ -64,7 +64,7 @@ class Game:
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(player_entity)
-        # self.player.current_entity.generate_vector_path()
+        self.player.current_entity.generate_vector_path()
 
     def save_game(self):
         save_dict = {
@@ -193,6 +193,9 @@ class Game:
         elif(result["type"] == "jump"):
             self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area, is_player=True))
         elif(result["type"] == "wait"):
+            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, lambda: [], is_player=True))
+        elif(result["type"] == "thrust"):
+            self.player.current_entity.thrust(result["value"][0], result["value"][1])
             self.global_queue.push(Action(self.player.current_entity, self.global_time+1, lambda: [], is_player=True))
         elif(result["type"] == "menu"):
             self.game_state = "game_menu"

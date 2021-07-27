@@ -1,5 +1,6 @@
 from source.entity.entity import Entity
 from source.action.move_action import MoveAction
+from source.helper_functions.is_negative import is_negative
 
 class NewtonianEntity(Entity):
     def __init__(self, x:int, y:int, char:str, color:tuple, area, vector:dict, **flags):
@@ -24,15 +25,18 @@ class NewtonianEntity(Entity):
         #Delete the previous Entities
         for entity in self.vector_entities:
             self.curr_area.delete_entity_at_coordinates(entity, entity.x, entity.y)
-        #Figure out wich of x or y is greater and store the value of the lesser divided by the greater. This is guaranteed to not be more than 1
-        if self.vector['x'] > self.vector['y']:
-            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': self.vector['y']/self.vector['x']}
-        else:
-            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': self.vector['x']/self.vector['y']}
+        try:
+            #Figure out wich of x or y is greater and store the value of the lesser divided by the greater. This is guaranteed to not be more than 1
+            if abs(self.vector['x']) > abs(self.vector['y']):
+                normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': abs(self.vector['y']/self.vector['x'])}
+            else:
+                normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': abs(self.vector['x']/self.vector['y'])}
+        except ZeroDivisionError:
+            return
         coordinate_dict = {'x': 0, 'y': 0}
-        for i in range(0, self.vector[normalized_dict['greater']]):
-            coordinate_dict[normalized_dict['greater']] += 1
-            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great']
+        for i in range(0, abs(self.vector[normalized_dict['greater']])):
+            coordinate_dict[normalized_dict['greater']] += 1 * is_negative(self.vector[normalized_dict['greater']])
+            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector[normalized_dict['lesser']])
             vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '.', self.color)
             self.curr_area.add_entity(vector_entity)
             self.vector_entities.append(vector_entity)
@@ -45,15 +49,15 @@ class NewtonianEntity(Entity):
 
             This should never be called until all the previous move actions from it have been resolved
         """
-        if self.vector['x'] > self.vector['y']:
-            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': self.vector['y']/self.vector['x']}
+        if abs(self.vector['x']) > abs(self.vector['y']):
+            normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': abs(self.vector['y']/self.vector['x'])}
         else:
-            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': self.vector['x']/self.vector['y']}
+            normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': abs(self.vector['x']/self.vector['y'])}
         coordinate_dict = {'x': 0, 'y': 0}
         move_actions = []
-        for i in range(0, self.vector[normalized_dict['greater']]):
-            coordinate_dict[normalized_dict['greater']] = 1
-            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great']
+        for i in range(0, abs(self.vector[normalized_dict['greater']])):
+            coordinate_dict[normalized_dict['greater']] += 1 * is_negative(self.vector[normalized_dict['greater']])
+            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector[normalized_dict['lesser']])
             move_actions.append(MoveAction(self, time, round(coordinate_dict['x']), round(coordinate_dict['y']), self.curr_area))
             if round(coordinate_dict[normalized_dict['lesser']]) == 1:
                 coordinate_dict[normalized_dict['lesser']] = 0
