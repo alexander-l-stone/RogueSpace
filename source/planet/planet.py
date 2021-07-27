@@ -39,7 +39,7 @@ class Planet:
         return exit_list
 
     def generate_area(self, entity_list=[]):
-        planetary_area = Area(self.bgcolor)
+        planetary_area = Area(self.bgcolor, name=self.name)
         for moon in self.moons:
             planetary_area.add_entity(moon.generate_entity())
         for planetary_entity in self.entity_list:

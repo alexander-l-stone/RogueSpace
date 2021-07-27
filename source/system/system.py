@@ -18,7 +18,7 @@ class System:
         self.explored = False
     
     def generate_area(self, entity_list=[]):
-        system_area = Area(self.bgcolor)
+        system_area = Area(self.bgcolor, name=self.name)
         for planet in self.planet_list:
             if (isinstance(planet, Ring)):
                 planet.generate_entities(system_area)

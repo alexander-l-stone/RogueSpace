@@ -13,11 +13,11 @@ from source.action.action_queue import ActionQueue
 
 @pytest.fixture
 def action():
-    return Action('me', 1)
+    return Action('me', 1, lambda:[])
 
 @pytest.fixture
 def long_action():
-    return Action('long', 2)
+    return Action('long', 2, lambda:[])
 
 @pytest.fixture
 def entity():

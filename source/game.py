@@ -8,6 +8,7 @@ from source.action.action_queue import ActionQueue
 from source.area.area import Area
 from source.helper_functions.circle_conversions import *
 from source.entity.entity import Entity
+from source.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.action.jump_action import JumpAction
@@ -49,7 +50,9 @@ class Game:
 
     def start_new_game(self):
         #Code to generate player
-        player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
+        # None,{'x': 1, 'y': 1}
+        player_entity = NewtonianEntity(1, 1, '@', (255,255,255), None, {'x': 1, 'y': 1}, is_player=True)
+        # player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
         self.player = Player(player_entity)
         
         #Code to generate initial system
@@ -61,6 +64,7 @@ class Game:
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(player_entity)
+        self.player.current_entity.generate_vector_path()
 
     def save_game(self):
         save_dict = {
@@ -185,9 +189,19 @@ class Game:
 
     def resolve_keyboard_input(self, result):
         if(result["type"] == "move"):
-            self.global_queue.push(MoveAction(self.player.current_entity, self.global_time+1, result["value"][0], result["value"][1], self.current_area))
+            self.global_queue.push(MoveAction(self.player.current_entity, self.global_time+1, result["value"][0], result["value"][1], self.current_area, is_player=True))
         elif(result["type"] == "jump"):
-            self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area))
+            self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area, is_player=True))
+        elif(result["type"] == "wait"):
+            actions = self.player.current_entity.generate_move_actions(self.global_time+1)
+            for action in actions:
+                self.global_queue.push(action)
+            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, lambda: [], is_player=True))
+        elif(result["type"] == "thrust"):
+            self.player.current_entity.thrust(result["value"][0], result["value"][1])
+            actions = self.player.current_entity.generate_move_actions(self.global_time+1)
+            for action in actions:
+                self.global_queue.push(action)
         elif(result["type"] == "menu"):
             self.game_state = "game_menu"
 
@@ -216,7 +230,6 @@ class Game:
             root_console.clear()
             menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
 
-
     def console_loop(self) -> None:
         with tcod.console_init_root(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F', vsync=False) as root_console:
             while not tcod.console_is_window_closed():
@@ -232,6 +245,8 @@ class Game:
             self.render()
             if self.global_queue.player_actions_count > 0:
                 self.resolve_actions()
+                if type(self.player.current_entity) is NewtonianEntity:
+                    self.player.current_entity.generate_vector_path()
                 self.global_time += 1
             else:
                 for event in tcod.event.wait():

@@ -1,6 +1,6 @@
 import tcod
 
-from typing import List, Dict
+from typing import Dict
 from source.entity.entity import Entity
 
 class Area:
@@ -8,8 +8,19 @@ class Area:
         self.entity_dict: Dict = {}
         self.background_color = bg
         self.kwargs = kwargs
+    
+    def __str__(self):
+        return f"[Area | kwargs: {self.kwargs}]"
+    
+    def __repr__(self) -> str:
+        return f"[Area | kwargs: {self.kwargs}]"
 
     def add_entity(self, new_entity) -> None:
+        """Adds an entity to the area at the entities x, y coordinates. Make sure they are set correctly.
+
+        Args:
+            new_entity (Entity): The entity to be added.
+        """
         if (new_entity.x, new_entity.y) in self.entity_dict:
             self.entity_dict[(new_entity.x, new_entity.y)].append(new_entity)
         else:
@@ -17,6 +28,13 @@ class Area:
         new_entity.curr_area = self
 
     def add_entity_at_coordinates(self, x, y, new_entity) -> None:
+        """Add a new entity to an area at the provided coordinates.
+
+        Args:
+            x (int): x coordinate to add the entity too
+            y (int): y coordinate to add the entity too
+            new_entity (Entity): The Entity to add to the area.
+        """
         if (x,y) in self.entity_dict:
             self.entity_dict[(x,y)].append(new_entity)
         else:
@@ -27,10 +45,23 @@ class Area:
 
     #TODO: make an actual delete at coordinates but also a generic delete entity maybe?
     def delete_entity_at_coordinates(self, entity, x, y) -> Entity:
-        if (x,y) in self.entity_dict:
-            self.entity_dict[(x,y)].remove(entity)
-            entity.curr_area = None
-        return entity
+        """[summary]
+
+        Args:
+            entity ([type]): [description]
+            x ([type]): [description]
+            y ([type]): [description]
+
+        Returns:
+            Entity: [description]
+        """,
+        try:
+            if (x,y) in self.entity_dict:
+                self.entity_dict[(x,y)].remove(entity)
+                entity.curr_area = None
+            return entity
+        except ValueError:
+            return None
     
     def transfer_entity_between_coordinates(self, entity, x1, y1, x2, y2) -> None:
         """Moves the entity at x1, y1 to x2, y2
@@ -44,13 +75,31 @@ class Area:
         transfering_entity = self.delete_entity_at_coordinates(entity, x1, y1)
         self.add_entity_at_coordinates(x2, y2, transfering_entity)
 
-    def get_entities_at_coordinates(self, x, y) -> Entity:
+    def get_entities_at_coordinates(self, x, y) -> list:
+        """Get a list of entities at the given coordinates
+
+        Args:
+            x (int): x coordinate to grab list of entities from
+            y (int): y coordinate to grab list of entities from
+
+        Returns:
+            list: The list of entities at the given coordinates.
+        """
         if (x, y) in self.entity_dict:
             return self.entity_dict[(x, y)]
         else:
             return []
     
     def draw(self, playerx, playery, screen_width, screen_height, **config) -> None:
+        """Draw everything in the visible area
+
+        Args:
+            playerx (int): The x coordinate the player is at
+            playery (int): The y coordinate the player is at
+            screen_width (int): [description]
+            screen_height (int): [description]
+            config(dict): On occasion there could be configuration flags passed through here
+        """
         corner_x = playerx - screen_width//2
         corner_y = playery - screen_height//2
         tcod.console_set_default_background(0, self.background_color)
