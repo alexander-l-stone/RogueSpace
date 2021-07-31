@@ -1,8 +1,9 @@
-from _pytest.monkeypatch import resolve
+
 from source.planet.planet import Planet
 from source.entity.entity import Entity
 from source.area.area import Area
-from source.action.move_action import MoveAction
+from source.action.action import Action
+from source.action.resolution_functions import resolve_move_action
 
 def test_can_instantiate_planet():
     """
@@ -31,7 +32,7 @@ def test_system_level_collide(planet, action_queue):
     area.add_entity(planet.generate_planetary_entity())
     moving_entity = Entity(3, 5, 'e', (255,0,0))
     area.add_entity(moving_entity)
-    move_action = MoveAction(moving_entity, 1, 1, 0, area)
+    move_action = Action(moving_entity, 1, resolve_move_action, dx=1, dy=0, area=area)
     action_queue.push(move_action)
     result = action_queue.resolve_actions(1)
     assert result == [{

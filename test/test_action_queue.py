@@ -1,6 +1,6 @@
 from source.action.action_queue import ActionQueue
 from source.action.action import Action
-from source.action.move_action import MoveAction
+from source.action.resolution_functions import *
 import random
 
 def test_can_instantiate_action():
@@ -8,13 +8,9 @@ def test_can_instantiate_action():
     Tests that Action imports properly and its constructor works.
     """
     assert Action
-    action = Action('test', 1, lambda: [])
+    action = Action('test', 1, resolve_no_action)
     assert type(action) is Action
 
-def test_can_instantiate_move_action(area):
-    assert MoveAction
-    move_action = MoveAction('test', 1, 1, 1, area)
-    assert type(move_action) is MoveAction
 
 def test_can_instantiate_action_queue():
     """
@@ -74,17 +70,17 @@ def test_multiple_actions_resolve_at_once(action):
     """
     action_queue = ActionQueue()
     action_queue.push(action)
-    second_action = Action('action_queue', 1, lambda:[])
+    second_action = Action('action_queue', 1, resolve_no_action)
     action_queue.push(second_action)
     action_queue.resolve_actions(1)
     assert action not in action_queue.heap 
     assert second_action not in action_queue.heap
 
-def test_actions_of_different_times_handled_properly(action, long_action):
+def test_actions_of_different_times_handled_properly(long_action):
     """
     This tests to see if this can handle actions of different times
     """
-    second_action = Action('action_queue', 1, lambda:[])
+    second_action = Action('action_queue', 1, resolve_no_action)
     action_queue = ActionQueue()
     action_queue.push(second_action)
     action_queue.push(long_action)
@@ -100,7 +96,7 @@ def test_pop_order():
     rand_order = list(range(0,10))
     random.shuffle(rand_order)
     for i in rand_order:
-        action = Action('test', i, lambda:[])
+        action = Action('test', i, resolve_no_action)
         action_queue.push(action)
     for i in range(0,10):
         action = action_queue.pop()
@@ -114,7 +110,7 @@ def test_multiple_resolve():
     rand_order = list(range(0,10))
     random.shuffle(rand_order)
     for i in rand_order:
-        action = Action(f'test {i}', i, lambda:[])
+        action = Action(f'test {i}', i, resolve_no_action)
         action_queue.push(action)
     assert len(action_queue.heap) == 10
     for time,length in ((2,7),(4,5),(8,1),(10,0)):
@@ -131,7 +127,7 @@ def test_can_resolve_move_action(area, entity):
     oldy = entity.y
     area.add_entity(entity)
     action_queue = ActionQueue()
-    action_queue.push(MoveAction(entity, 1, dx, dy, area))
+    action_queue.push(Action(entity, 1, resolve_move_action, dx=dx, dy=dy, area=area))
     results = action_queue.resolve_actions(1)
     assert results[0] == {'type': 'move'}
     assert (entity.x == oldx + dx) and (entity.y == oldy + dy)

@@ -8,16 +8,17 @@ from source.galaxy.galaxy import Galaxy
 from source.planet.planet import Planet
 from source.system.system import System
 from source.action.action_queue import ActionQueue
+from source.action.resolution_functions import resolve_no_action
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
 
 @pytest.fixture
 def action():
-    return Action('me', 1, lambda:[])
+    return Action('me', 1, resolve_no_action)
 
 @pytest.fixture
 def long_action():
-    return Action('long', 2, lambda:[])
+    return Action('long', 2, resolve_no_action)
 
 @pytest.fixture
 def entity():
