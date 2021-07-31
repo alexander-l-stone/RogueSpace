@@ -1,5 +1,4 @@
-#TODO: Replace the non-generic actions with resolution functions 
-
+#TODO: move the area, x, and y of the resolve jump action into a value dict
 def resolve_jump_action(originator, flags):
         return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
 
