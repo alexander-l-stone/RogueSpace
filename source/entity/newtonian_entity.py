@@ -1,5 +1,6 @@
 from source.entity.entity import Entity
-from source.action.move_action import MoveAction
+from source.action.action import Action
+from source.action.resolution_functions import resolve_move_action
 from source.helper_functions.is_negative import is_negative
 
 class NewtonianEntity(Entity):
@@ -43,7 +44,7 @@ class NewtonianEntity(Entity):
     
     def generate_move_actions(self, time) -> list:
         """
-            Generates a list of MoveActions based upon this objects vector.
+            Generates a list of movement Actions based upon this objects vector.
 
             time [int] - The time these move actions should be generated at.
 
@@ -65,7 +66,7 @@ class NewtonianEntity(Entity):
             is_player = False
         for i in range(0, abs(self.vector[normalized_dict['greater']])):
             coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector[normalized_dict['lesser']])
-            move_actions.append(MoveAction(self, time, round(coordinate_dict['x']), round(coordinate_dict['y']), self.curr_area, is_player=is_player))
+            move_actions.append(Action(self, time, resolve_move_action, dx=round(coordinate_dict['x']), dy=round(coordinate_dict['y']), area=self.curr_area, is_player=is_player))
             if round(coordinate_dict[normalized_dict['lesser']]) >= 1:
                 coordinate_dict[normalized_dict['lesser']] = 0
         return move_actions

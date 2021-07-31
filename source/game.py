@@ -4,20 +4,16 @@ import tcod.event
 from typing import Dict
 
 from source.action.action import Action
+from source.action.resolution_functions import *
 from source.action.action_queue import ActionQueue
 from source.area.area import Area
-from source.helper_functions.circle_conversions import *
-from source.entity.entity import Entity
 from source.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
-from source.action.jump_action import JumpAction
 from source.menu.menu import Menu
 from source.menu.menu_item import MenuItem
-from source.action.move_action import MoveAction
 from source.planet.planet import Planet
 from source.player.player import Player
-from source.helper_functions.colliders import stop_collision
 from source.helper_functions.circle_conversions import *
 from source.system.system import System
 from source.ui.ui_panel import UIPanel
@@ -189,14 +185,14 @@ class Game:
 
     def resolve_keyboard_input(self, result):
         if(result["type"] == "move"):
-            self.global_queue.push(MoveAction(self.player.current_entity, self.global_time+1, result["value"][0], result["value"][1], self.current_area, is_player=True))
+            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.current_area, is_player=True))
         elif(result["type"] == "jump"):
-            self.global_queue.push(JumpAction(self.player.current_entity, self.global_time+1, self.player.current_entity.x, self.player.current_entity.y, self.current_area, is_player=True))
+            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, resolve_jump_action, y=self.player.current_entity.x, x=self.player.current_entity.y, area=self.current_area, is_player=True))
         elif(result["type"] == "wait"):
             actions = self.player.current_entity.generate_move_actions(self.global_time+1)
             for action in actions:
                 self.global_queue.push(action)
-            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, lambda: [], is_player=True))
+            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, resolve_wait_action, is_player=True))
         elif(result["type"] == "thrust"):
             self.player.current_entity.thrust(result["value"][0], result["value"][1])
             actions = self.player.current_entity.generate_move_actions(self.global_time+1)

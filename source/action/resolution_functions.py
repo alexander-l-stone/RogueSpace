@@ -1,13 +1,18 @@
-#TODO: Replace the non-generic actions with resolution functions 
+#TODO: move the area, x, and y of the resolve jump action into a value dict
+def resolve_jump_action(originator, flags):
+        return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
 
-def resolve_jump_action(originator, area, flags):
-        return [{'type': 'jump', 'area': area, 'x': originator.x, 'y': originator.y}]
+def resolve_no_action(originator, flags):
+    return [{"type": 'none'}]
 
-def resolve_move_action(originator, area, flags):
+def resolve_wait_action(originator, flags):
+    return [{"type": 'wait'}]
+
+def resolve_move_action(originator, flags):
     """
     Resolve this action by running any collision functions entities in the new sqaure have. Otherwise just send move.
     """
-    entities_at_target = area.get_entities_at_coordinates(originator.x + flags['dx'], originator.y + flags['dy'])
+    entities_at_target = flags['area'].get_entities_at_coordinates(originator.x + flags['dx'], originator.y + flags['dy'])
     if entities_at_target is not None and len(entities_at_target) > 0:
         result_list = []
         collision = False
@@ -18,12 +23,12 @@ def resolve_move_action(originator, area, flags):
             except:
                 pass
         if not collision:
-            area.transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
+            flags['area'].transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
             result_list.append({"type": "move"})
         return result_list
     else:
-        area.transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
+        flags['area'].transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
         return [{"type": "move"}]
 
-def resolve_thrust_action(originator, area, flags):
+def resolve_thrust_action(originator, flags):
     return [{"type": "thrust", "value": {"dx": flags['dx'], "dy": flags['dy']}}]

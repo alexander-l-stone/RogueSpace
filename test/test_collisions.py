@@ -1,7 +1,7 @@
-from source.area.area import Area
 from source.entity.entity import Entity
+from source.action.action import Action
 from source.action.action_queue import ActionQueue
-from source.action.move_action import MoveAction
+from source.action.resolution_functions import resolve_move_action
 from source.helper_functions.colliders import stop_collision
 
 def test_stop_collision_exists():
@@ -19,7 +19,7 @@ def test_stop_collision_in_area_with_queue(area, entity):
     area.add_entity(entity)
     area.add_entity(collidable_entity)
     action_queue = ActionQueue()
-    move_action = MoveAction(entity, 1, -1, 0, area)
+    move_action = Action(entity, 1, resolve_move_action, dx=-1, dy=0, area=area)
     action_queue.push(move_action)
     result_list = action_queue.resolve_actions(1)
     assert entity.x == oldx and entity.y == oldy
