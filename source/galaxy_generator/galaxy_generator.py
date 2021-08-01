@@ -72,25 +72,25 @@ class GalaxyGenerator:
             d4 = randint(1, 4)
             if d4 == 1:
                 #white
-                character = 'O'
+                character = chr(0x263C)
                 color = (randint(200, 255), randint(200, 255), randint(150, 200))
                 star_type = "normal-white"
                 hyperlimit = randint(10, 20)
             elif d4 == 2:
                 #yellow
-                character = 'O'
+                character = chr(0x263C)
                 color = (randint(200, 255), randint(200, 255), 0)
                 star_type = "normal-yellow"
                 hyperlimit = randint(10, 20)
             elif d4 == 3:
                 #orange
-                character = 'O'
+                character = chr(0x263C)
                 color = (randint(200, 255), randint(120, 165), 0)
                 star_type = "normal-orange"
                 hyperlimit = randint(10, 20)
             elif d4 == 4:
                 #red
-                character = 'O'
+                character = chr(0x263C)
                 color = (randint(130, 190), 0, 0)
                 star_type = "normal-red"
                 hyperlimit = randint(10, 20)
@@ -99,13 +99,13 @@ class GalaxyGenerator:
             d6 = randint(1, 6)
             if d6 == 6:
                 #white
-                character = chr(7)
+                character = chr(0x2022)
                 color = (randint(200, 255), randint(200, 255), randint(150, 200))
                 star_type = "dwarf-white"
                 hyperlimit = randint(5, 15)
             else:
                 #red
-                character = chr(7)
+                character = chr(0x2022)
                 color = (randint(130, 190), 0, 0)
                 star_type = "dwarf-red"
                 hyperlimit = randint(5, 15)
@@ -126,7 +126,7 @@ class GalaxyGenerator:
                 hyperlimit = randint(5, 70)
         else:
             #anomaly(for now brown dwarf)
-            character = chr(7)
+            character = chr(0x2022)
             color = (randint(120,145), randint(60, 70), randint(12, 18))
             star_type = "dwarf-brown"
             hyperlimit = randint(3, 8)

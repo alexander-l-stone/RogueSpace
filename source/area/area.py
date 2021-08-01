@@ -90,7 +90,7 @@ class Area:
         else:
             return []
     
-    def draw(self, playerx, playery, screen_width, screen_height, **config) -> None:
+    def draw(self, root_console, playerx, playery, screen_width, screen_height, **config) -> None:
         """Draw everything in the visible area
 
         Args:
@@ -102,9 +102,9 @@ class Area:
         """
         corner_x = playerx - screen_width//2
         corner_y = playery - screen_height//2
-        tcod.console_set_default_background(0, self.background_color)
+        root_console.default_bg = self.background_color
         for drawx in range(playerx - screen_width//2, playerx + screen_width//2):
             for drawy in range(playery - screen_height//2, playery + screen_height//2):
                 entities_at_point = self.get_entities_at_coordinates(drawx, drawy)
                 if entities_at_point is not None and len(entities_at_point) > 0:
-                    entities_at_point[-1].draw(corner_x, corner_y, self.background_color)
+                    entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color)
