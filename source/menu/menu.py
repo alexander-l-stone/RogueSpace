@@ -9,7 +9,7 @@ class Menu:
         self.menu_title:str = ''
         self.MenuHandler:MenuHandler = MenuHandler()
     
-    def render(self, sh, sw, console):
+    def render(self, sh, sw, root_console):
         """Render this menu. Only works if there is more than 0 menu items.
 
         Args:
@@ -17,19 +17,17 @@ class Menu:
             sw (int): Screen Width
         """
         try:
-            start_height = int(sh//2 + len(self.menu_items)//2)
+            start_height = int(sh//3 + len(self.menu_items)//2)
             start_width = int(sw//2 - len(self.menu_items[0].message)//2)
             for index in range(len(self.menu_items)):
                 for char_index in range(len(self.menu_items[index].message)):
                     if self.menu_items[index].disabled:
-                        tcod.console_set_default_foreground(0, self.menu_items[index].disabled_color)
+                        root_console.draw_rect(start_width + char_index, start_height + index, 1, 1, ord(self.menu_items[index].message[char_index]),fg=self.menu_items[index].disabled_color)
                     else:
                         if index == self.active_item:
-                            tcod.console_set_default_foreground(0, self.menu_items[index].active_color)
+                            root_console.draw_rect(start_width + char_index, start_height + index, 1, 1, ord(self.menu_items[index].message[char_index]),fg=self.menu_items[index].active_color)
                         else:
-                            tcod.console_set_default_foreground(0, self.menu_items[index].default_color)
-                    tcod.console_put_char(console, start_width + char_index, start_height + index, self.menu_items[index].message[char_index])
-            tcod.console_flush()
+                            root_console.draw_rect(start_width + char_index, start_height + index, 1, 1, ord(self.menu_items[index].message[char_index]),fg=self.menu_items[index].default_color)
         except IndexError:
             raise IndexError
     

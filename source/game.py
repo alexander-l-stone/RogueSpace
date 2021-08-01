@@ -22,7 +22,7 @@ class Game:
     def __init__(self, config:Dict={}):
         self.config = config
         #set up font
-        tcod.console_set_custom_font("terminal12x12_gs_ro.png", tcod.FONT_LAYOUT_ASCII_INROW | tcod.FONT_TYPE_GREYSCALE,)
+        self.tileset = tcod.tileset.load_tilesheet("dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD)
         self.SCREEN_WIDTH:int = 50
         self.SCREEN_HEIGHT:int = 50
         self.global_time:int = 0
@@ -94,19 +94,18 @@ class Game:
     def generate_current_area(self):
         self.current_area = self.current_location.generate_area()
 
-    def render(self) -> None:
-        self.current_area.draw(self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.bot_ui.draw()
-        self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"{self.player.current_entity.x}, {-self.player.current_entity.y}")//2, 1, f"{self.player.current_entity.x}, {-self.player.current_entity.y}")
+    def render(self, root_console) -> None:
+        self.current_area.draw(root_console, self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        self.bot_ui.draw(root_console)
+        self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"{self.player.current_entity.x}, {-self.player.current_entity.y}")//2, 1, f"{self.player.current_entity.x}, {-self.player.current_entity.y}")
         if not isinstance(self.current_location, Galaxy):
-            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(self.current_location.name)//2, 2, self.current_location.name, )
+            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(self.current_location.name)//2, 2, self.current_location.name, )
         if isinstance(self.current_location, Planet):
-            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Planetary Radius: {self.current_location.planetary_radius}")//2, 3, f"Planetary Radius: {self.current_location.planetary_radius}", (0, 255, 0))
-            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Moons: {len(self.current_location.moons)}")//2, 4, f"Moons: {len(self.current_location.moons)}")
+            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Planetary Radius: {self.current_location.planetary_radius}")//2, 3, f"Planetary Radius: {self.current_location.planetary_radius}", (0, 255, 0))
+            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Moons: {len(self.current_location.moons)}")//2, 4, f"Moons: {len(self.current_location.moons)}")
         elif isinstance(self.current_location, System):
-            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Hyperlimit: {self.current_location.hyperlimit}")//2, 3, f"Hyperlimit: {self.current_location.hyperlimit}", (255, 0, 0))
-            self.bot_ui.print_string(self.SCREEN_WIDTH//2 - len(f"Planets: {len(self.current_location.planet_list)}")//2, 4, f"Planets: {len(self.current_location.planet_list)}")
-        tcod.console_flush()
+            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Hyperlimit: {self.current_location.hyperlimit}")//2, 3, f"Hyperlimit: {self.current_location.hyperlimit}", (255, 0, 0))
+            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Planets: {len(self.current_location.planet_list)}")//2, 4, f"Planets: {len(self.current_location.planet_list)}")
 
     def resolve_actions(self):
         results = self.global_queue.resolve_actions(self.global_time)
@@ -227,9 +226,10 @@ class Game:
             menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
 
     def console_loop(self) -> None:
-        with tcod.console_init_root(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F', vsync=False) as root_console:
-            while not tcod.console_is_window_closed():
-                root_console.clear()
+        with tcod.context.new_terminal(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, tileset=self.tileset, title="Rogue Expedition", vsync=True) as context:
+            root_console = tcod.Console(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F')
+            while True:
+                context.present(root_console)
                 if (self.game_state == 'game'):
                     self.game_loop(root_console)
                 elif (self.game_state == 'main_menu'):
@@ -238,7 +238,7 @@ class Game:
                     self.menu_loop(root_console, self.game_menu)
 
     def game_loop(self, root_console) -> None:
-            self.render()
+            self.render(root_console)
             if self.global_queue.player_actions_count > 0:
                 self.resolve_actions()
                 if type(self.player.current_entity) is NewtonianEntity:
@@ -252,4 +252,4 @@ class Game:
                     if event.type == "QUIT":
                         raise SystemExit()
             root_console.clear()
-            self.render()
+            self.render(root_console)

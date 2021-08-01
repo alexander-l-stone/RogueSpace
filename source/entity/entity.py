@@ -19,7 +19,7 @@ class Entity:
     def __repr__(self) -> str:
         return f"[Char: {self.char} | {self.x}, {self.y}]"
     
-    def draw(self, topx, topy, bgcolor, override_color=None,) -> None:
+    def draw(self, root_console, topx, topy, bgcolor, **kwargs) -> None:
         """Draw this entity onto the screen.
 
         Args:
@@ -28,14 +28,5 @@ class Entity:
             bgcolor (tuple): the background color to set if the entity does not have a background color
             override_color (tuple, optional): [description]. Defaults to None. This will override the entities base color. Used only for debugging purposes with fov.
         """
-        if ('bg_color' not in self.flags):
-            tcod.console_set_default_background(0, bgcolor)
-        else:
-            tcod.console_set_default_background(0, self.flags['bg_color'])
-        if(override_color is None):
-            tcod.console_set_default_foreground(0, self.color)
-        else:
-            tcod.console_set_default_foreground(0, override_color)
         #find the offset coordinates and draw on that point
-        tcod.console_put_char(0, self.x-topx, self.y-topy, self.char, tcod.BKGND_DEFAULT)
-        tcod.console_set_default_background(0, bgcolor)
+        root_console.draw_rect(self.x-topx, self.y-topy, 1, 1, ord(self.char),fg=self.color, bg=bgcolor)
