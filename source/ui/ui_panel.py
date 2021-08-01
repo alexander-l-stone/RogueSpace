@@ -7,18 +7,20 @@ class UIPanel:
         self.panel_height:int = panel_height
         self.panel_width:int = panel_width
         self.border_char:str = border_char
+        self.decoration_tuple:tuple = (ord(self.border_char), ord(self.border_char), ord(self.border_char), ord(self.border_char), ord(' '), ord(self.border_char), ord(self.border_char), ord(self.border_char), ord(self.border_char))
 
     def draw(self, root_console):
         """
         Draw this UIPanel
         """
         #Make a Rectangle
-        for x in range(self.x, self.x + self.panel_width):
-            root_console.draw_rect(x, self.y, 1, 1, ord(self.border_char))
-            root_console.draw_rect(x, self.y + self.panel_height-1, 1, 1, ord(self.border_char))
-        for y in range(self.y, self.y + self.panel_height):
-            root_console.draw_rect(self.x, y, 1, 1, ord(self.border_char))
-            root_console.draw_rect(self.x + self.panel_width-1, y + self.panel_height-1, 1, 1, ord(self.border_char))
+        root_console.draw_frame(self.x, self.y, self.panel_width, self.panel_height, clear=True, fg=(255,255,255), decoration=self.decoration_tuple)
+        # for x in range(self.x, self.x + self.panel_width):
+        #     root_console.draw_rect(x, self.y, 1, 1, ord(self.border_char))
+        #     root_console.draw_rect(x, self.y + self.panel_height-1, 1, 1, ord(self.border_char))
+        # for y in range(self.y, self.y + self.panel_height):
+        #     root_console.draw_rect(self.x, y, 1, 1, ord(self.border_char))
+        #     root_console.draw_rect(self.x + self.panel_width-1, y, 1, 1, ord(self.border_char))
     
     def print_string(self, root_console, x:int, y:int, message:str, color:tuple = (255, 255, 255)):
         """

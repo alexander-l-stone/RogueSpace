@@ -22,12 +22,12 @@ class Menu:
             for index in range(len(self.menu_items)):
                 for char_index in range(len(self.menu_items[index].message)):
                     if self.menu_items[index].disabled:
-                        root_console.draw_rect(start_width + char_index, start_height + index, 1, 1, ord(self.menu_items[index].message[char_index]),fg=self.menu_items[index].disabled_color)
+                        root_console.print(start_width + char_index, start_height + index, self.menu_items[index].message[char_index],fg=self.menu_items[index].disabled_color)
                     else:
                         if index == self.active_item:
-                            root_console.draw_rect(start_width + char_index, start_height + index, 1, 1, ord(self.menu_items[index].message[char_index]),fg=self.menu_items[index].active_color)
+                            root_console.print(start_width + char_index, start_height + index, self.menu_items[index].message[char_index],fg=self.menu_items[index].active_color)
                         else:
-                            root_console.draw_rect(start_width + char_index, start_height + index, 1, 1, ord(self.menu_items[index].message[char_index]),fg=self.menu_items[index].default_color)
+                            root_console.print(start_width + char_index, start_height + index, self.menu_items[index].message[char_index],fg=self.menu_items[index].default_color)
         except IndexError:
             raise IndexError
     

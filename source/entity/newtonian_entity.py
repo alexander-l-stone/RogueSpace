@@ -38,7 +38,7 @@ class NewtonianEntity(Entity):
         for i in range(0, abs(self.vector[normalized_dict['greater']])):
             coordinate_dict[normalized_dict['greater']] += 1 * is_negative(self.vector[normalized_dict['greater']])
             coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector[normalized_dict['lesser']])
-            vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '.', self.color)
+            vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '+', self.color)
             self.curr_area.add_entity(vector_entity)
             self.vector_entities.append(vector_entity)
     

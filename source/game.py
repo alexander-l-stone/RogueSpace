@@ -22,7 +22,7 @@ class Game:
     def __init__(self, config:Dict={}):
         self.config = config
         #set up font
-        self.tileset = tcod.tileset.load_tilesheet("dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD)
+        self.tileset = tcod.tileset.load_tilesheet("terminal12x12_gs_ro.png", 16, 16, tcod.tileset.CHARMAP_CP437)
         self.SCREEN_WIDTH:int = 50
         self.SCREEN_HEIGHT:int = 50
         self.global_time:int = 0

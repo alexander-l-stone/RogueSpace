@@ -29,4 +29,8 @@ class Entity:
             override_color (tuple, optional): [description]. Defaults to None. This will override the entities base color. Used only for debugging purposes with fov.
         """
         #find the offset coordinates and draw on that point
-        root_console.draw_rect(self.x-topx, self.y-topy, 1, 1, ord(self.char),fg=self.color, bg=bgcolor)
+        if ('bgcolor' in self.flags):
+            root_console.tiles_rgb[self.x-topx, self.y-topy] = self.flags['bgcolor']
+        else:
+            root_console.tiles_rgb[self.x-topx, self.y-topy] = bgcolor
+        root_console.print(self.x-topx, self.y-topy, self.char,fg=self.color)
