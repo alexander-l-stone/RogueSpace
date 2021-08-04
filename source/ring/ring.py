@@ -16,3 +16,11 @@ class Ring:
             radius_marker = Entity(x, y, self.char, self.color, flags=self.flags)
             if (x, y) not in area.entity_dict:
                 area.add_entity(radius_marker)
+    
+    def generate_offset_entities(self, area, off_x, off_y):
+        for theta in range(0,360):
+            x = int(self.radius*math.cos(theta)) + off_x
+            y = int(self.radius*math.sin(theta)) + off_y
+            radius_marker = Entity(x, y, self.char, self.color, flags=self.flags)
+            if (x, y) not in area.entity_dict:
+                area.add_entity(radius_marker)

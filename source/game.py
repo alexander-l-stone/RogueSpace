@@ -100,9 +100,6 @@ class Game:
         self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"{self.player.current_entity.x}, {-self.player.current_entity.y}")//2, 1, f"{self.player.current_entity.x}, {-self.player.current_entity.y}")
         if not isinstance(self.current_location, Galaxy):
             self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(self.current_location.name)//2, 2, self.current_location.name, )
-        if isinstance(self.current_location, Planet):
-            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Planetary Radius: {self.current_location.planetary_radius}")//2, 3, f"Planetary Radius: {self.current_location.planetary_radius}", (0, 255, 0))
-            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Moons: {len(self.current_location.moons)}")//2, 4, f"Moons: {len(self.current_location.moons)}")
         elif isinstance(self.current_location, System):
             self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Hyperlimit: {self.current_location.hyperlimit}")//2, 3, f"Hyperlimit: {self.current_location.hyperlimit}", (255, 0, 0))
             self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Planets: {len(self.current_location.planet_list)}")//2, 4, f"Planets: {len(self.current_location.planet_list)}")
@@ -119,20 +116,16 @@ class Game:
                     if (value == False):
                         self.current_location.generate_new_sector(key[0], key[1])
                 if (
-                self.player.current_entity.x <= self.current_area.kwargs['center_x'] - self.SCREEN_WIDTH//2
+                self.player.current_entity.x <= self.current_area.flags['center_x'] - self.SCREEN_WIDTH//2
                 or
-                self.player.current_entity.x >= self.current_area.kwargs['center_x'] + self.SCREEN_WIDTH//2
+                self.player.current_entity.x >= self.current_area.flags['center_x'] + self.SCREEN_WIDTH//2
                 or
-                self.player.current_entity.y <= self.current_area.kwargs['center_y'] - self.SCREEN_HEIGHT//2
+                self.player.current_entity.y <= self.current_area.flags['center_y'] - self.SCREEN_HEIGHT//2
                 or
-                self.player.current_entity.y >= self.current_area.kwargs['center_y'] - self.SCREEN_HEIGHT//2
+                self.player.current_entity.y >= self.current_area.flags['center_y'] - self.SCREEN_HEIGHT//2
                 ):
                     self.current_area = self.current_location.generate_local_area(self.player.current_entity.x, self.player.current_entity.y)
                     self.current_area.add_entity(self.player.current_entity)
-        if(isinstance(self.current_location, Planet)):
-            for result in self.current_location.test_for_exit_planetary_area(self.current_area):
-                if result["type"] == 'exit':
-                    self.resolve_exit(result)
 
     def resolve_enter(self, result):
     #TODO: figure out what to do for non-player entities
@@ -141,9 +134,7 @@ class Game:
             dx, dy = result['entering_entity'].x - result['target_entity'].x, result['entering_entity'].y - result['target_entity'].y
             theta = convert_delta_to_theta(dx, dy)
             self.current_location.entity_list.append(result['entering_entity'])
-            if (isinstance(self.current_location, Planet)):
-                result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.planetary_radius*math.cos(theta)), int(self.current_location.planetary_radius*math.sin(theta))
-            elif (isinstance(self.current_location, System)):
+            if (isinstance(self.current_location, System)):
                 if(self.current_location.explored == False):
                     self.galaxy.galaxy_generator.generate_planets(self.current_location)
                     self.current_location.explored = True
@@ -156,8 +147,6 @@ class Game:
             theta = convert_delta_to_theta(result['exiting_entity'].x, result['exiting_entity'].y)
             delta = convert_theta_to_delta(theta)
             result['exiting_entity'].x, result['exiting_entity'].y = self.current_location.x + delta[0], self.current_location.y + delta[1]
-            if(isinstance(self.current_location, Planet)):
-                self.current_location = self.current_location.system
             self.current_location.entity_list.append(result['exiting_entity'])
             self.generate_current_area()
             self.current_area.add_entity(self.player.current_entity)

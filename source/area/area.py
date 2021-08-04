@@ -4,16 +4,16 @@ from typing import Dict
 from source.entity.entity import Entity
 
 class Area:
-    def __init__(self, bg=(0,0,0), **kwargs):
+    def __init__(self, bg=(0,0,0), **flags):
         self.entity_dict: Dict = {}
         self.background_color = bg
-        self.kwargs = kwargs
+        self.flags = flags
     
     def __str__(self):
-        return f"[Area | kwargs: {self.kwargs}]"
+        return f"[Area | flags: {self.flags}]"
     
     def __repr__(self) -> str:
-        return f"[Area | kwargs: {self.kwargs}]"
+        return f"[Area | flags: {self.flags}]"
 
     def add_entity(self, new_entity) -> None:
         """Adds an entity to the area at the entities x, y coordinates. Make sure they are set correctly.

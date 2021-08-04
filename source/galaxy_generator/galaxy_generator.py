@@ -143,27 +143,27 @@ class GalaxyGenerator:
             return False
         elif (system.system_type == "normal-red") or (system.system_type == "normal-yellow") or (system.system_type == "normal-white") or (system.system_type == "normal-orange"):
             hot_zone = randint(1, 8)
-            bio_zone = randint(hot_zone+1, hot_zone+15)
-            cold_zone = randint(bio_zone+1, bio_zone+20)
-            gas_zone = randint(cold_zone+1, cold_zone+50)
-            frozen_zone = randint(gas_zone, gas_zone+100)
+            bio_zone = randint(hot_zone + 1, hot_zone + 15)
+            cold_zone = randint(bio_zone + 1, bio_zone + 20)
+            gas_zone = randint(cold_zone + 1, cold_zone + 50)
+            frozen_zone = randint(gas_zone, gas_zone + 100)
         elif system.system_type == ("dwarf-red"):
             hot_zone = randint(1, 3)
-            bio_zone = randint(hot_zone+1, hot_zone+7)
-            cold_zone = randint(bio_zone+1, bio_zone+10)
-            gas_zone = randint(cold_zone+1, cold_zone+20)
-            frozen_zone = randint(gas_zone, gas_zone+40)
+            bio_zone = randint(hot_zone + 1, hot_zone + 7)
+            cold_zone = randint(bio_zone + 1, bio_zone + 10)
+            gas_zone = randint(cold_zone + 1, cold_zone + 20)
+            frozen_zone = randint(gas_zone, gas_zone + 40)
         elif system.system_type == ("dwarf-white"):
             hot_zone = randint(1, 12)
-            bio_zone = randint(hot_zone+1, hot_zone+8)
-            cold_zone = randint(bio_zone+1, bio_zone+10)
-            gas_zone = randint(cold_zone+1, cold_zone+10)
-            frozen_zone = randint(gas_zone, gas_zone+20)
+            bio_zone = randint(hot_zone + 1, hot_zone + 8)
+            cold_zone = randint(bio_zone + 1, bio_zone + 10)
+            gas_zone = randint(cold_zone + 1, cold_zone + 10)
+            frozen_zone = randint(gas_zone, gas_zone + 20)
         elif system.system_type == ("dwarf-brown"):
             cold_zone = randint(1, 3)
             gas_zone = randint(cold_zone + 1, cold_zone + 5)
             frozen_zone = randint(gas_zone + 1, gas_zone + 5)
-        num_planets = randint(2, 14)
+        num_planets = randint(2, 10)
         p1 = randint(3, 10)
         p2 = randint(p1+3, p1+7)
         for i in range(1,num_planets):
@@ -327,11 +327,11 @@ class GalaxyGenerator:
                     self.generate_cold_zone_moons(new_planet, new_moon_radius)
         elif d100 <= 80:
             new_planet = Planet(xy['x'], xy['y'], 'O', (randint(100, 255),randint(50, 150),randint(0, 100)), f"Gas {orbital_radius}", "gas", system, randint(10,15))
-            num_moons = randint(0, 15)
+            num_moons = randint(0, 5)
             prev_radius = 0
             if num_moons > 0:
                 for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                    new_moon_radius = randint(prev_radius+1, prev_radius+3)
                     prev_radius = new_moon_radius
                     self.generate_gas_zone_moons(new_planet, new_moon_radius)
         else:
@@ -343,18 +343,20 @@ class GalaxyGenerator:
         #TODO: Figure out a way to put the asteroids on the outside maybe ???
         xy = self.get_random_point_on_circle(radius)
         planet.planetary_radius = radius + randint(5,10)
+        if len(planet.moons) == 0 and len(planet.entity_list) == 0:
+            d10 = randint(1, 10)
+            if d10 < 8:
+                planet.entity_list.append(Ring(radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90))))
+                return
         d10 = randint(1, 10)
         if d10 <= 1:
             planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(80, 90),randint(80, 90),randint(80, 90)), 'barren', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
-        elif d10 <= 3:
+        elif d10 <= 4:
             planet.moons.append(Moon(xy['x'], xy['y'], '*', (randint(80, 120), randint(80, 100), randint(80, 90)), 'asteroid', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
-        elif d10 <= 6:
-            planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(230, 255), randint(200, 210), 0), 'methane', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
         elif d10 <= 7:
+            planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(230, 255), randint(200, 210), 0), 'methane', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
+        elif d10 <= 9:
             planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(230, 255), randint(230, 255), randint(120, 170)), 'volcanic', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
-        else:
-            planet.entity_list.append(Ring(radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255))))
-
 
     def generate_frozen_zone_planet(self, system:System, orbital_radius:int):
         d100 = randint(1, 100)
@@ -386,16 +388,18 @@ class GalaxyGenerator:
         xy = self.get_random_point_on_circle(radius)
         planet.planetary_radius = radius + randint(4,8)
         d10 = randint(1, 10)
-        if d10 <= 4:
+        if len(planet.moons) == 0 and len(planet.entity_list) == 0:
+            d10 = randint(1, 10)
+            if d10 < 8:
+                planet.entity_list.append(Ring(radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255))))
+                return
+        if d10 <= 7:
             planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(150, 170), randint(230, 255), randint(230, 255)), 'frozen', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
-        elif d10 <= 8:
-            planet.entity_list.append(Ring(radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255))))
         else:
             planet.moons.append(Moon(xy['x'], xy['y'], '*', (randint(150, 170), randint(230, 255), randint(230, 255)), 'frozen-asteroid', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
     def generate_oort_cloud_planet(self, system:System, orbital_radius:int):
-        # system.add_planet(Ring(orbital_radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255))))
-        pass
+        system.add_planet(Ring(orbital_radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255))))
 
     def get_random_point_on_circle(self, radius):
         randTheta = randint(0, 360) * math.pi/180

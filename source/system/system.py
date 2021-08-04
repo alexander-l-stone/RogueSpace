@@ -18,12 +18,12 @@ class System:
         self.explored = False
     
     def generate_area(self, entity_list=[]):
-        system_area = Area(self.bgcolor, name=self.name)
+        system_area = Area(self.bgcolor, name=self.name, generate_background=True)
         for planet in self.planet_list:
             if (isinstance(planet, Ring)):
                 planet.generate_entities(system_area)
             else:
-                system_area.add_entity(planet.generate_planetary_entity())
+                planet.generate_entities(system_area)
         for entity in entity_list:
             system_area.add_entity(entity)
         for theta in range(0,360):
