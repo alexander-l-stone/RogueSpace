@@ -1,5 +1,6 @@
 from source.area.area import Area
 from source.entity.entity import Entity
+from source.entity.multitileentity import MultiTileEntity
 from source.ring.ring import Ring
 import math
 
@@ -32,7 +33,14 @@ class System:
             radius_marker = Entity(x, y, '.', (100, 0,0))
             if (x, y) not in system_area.entity_dict:
                 system_area.add_entity(radius_marker)
-        system_area.add_entity(Entity(0, 0, self.char, self.color, {'on_collide': self.on_collide}))
+        if self.system_type == 'dwarf-red' or self.system_type == 'dwarf-white':
+            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 6))
+        elif self.system_type == 'dwarf-brown':
+            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 5))
+        elif self.system_type == 'giant-red' or self.system_type == 'giant-blue':
+            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 10))
+        else:
+            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 7))
         return system_area
 
     def add_planet(self, planet):

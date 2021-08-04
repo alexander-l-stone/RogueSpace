@@ -1,4 +1,5 @@
 from source.entity.entity import Entity
+from source.entity.multitileentity import MultiTileEntity
 from source.area.area import Area
 from source.planet.moon import Moon
 from source.ring.ring import Ring
@@ -28,7 +29,12 @@ class Planet:
         return {'type': 'stop'}
     
     def generate_entities(self, area):
-        area.add_entity(Entity(self.x, self.y, self.char, self.color))
+        if self.planet_type == 'gas':
+            area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, 4))
+        elif self.planet_type == 'liquid':
+            area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, 3))
+        else:
+            area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, 2))
         for moon in self.moons:
             area.add_entity(moon.generate_offset_entity(self.x, self.y))
         for planetary_entity in self.entity_list:
