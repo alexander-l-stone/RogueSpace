@@ -173,7 +173,6 @@ class GalaxyGenerator:
         current_angle = 0
         for i in range(1,num_planets):
             current_angle = current_angle + 120
-            print(f"Current Angle: {current_angle}")
             if i == 1:
                 planet_radius = p1 * self.system_scalar
             elif i == 2:
