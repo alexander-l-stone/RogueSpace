@@ -6,6 +6,7 @@ from source.ring.ring import Ring
 from source.system.system import System
 from random import seed, randint, random
 
+#TODO: Turn a lot of this into reading out of a grammar
 class GalaxyGenerator:
     def __init__(self):
         self.generator_queue = []
