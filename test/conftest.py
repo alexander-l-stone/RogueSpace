@@ -9,6 +9,7 @@ from source.planet.planet import Planet
 from source.system.system import System
 from source.action.action_queue import ActionQueue
 from source.action.resolution_functions import resolve_no_action
+from source.vector.vector import Vector
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
 
@@ -56,3 +57,7 @@ def action_queue():
 @pytest.fixture
 def galaxy():
     return Galaxy()
+
+@pytest.fixture
+def vector():
+    return Vector(1,1)
