@@ -1,5 +1,6 @@
 from source.entity.entity import Entity
 
+#TODO: Make this better
 class MultiTileEntity:
     def __init__(self, x, y, char, color, radius, **flags):
         self.x = x

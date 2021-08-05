@@ -21,6 +21,13 @@ class Planet:
         self.planetary_radius:int = planetary_radius
         self.entity_list = []
         self.bgcolor = bgcolor
+        #TODO: Pass radius in
+        if self.planet_type == 'gas':
+            self.radius = 4
+        elif self.planet_type == 'liquid':
+            self.radius = 3
+        else:
+            self.radius = 2
 
     def generate_planetary_entity(self):
         return Entity(self.x, self.y, self.char, self.color, flags={'bg_color': self.bgcolor})
@@ -29,12 +36,7 @@ class Planet:
         return {'type': 'stop'}
     
     def generate_entities(self, area):
-        if self.planet_type == 'gas':
-            area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, 4))
-        elif self.planet_type == 'liquid':
-            area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, 3))
-        else:
-            area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, 2))
+        area.add_entity(MultiTileEntity(self.x, self.y, self.char, self.color, self.radius))
         for moon in self.moons:
             area.add_entity(moon.generate_offset_entity(self.x, self.y))
         for planetary_entity in self.entity_list:

@@ -4,6 +4,7 @@ from source.planet.moon import Moon
 from source.helper_functions.colliders import stop_collision
 from source.ring.ring import Ring
 from source.system.system import System
+from source.cloud.cloud import Cloud
 from random import seed, randint, random
 
 #TODO: Turn a lot of this into reading out of a grammar
@@ -196,6 +197,19 @@ class GalaxyGenerator:
                 system.hyperlimit += int((system.planet_list[-1].x**2 + system.planet_list[-1].y**2)**(1/2))
             except AttributeError:
                 system.hyperlimit += system.planet_list[-1].radius
+        #Make Clouds
+        num_clouds = randint(int(math.pi*system.hyperlimit**2)//1200, int(math.pi*system.hyperlimit**2)//800)
+        for i in range(num_clouds):
+            randradius = randint(10, system.hyperlimit)
+            xy = self.get_random_point_on_circle(randradius)
+            randradius = randint(1, 6)
+            overlap = False
+            for planet in system.planet_list:
+                if not type(planet) is Ring:
+                    if abs(planet.x - xy['x'])**2 + abs(planet.y - xy['y'])**2 <= (planet.radius + randradius)**2:
+                        overlap = True
+            if not overlap:
+                system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (128, 0, 128), randradius, randint(0, randradius + abs(xy['x']) + abs(xy['y']))))
         return True
     
     #TODO: add big asteroids as planets inside the belt

@@ -2,6 +2,7 @@ from source.area.area import Area
 from source.entity.entity import Entity
 from source.entity.multitileentity import MultiTileEntity
 from source.ring.ring import Ring
+from source.cloud.cloud import Cloud
 import math
 
 class System:
@@ -20,13 +21,21 @@ class System:
     
     def generate_area(self, entity_list=[]):
         system_area = Area(self.bgcolor, name=self.name, generate_background=True)
+        for entity in self.entity_list:
+            if isinstance(entity, Cloud):
+                entity.generate_entities(system_area)
+            else:
+                system_area.add_entity(entity)
         for planet in self.planet_list:
             if (isinstance(planet, Ring)):
                 planet.generate_entities(system_area)
             else:
                 planet.generate_entities(system_area)
         for entity in entity_list:
-            system_area.add_entity(entity)
+            if isinstance(entity, Cloud):
+                entity.generate_entities(system_area)
+            else:
+                system_area.add_entity(entity)
         for theta in range(0,360):
             x = int(float(self.hyperlimit)*math.cos(theta))
             y = int(float(self.hyperlimit)*math.sin(theta))
