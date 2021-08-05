@@ -3,6 +3,7 @@ from source.planet.planet import Planet
 from source.planet.moon import Moon
 from source.helper_functions.colliders import stop_collision
 from source.ring.ring import Ring
+from source.belt.belt import Belt
 from source.system.system import System
 from source.cloud.cloud import Cloud
 from random import seed, randint, random
@@ -12,7 +13,7 @@ class GalaxyGenerator:
     def __init__(self):
         self.generator_queue = []
         self.angleplusminus = 50
-        self.system_scalar = 2
+        self.system_scalar = 3
     
     #TODO: Remove generator queue
     def resolve_generator_queue(self, galaxy):
@@ -134,7 +135,7 @@ class GalaxyGenerator:
             color = (randint(120,145), randint(60, 70), randint(12, 18))
             star_type = "dwarf-brown"
             hyperlimit = randint(3, 8)
-        return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit)
+        return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit * self.system_scalar)
     
     def generate_planets(self, system):
         #TODO: Differentiate this by colors
@@ -205,11 +206,20 @@ class GalaxyGenerator:
             cloudradius = randint(1, 6)
             overlap = False
             for planet in system.planet_list:
-                if not type(planet) is Ring:
+                planet_datatype = type(planet)
+                if not planet_datatype is Ring and not planet_datatype is Belt:
                     if abs(planet.x - xy['x'])**2 + abs(planet.y - xy['y'])**2 <= (planet.radius + cloudradius)**2:
                         overlap = True
+            for entity in system.entity_list:
+                if type(entity) is Cloud:
+                    if abs(entity.x - xy['x'])**2 + abs(entity.y - xy['y'])**2 <= (entity.radius + cloudradius)**2:
+                        overlap = True
             if not overlap:
-                system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y']))))
+                d10 = randint(1, 10)
+                if d10 < 6:
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y']))))
+                else:
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y']))))
         return True
     
     #TODO: add big asteroids as planets inside the belt
@@ -230,7 +240,7 @@ class GalaxyGenerator:
                     prev_radius = new_moon_radius
                     self.generate_hot_zone_moons(new_planet, new_moon_radius)
         else:
-            new_planet = Ring(orbital_radius, '*', (randint(210, 230), randint(170, 190), randint(130, 140)))
+            new_planet = Belt(orbital_radius, '*', 3, (randint(210, 230), randint(170, 190), randint(130, 140)), randint(0, orbital_radius))
         system.add_planet(new_planet)
 
     def generate_hot_zone_moons(self, planet:Planet, radius:int):
@@ -292,7 +302,7 @@ class GalaxyGenerator:
                     prev_radius = new_moon_radius
                     self.generate_bio_zone_moons(new_planet, new_moon_radius)
         else:
-            new_planet = Ring(orbital_radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90)))
+            new_planet = Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
         system.add_planet(new_planet)
 
     def generate_bio_zone_moons(self, planet:Planet, radius:int):
@@ -320,7 +330,7 @@ class GalaxyGenerator:
                     prev_radius = new_moon_radius
                     self.generate_bio_zone_moons(new_planet, new_moon_radius)
         else:
-            new_planet = Ring(orbital_radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90)))
+            new_planet = Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
         system.add_planet(new_planet)
 
     def generate_cold_zone_moons(self, planet:Planet, radius:int):
@@ -355,7 +365,7 @@ class GalaxyGenerator:
                     prev_radius = new_moon_radius
                     self.generate_gas_zone_moons(new_planet, new_moon_radius)
         else:
-            new_planet = Ring(orbital_radius, '*', (randint(80, 120), randint(80, 100), randint(80, 90)))
+            new_planet = Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
         system.add_planet(new_planet)
 
     def generate_gas_zone_moons(self, planet:Planet, radius:int):
@@ -400,7 +410,7 @@ class GalaxyGenerator:
                     prev_radius = new_moon_radius
                     self.generate_frozen_zone_moons(new_planet, new_moon_radius)
         else:
-            new_planet = Ring(orbital_radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255)))
+            new_planet = Belt(orbital_radius, '*', 3, (randint(150, 170), randint(230, 255), randint(230, 255)), randint(0, orbital_radius))
         system.add_planet(new_planet)
 
     def generate_frozen_zone_moons(self, planet:Planet, radius:int):
@@ -419,7 +429,7 @@ class GalaxyGenerator:
             planet.moons.append(Moon(xy['x'], xy['y'], '*', (randint(150, 170), randint(230, 255), randint(230, 255)), 'frozen-asteroid', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
     def generate_oort_cloud_planet(self, system:System, orbital_radius:int, current_angle:int):
-        system.add_planet(Ring(orbital_radius, '*', (randint(150, 170), randint(230, 255), randint(230, 255))))
+        system.add_planet(Belt(orbital_radius, '*', 10, (randint(150, 170), randint(230, 255), randint(230, 255)), randint(0, orbital_radius)))
 
     def get_random_point_on_circle(self, radius):
         randTheta = randint(0, 360) * math.pi/180

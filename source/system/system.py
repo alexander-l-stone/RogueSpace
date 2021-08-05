@@ -2,6 +2,7 @@ from source.area.area import Area
 from source.entity.entity import Entity
 from source.entity.multitileentity import MultiTileEntity
 from source.ring.ring import Ring
+from source.belt.belt import Belt
 from source.cloud.cloud import Cloud
 import math
 
@@ -27,7 +28,7 @@ class System:
             else:
                 system_area.add_entity(entity)
         for planet in self.planet_list:
-            if (isinstance(planet, Ring)):
+            if (isinstance(planet, Ring) or isinstance(planet, Belt)):
                 planet.generate_entities(system_area)
             else:
                 planet.generate_entities(system_area)

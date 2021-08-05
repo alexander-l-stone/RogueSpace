@@ -3,7 +3,7 @@ from random import seed, randint
 import math
 
 class Cloud:
-    def __init__(self, x, y, char, color, radius, seed):
+    def __init__(self, x, y, char, color, radius, seed, **flags):
         self.x = x
         self.y = y
         self.char = char
@@ -11,6 +11,9 @@ class Cloud:
         self.radius = radius
         self.seed = seed
         self.generation_type = 'random_seeds'
+        if ('generation_type' in flags):
+            self.generation_type = flags['generation_type']
+        self.flags = flags
     
     def get_random_point_in_cloud(self):
         randTheta = randint(0, 360) * math.pi/180
@@ -30,6 +33,7 @@ class Cloud:
             pass
     
     def random_seeds(self, area):
+        seed(self.seed)
         randnumber = randint(1, math.pi*self.radius**2//2)
         area.add_entity(Entity(self.x, self.y, self.char, self.color))
         for i in range(randnumber):
