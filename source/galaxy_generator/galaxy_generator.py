@@ -200,16 +200,16 @@ class GalaxyGenerator:
         #Make Clouds
         num_clouds = randint(int(math.pi*system.hyperlimit**2)//1200, int(math.pi*system.hyperlimit**2)//800)
         for i in range(num_clouds):
-            randradius = randint(10, system.hyperlimit)
+            randradius = randint(11, system.hyperlimit)
             xy = self.get_random_point_on_circle(randradius)
-            randradius = randint(1, 6)
+            cloudradius = randint(1, 6)
             overlap = False
             for planet in system.planet_list:
                 if not type(planet) is Ring:
-                    if abs(planet.x - xy['x'])**2 + abs(planet.y - xy['y'])**2 <= (planet.radius + randradius)**2:
+                    if abs(planet.x - xy['x'])**2 + abs(planet.y - xy['y'])**2 <= (planet.radius + cloudradius)**2:
                         overlap = True
             if not overlap:
-                system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (128, 0, 128), randradius, randint(0, randradius + abs(xy['x']) + abs(xy['y']))))
+                system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y']))))
         return True
     
     #TODO: add big asteroids as planets inside the belt

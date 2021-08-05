@@ -12,12 +12,28 @@ class Cloud:
         self.seed = seed
     
     def generate_entities(self, area):
-        seed(self.seed)
+        #TODO: Make these contiguous
         randnumber = randint(1, math.pi*self.radius**2//2)
-        angle = 0
+        x = self.x
+        y = self.y
         for i in range(randnumber):
-            randangle = randint(angle - 45, angle + 45)
-            randdistance = randint(0, self.radius)
-            area.add_entity(Entity(int((randdistance + 0.5) * math.cos(randangle)) + self.x, int((randdistance + 0.5) * math.cos(randangle)) + self.y, self.char, self.color))
-            seed(self.seed + i)
-            angle += 90
+            area.add_entity(Entity(x, y, self.char, self.color))
+            d2 = randint(1, 2)
+            d22 = randint(1, 2)
+            #This is the second d2
+            if d2 == 1:
+                if d22 == 1:
+                    dx = 1
+                    dy = 0
+                else:
+                    dx = -1
+                    dy = 0
+            else:
+                if d22 == 1:
+                    dx = 0
+                    dy = 1
+                else:
+                    dx = 0
+                    dy = -1
+            x += dx
+            y += dy
