@@ -30,7 +30,7 @@ class Planet:
             self.radius = 2
 
     def generate_planetary_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, flags={'bg_color': self.bgcolor})
+        return Entity(self.x, self.y, self.char, self.color, self, bg_color=self.bgcolor)
 
     def on_collide(self, target, initiator):
         return {'type': 'stop'}

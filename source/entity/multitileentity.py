@@ -1,6 +1,7 @@
 from source.entity.entity import Entity
 
-#TODO: Make this better
+#TODO: Stop using this and instead use parent
+#TODO this means mostly move circle logic into planet and parent the entities to itself
 class MultiTileEntity:
     def __init__(self, x, y, char, color, radius, **flags):
         self.x = x

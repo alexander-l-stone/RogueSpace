@@ -2,16 +2,14 @@ import tcod
 
 #TODO: Change flags to a **kwargs field
 class Entity:
-    def __init__(self, x:int, y:int, char:str, color:tuple, flags:dict=None):
+    def __init__(self, x:int, y:int, char:str, color:tuple, parent, **flags:dict):
         self.x:int = x
         self.y:int = y
         self.char:str = char
         self.color:tuple = color
+        self.parent = parent
         self.curr_area = None
-        if flags == None:
-            self.flags:dict = {}
-        else:
-            self.flags:dict = flags
+        self.flags:dict = flags
     
     def __str__(self):
         return f"[Char: {self.char} | {self.x}, {self.y}]"

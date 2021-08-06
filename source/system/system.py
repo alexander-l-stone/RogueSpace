@@ -40,7 +40,7 @@ class System:
         for theta in range(0,360):
             x = int(float(self.hyperlimit)*math.cos(theta))
             y = int(float(self.hyperlimit)*math.sin(theta))
-            radius_marker = Entity(x, y, '.', (100, 0,0))
+            radius_marker = Entity(x, y, '.', (100, 0,0), self)
             if (x, y) not in system_area.entity_dict:
                 system_area.add_entity(radius_marker)
         if self.system_type == 'dwarf-red' or self.system_type == 'dwarf-white':
@@ -64,4 +64,4 @@ class System:
         return {'type': 'stop'}
 
     def generate_star_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, flags={'on_collide': self.on_collide_sector_level, 'bg_color': self.bgcolor})
+        return Entity(self.x, self.y, self.char, self.color, self, on_collide=self.on_collide_sector_level, bg_color=self.bgcolor)
