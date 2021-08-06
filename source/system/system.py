@@ -2,7 +2,7 @@ from source.area.area import Area
 from source.entity.entity import Entity
 from source.entity.multitileentity import MultiTileEntity
 from source.ring.ring import Ring
-from source.belt.belt import B
+from source.belt.belt import Belt
 from source.cloud.cloud import Cloud
 import math
 
