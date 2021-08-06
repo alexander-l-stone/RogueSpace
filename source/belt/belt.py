@@ -25,10 +25,6 @@ class Belt:
                     overlap = False
                     if (x, y) in area.entity_dict:
                         overlap = True
-                    for mte in area.multitileentitylist:
-                        if mte.point_inside(x, y):
-                            overlap = True
-                            break
                     if not overlap:
                         area.add_entity(radius_marker)
 

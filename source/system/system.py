@@ -1,15 +1,16 @@
 from source.area.area import Area
 from source.entity.entity import Entity
-from source.entity.multitileentity import MultiTileEntity
 from source.ring.ring import Ring
 from source.belt.belt import Belt
 from source.cloud.cloud import Cloud
 import math
 
 class System:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, bgcolor=(0,0,0)):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, bgcolor=(0,0,0), **flags):
         self.x = x
         self.y = y
+        self.star_x = 0
+        self.star_y = 0
         self.char = char
         self.color = color
         self.name = name
@@ -19,7 +20,25 @@ class System:
         self.entity_list = []
         self.bgcolor = bgcolor
         self.explored = False
+        self.radius = 1
+        if self.system_type == 'dwarf-red' or self.system_type == 'dwarf-white':
+            self.radius = 6
+        elif self.system_type == 'dwarf-brown':
+            self.radius = 5
+        elif self.system_type == 'giant-red' or self.system_type == 'giant-blue':
+            self.radius = 10
+        else:
+            self.radius = 7
     
+    def point_inside(self, x, y):
+        dx = abs(x - self.star_x)
+        dy = abs(y - self.star_y)
+        tempradius = self.radius + 0.5
+        if self.radius <= 2:
+            return dx**2 + dy**2 <= tempradius**2
+        else:
+            return dx**2 + dy**2 < tempradius**2
+
     def generate_area(self, entity_list=[]):
         system_area = Area(self.bgcolor, name=self.name, generate_background=True)
         for entity in self.entity_list:
@@ -43,14 +62,10 @@ class System:
             radius_marker = Entity(x, y, '.', (100, 0,0), self)
             if (x, y) not in system_area.entity_dict:
                 system_area.add_entity(radius_marker)
-        if self.system_type == 'dwarf-red' or self.system_type == 'dwarf-white':
-            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 6))
-        elif self.system_type == 'dwarf-brown':
-            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 5))
-        elif self.system_type == 'giant-red' or self.system_type == 'giant-blue':
-            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 10))
-        else:
-            system_area.add_entity(MultiTileEntity(0, 0, self.char, self.color, 7))
+        for x in range(self.star_x - self.radius, self.star_x + self.radius + 1):
+            for y in range(self.star_y - self.radius, self.star_y + self.radius + 1):
+                if self.point_inside(x, y):
+                    system_area.add_entity(Entity(x, y, self.char, self.color, self))
         return system_area
 
     def add_planet(self, planet):

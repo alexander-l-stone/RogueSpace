@@ -216,10 +216,14 @@ class GalaxyGenerator:
                         overlap = True
             if not overlap:
                 d10 = randint(1, 10)
-                if d10 < 6:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), thin_color=(88, 0, 88)))
+                if d10 < 3:
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'purple-gas', thin_color=(88, 0, 88)))
+                elif d10 < 5:
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'green-gas', thin_color=(0, 100, 0)))
+                elif d10 < 7:
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 150), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'cyan-gas', thin_color=(0, 100, 100)))
                 else:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], chr(0x2593), (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), thin_color=(80, 45, 0)))
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'gold-dust', thin_color=(80, 45, 0)))
         return True
     
     #TODO: add big asteroids as planets inside the belt

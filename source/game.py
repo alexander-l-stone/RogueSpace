@@ -28,7 +28,7 @@ class Game:
         self.global_time:int = 0
         self.global_queue = ActionQueue()
         self.InputHandler:InputHandler = InputHandler()
-        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH)
+        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20,20,20))
         self.game_state = 'main_menu'
 
         #generate main menu

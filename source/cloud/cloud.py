@@ -3,13 +3,14 @@ from random import seed, randint
 import math
 
 class Cloud:
-    def __init__(self, x, y, char, color, radius, seed, **flags):
+    def __init__(self, x, y, char, color, radius, cloud_type, seed, **flags):
         self.x = x
         self.y = y
         self.char = char
         self.color = color
         self.radius = radius
         self.seed = seed
+        self.cloud_type = cloud_type
         self.generation_type = 'dense_seeds'
         if ('generation_type' in flags):
             self.generation_type = flags['generation_type']
@@ -41,7 +42,7 @@ class Cloud:
     def random_seeds(self, area):
         seed(self.seed)
         randnumber = randint(1, math.pi*self.radius**2//2)
-        area.add_entity(Entity(self.x, self.y, self.char, self.color, self))
+        area.add_entity(Entity(self.x, self.y, self.char, self.color, self, bg_color=self.color))
         # make i seeds
         for i in range(randnumber):
             xy = self.get_random_point_in_cloud()
@@ -51,7 +52,7 @@ class Cloud:
                     # probably make cloud
                     d10 = randint(1,10)
                     if d10 <= 7:
-                        area.add_entity(Entity(x, y, self.char, self.color, self))
+                        area.add_entity(Entity(x, y, self.char, self.color, self, bg_color=self.color))
 
     # do random seeds, but instead of making entities make a dict to cloud level
     # maybe add a negative seed pass for extra texture
@@ -93,9 +94,9 @@ class Cloud:
                                         cloud_dict[(x,y)] = -1
         for coord,dense in cloud_dict.items():
             if dense == 1 or dense == 2:
-                area.add_entity(Entity(coord[0], coord[1], self.char, self.flags['thin_color'], self))
+                area.add_entity(Entity(coord[0], coord[1], self.char, self.flags['thin_color'], self, bg_color=self.flags['thin_color']))
             elif dense >= 3:
-                area.add_entity(Entity(coord[0], coord[1], self.char, self.color, self))
+                area.add_entity(Entity(coord[0], coord[1], self.char, self.color, self, bg_color=self.color))
 
     def yinyang_seeds(self, area):
         seed(self.seed)

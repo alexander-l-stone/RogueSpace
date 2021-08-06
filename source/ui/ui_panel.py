@@ -1,27 +1,24 @@
 import tcod
 
 class UIPanel:
-    def __init__(self, x:int, y:int, panel_height:int, panel_width:int, border_char:str = '#'):
+    def __init__(self, x:int, y:int, panel_height:int, panel_width:int, panel_color:tuple, border_char:str = ' ', **flags):
         self.x:int = x
         self.y:int = y
         self.panel_height:int = panel_height
         self.panel_width:int = panel_width
+        self.panel_color:tuple = panel_color
         self.border_char:str = border_char
-        self.decoration_tuple:tuple = (ord(self.border_char), ord(self.border_char), ord(self.border_char), ord(self.border_char), ord(' '), ord(self.border_char), ord(self.border_char), ord(self.border_char), ord(self.border_char))
+        self.flags = flags
+        self.decoration_tuple:tuple = (ord(self.border_char), ord(self.border_char), ord(self.border_char), 
+                                    ord(self.border_char), ord(' '), ord(self.border_char), 
+                                    ord(self.border_char), ord(self.border_char), ord(self.border_char))
 
     def draw(self, root_console):
         """
         Draw this UIPanel
         """
-        #Make a Rectangle
-        root_console.draw_frame(self.x, self.y, self.panel_width, self.panel_height, clear=True, fg=(255,255,255), decoration=self.decoration_tuple)
-        # for x in range(self.x, self.x + self.panel_width):
-        #     root_console.draw_rect(x, self.y, 1, 1, ord(self.border_char))
-        #     root_console.draw_rect(x, self.y + self.panel_height-1, 1, 1, ord(self.border_char))
-        # for y in range(self.y, self.y + self.panel_height):
-        #     root_console.draw_rect(self.x, y, 1, 1, ord(self.border_char))
-        #     root_console.draw_rect(self.x + self.panel_width-1, y, 1, 1, ord(self.border_char))
-    
+        root_console.draw_frame(self.x, self.y, self.panel_width, self.panel_height, clear=True, fg=(255,255,255), bg=self.panel_color, decoration=self.decoration_tuple)
+
     def print_string(self, root_console, x:int, y:int, message:str, color:tuple = (255, 255, 255)):
         """
         Prints a string to the ui panel, offset from the panels upper right corner by x and y
