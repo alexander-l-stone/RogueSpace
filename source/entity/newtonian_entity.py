@@ -5,7 +5,7 @@ from source.helper_functions.is_negative import is_negative
 from source.vector.vector import Vector
 
 class NewtonianEntity(Entity):
-    def __init__(self, x:int, y:int, char:str, color:tuple, area, vector:dict, **flags):
+    def __init__(self, x:int, y:int, char:str, color:tuple, parent, area, vector:dict, **flags):
         """Constructor for the NewtonianObject
 
         Args:
@@ -16,7 +16,7 @@ class NewtonianEntity(Entity):
             area (Area): Area the object is in
             vector (dict): Vector the object is on. Will be of the form {x: int, y: int}
         """
-        Entity.__init__(self, x, y, char, color, flags)
+        Entity.__init__(self, x, y, char, color, parent, **flags)
         self.curr_area = area
         self.vector = Vector(vector['x'], vector['y'])
         self.vector_entities = [] #A list of entities that compose this objects vector path
@@ -39,7 +39,7 @@ class NewtonianEntity(Entity):
         for i in range(0, abs(self.vector.get_value(normalized_dict['greater']))):
             coordinate_dict[normalized_dict['greater']] += 1 * is_negative(self.vector.get_value(normalized_dict['greater']))
             coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector.get_value(normalized_dict['lesser']))
-            vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '+', self.color)
+            vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '+', self.color, self)
             self.curr_area.add_entity(vector_entity)
             self.vector_entities.append(vector_entity)
     

@@ -2,13 +2,10 @@ import tcod
 
 from typing import Dict
 from source.entity.entity import Entity
-from source.entity.multitileentity import MultiTileEntity
 
 class Area:
     def __init__(self, bg=(0,0,0), **flags):
         self.entity_dict: dict = {}
-        self.multitileentitylist: list = []
-        #TODO: Figure out a better way to store multi tile entities.
         self.background_color = bg
         self.flags = flags
     
@@ -28,8 +25,6 @@ class Area:
             self.entity_dict[(new_entity.x, new_entity.y)].append(new_entity)
         else:
             self.entity_dict[(new_entity.x, new_entity.y)] = [new_entity]
-        if type(new_entity) is MultiTileEntity:
-            self.multitileentitylist.append(new_entity)
         new_entity.curr_area = self
 
     def add_entity_at_coordinates(self, x, y, new_entity) -> None:
@@ -113,9 +108,9 @@ class Area:
             for drawy in range(playery - screen_height//2, playery + screen_height//2):
                 entities_at_point = self.get_entities_at_coordinates(drawx, drawy)
                  #TODO: Do the below in a way that doesn't suck
-                for entity in self.multitileentitylist:
-                    if entity.point_inside(drawx, drawy):
-                        entity.offset_draw(root_console, corner_x, corner_y, drawx, drawy, self.background_color)
                 if entities_at_point is not None and len(entities_at_point) > 0:
-                    entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color)
+                    if len(entities_at_point) > 1:
+                        entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                    else:
+                        entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color)
                

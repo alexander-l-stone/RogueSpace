@@ -21,23 +21,18 @@ class Belt:
                     randwidth = randint(self.radius - self.width//2, self.radius + self.width//2)
                     x = int((self.radius + 0.5 + randwidth) * math.cos(theta))
                     y = int((self.radius + 0.5 + randwidth) * math.sin(theta))
-                    radius_marker = Entity(x, y, self.char, self.color, flags=self.flags)
+                    radius_marker = Entity(x, y, self.char, self.color, self, **self.flags)
                     overlap = False
                     if (x, y) in area.entity_dict:
                         overlap = True
-                    for mte in area.multitileentitylist:
-                        if mte.point_inside(x, y):
-                            overlap = True
-                            break
                     if not overlap:
                         area.add_entity(radius_marker)
 
-    
     #TODO: Turn this into a Belt not a ring method
     # def generate_offset_entities(self, area, off_x, off_y):
     #     for theta in range(0,360):
     #         x = int((self.radius + 0.5) * math.cos(theta)) + off_x
     #         y = int((self.radius + 0.5) * math.sin(theta)) + off_y
-    #         radius_marker = Entity(x, y, self.char, self.color, flags=self.flags)
+    #         radius_marker = Entity(x, y, self.char, self.color,  self, flags=self.flags)
     #         if (x, y) not in area.entity_dict:
     #             area.add_entity(radius_marker)

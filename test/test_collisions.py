@@ -8,14 +8,14 @@ def test_stop_collision_exists():
     assert stop_collision
 
 def test_stop_collision_returns_correct_value():
-    first_entity = Entity(0, 0, '@', (255,255,255))
-    second_entity = Entity(0, 1, '#', (255, 255, 255))
+    first_entity = Entity(0, 0, '@', (255,255,255), None)
+    second_entity = Entity(0, 1, '#', (255, 255, 255), None)
     result = stop_collision(first_entity, second_entity)
     assert result['type'] == 'stop'
 
 def test_stop_collision_in_area_with_queue(area, entity):
     oldx, oldy = entity.x, entity.y
-    collidable_entity = Entity(0, 1, '#', (255, 255, 255), flags={'on_collide': stop_collision})
+    collidable_entity = Entity(0, 1, '#', (255, 255, 255), None, on_collide=stop_collision)
     area.add_entity(entity)
     area.add_entity(collidable_entity)
     action_queue = ActionQueue()

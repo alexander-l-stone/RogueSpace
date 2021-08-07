@@ -12,8 +12,8 @@ class Moon:
         self.name = name
     
     def generate_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, self.flags)
+        return Entity(self.x, self.y, self.char, self.color, self, **self.flags)
     
     def generate_offset_entity(self, x, y):
-        return Entity(self.x + x, self.y + y, self.char, self.color, self.flags)
+        return Entity(self.x + x, self.y + y, self.char, self.color, self, **self.flags)
 

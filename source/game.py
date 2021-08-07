@@ -28,7 +28,7 @@ class Game:
         self.global_time:int = 0
         self.global_queue = ActionQueue()
         self.InputHandler:InputHandler = InputHandler()
-        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH)
+        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20,20,20))
         self.game_state = 'main_menu'
 
         #generate main menu
@@ -47,8 +47,7 @@ class Game:
     def start_new_game(self):
         #Code to generate player
         # None,{'x': 1, 'y': 1}
-        player_entity = NewtonianEntity(7, 7, '@', (255,255,255), None, {'x': 1, 'y': 1}, is_player=True)
-        # player_entity = Entity(1, 1, '@', (255,255,255), flags={'is_player': True})
+        player_entity = NewtonianEntity(7, 7, '@', (255,255,255), None, None, {'x': 1, 'y': 1}, is_player=True)
         self.player = Player(player_entity)
         
         #Code to generate initial system
