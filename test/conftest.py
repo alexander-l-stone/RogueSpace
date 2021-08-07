@@ -23,7 +23,7 @@ def long_action():
 
 @pytest.fixture
 def entity():
-    return Entity(1, 1, '@', (255, 255, 255))
+    return Entity(1, 1, '@', (255, 255, 255), None)
 
 @pytest.fixture
 def area():
@@ -32,7 +32,7 @@ def area():
 @pytest.fixture
 def area_with_entity():
     area = Area()
-    area.add_entity(Entity(1, 1, '@', (30, 60, 150)))
+    area.add_entity(Entity(1, 1, '@', (30, 60, 150), None))
     return area
 
 @pytest.fixture
