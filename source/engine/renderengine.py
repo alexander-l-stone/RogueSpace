@@ -13,7 +13,7 @@ class RenderEngine:
         self.SCREEN_WIDTH = screen_width
         self.game = game
         self.InputHandler = InputHandler()
-        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH)
+        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20, 20, 20))
 
     def render(self, root_console) -> None:
         self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)

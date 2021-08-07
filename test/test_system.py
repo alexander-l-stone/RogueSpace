@@ -18,7 +18,7 @@ def test_can_generate_system_area(system):
 def test_sector_level_collide(system, action_queue):
     area = Area()
     area.add_entity(system.generate_star_entity())
-    moving_entity = Entity(-1, 0, 'e', (255,0,0))
+    moving_entity = Entity(-1, 0, 'e', (255,0,0), None)
     area.add_entity(moving_entity)
     move_action = Action(moving_entity, 1, resolve_move_action, dx=1, dy=0, area=area)
     action_queue.push(move_action)
