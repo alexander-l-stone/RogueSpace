@@ -215,13 +215,15 @@ class GalaxyGenerator:
                     if abs(entity.x - xy['x'])**2 + abs(entity.y - xy['y'])**2 <= (entity.radius + cloudradius)**2:
                         overlap = True
             if not overlap:
-                d10 = randint(1, 10)
-                if d10 < 3:
+                d15 = randint(1, 15)
+                if d15 < 4:
                     system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'purple-gas', thin_color=(88, 0, 88)))
-                elif d10 < 5:
+                elif d15 < 7:
                     system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'green-gas', thin_color=(0, 100, 0)))
-                elif d10 < 7:
+                elif d15 < 9:
                     system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 150), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'cyan-gas', thin_color=(0, 100, 100)))
+                elif d15 < 12:
+                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (150, 0, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'red-gas', thin_color=(60, 0, 0)))
                 else:
                     system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'gold-dust', thin_color=(80, 45, 0)))
         return True
