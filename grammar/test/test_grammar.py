@@ -65,10 +65,9 @@ def test_variable():
     assert output
     assert output == "This story is the best the best"
 
-# TODO test internal var lookup once implemented
-# def test_dynamic_rule():
-#     rules = { 'root':Rule('root',["This story is #var:adj# #$var$#"]), 'adj':Rule('adj',["the best"]), 'the best':Rule("the best",["and dynamic"]) }
-#     grammar = Grammar(rules)
-#     output = grammar.generate()
-#     assert output
-#     assert output == "This story is the best and dynamic"
+def test_dynamic_rule():
+    rules = { 'root':Rule('root',["This story is #var:adj# #$var$#"]), 'adj':Rule('adj',["the best"]), 'the best':Rule("the best",["and dynamic"]) }
+    grammar = Grammar(rules)
+    output = grammar.generate()
+    assert output
+    assert output == "This story is the best and dynamic"

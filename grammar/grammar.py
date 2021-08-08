@@ -93,7 +93,10 @@ class Grammar:
             # process output from previous rec level
             if scope[-1]['scope_type'] == '#':
                 last_scope = scope.pop()
-                output += child_output
+                if len(scope) == 0:
+                    output += child_output
+                else:
+                    scope[-1]['token'] += child_output
                 if 'varstore' in last_scope:
                     user_vars[last_scope['varstore']] = child_output
 
@@ -120,10 +123,9 @@ class Grammar:
             if len(scope) == 0:
                 # top level no scope
                 # check for a scope begin char, else character is plaintext to output
+                # no top level <> scope! preprocess tags
                 if char == '#':
                     scope.append({'scope_type':'#', 'token':''})
-                elif char == '<':
-                    scope.append({'scope_type':'<', 'token':''})
                 elif char == '$':
                     scope.append({'scope_type':'$', 'token':''})
                 elif char == '[':
@@ -147,8 +149,8 @@ class Grammar:
                     print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-2]['token']}\n")
                     return (user_vars, parent_stack, output, scope[-2]['token'])
                 # TODO properly handle internal var lookup
-                # elif char == '$':
-                #     scope.append({'scope_type':'$', 'token':''})
+                elif char == '$':
+                    scope.append({'scope_type':'$', 'token':''})
                 elif char == '#':
                     exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
                     parent_stack.append(exp_frame)
@@ -159,12 +161,15 @@ class Grammar:
                 # print(f"token {scope[-1]['token']}")
             elif scope[-1]['scope_type'] == '$':
                 if char == '$':
-                    # output var to text, clear state
-                    if scope[-1]['token'] not in user_vars:
+                    # output var to outer scope (which may be literal output), clear state
+                    var_name = scope[-1]['token']
+                    if var_name not in user_vars:
                         raise AttributeError(f"var not defined before use: {scope[-1]['token']}\ncurrent output: {output}\nstack:{parent_stack}")
-                    output += user_vars[scope[-1]['token']]
-                    scope[-1]['scope_type'] = ''
-                    scope[-1]['token'] = ''
+                    scope.pop()
+                    if len(scope) == 0:
+                        output += user_vars[var_name]
+                    else:
+                        scope[-1]['token'] += user_vars[var_name]
                 else:
                     scope[-1]['token'] += char
             elif scope[-1]['scope_type'] == '<':
@@ -206,6 +211,7 @@ class Rule:
     def __init__(self, name:str, expansions:list):
         self.name = name
         self.expansions = {}
+        #TODO precalculate tag mapping
         for exp in expansions:
             # if the string starts with a number and a %, strip that off as a weight
             numstr = ''
@@ -225,8 +231,9 @@ class Rule:
                     break
             if not inserted:
                 self.expansions[exp] = 1
-
-    def select_child(self):
+        
+    # TODO add argument to filter by tag
+    def select_child(self)->str:
         '''
         randomly select an expansion by weight
         '''
