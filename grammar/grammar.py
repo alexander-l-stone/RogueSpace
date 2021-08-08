@@ -64,7 +64,10 @@ class Grammar:
                     curr_rule = self.rules[rule_name]
                 else:
                     raise AttributeError(f"rule name not found: {rule_name}\ncurrent output: {output}\nstack:{parent_stack}")
-                child_expansion = curr_rule.select_child()
+                if 'tags' in parent_stack[-1]['scope'][-1]:
+                    child_expansion = curr_rule.select_child(parent_stack[-1]['scope'][-1]['tags'])
+                else:
+                    child_expansion = curr_rule.select_child()
                 print(f"\nrule_name {rule_name} rule {curr_rule} chosen exp {child_expansion}\n")
                 ret = self.__expand_rule_helper(user_vars, parent_stack, output, True, child_expansion)
             elif len(ret) == 3:
@@ -173,8 +176,20 @@ class Grammar:
                 else:
                     scope[-1]['token'] += char
             elif scope[-1]['scope_type'] == '<':
-                # TODO
-                pass
+                if char == '>':
+                    # output var to outer scope (which may be literal output), clear state
+                    tag = scope[-1]['token']
+                    popped_scope = scope.pop()
+                    if len(scope) == 0:
+                        # impossible
+                        raise AttributeError(f"impossible tag lookup in outside scope: tag: {tag}\nscope: {popped_scope}\ncurrent output: {output}\nstack:{parent_stack}")
+                    elif scope[-1]['scope_type'] == "#":
+                        if 'tags' not in scope[-1]:
+                            scope[-1]['tags'] = [tag]
+                        else:
+                            scope[-1]['tags'].append(tag)
+                else:
+                    scope[-1]['token'] += char
             elif scope[-1]['scope_type'] == '[':
                 # TODO
                 pass
@@ -210,15 +225,17 @@ class Grammar:
 class Rule:
     def __init__(self, name:str, expansions:list):
         self.name = name
-        self.expansions = {}
+        self.expansions = {} # str expansion -> tuple(int weight, array[str] tags)
         #TODO precalculate tag mapping
         for exp in expansions:
             # if the string starts with a number and a %, strip that off as a weight
             numstr = ''
             inserted = False
             for char in exp:
+                if char == '\\':
+                    continue
                 if not char.isdigit() and char != '%':
-                    self.expansions[exp] = 1
+                    self.expansions[exp] = (1, [])
                     inserted = True
                     break
                 if char != '%':
@@ -226,27 +243,83 @@ class Rule:
                 elif numstr == '':
                     raise AttributeError(f"Null weight. Rule: {name} Expansion: {exp}")
                 else:
-                    self.expansions[exp[len(numstr)+1:]] = int(numstr)
+                    self.expansions[exp[len(numstr)+1:]] = (int(numstr), [])
                     inserted = True
                     break
             if not inserted:
-                self.expansions[exp] = 1
-        
+                self.expansions[exp] = (1, [])
+        # strip tags and escapes
+        changed_dict = {}
+        for exp,data in self.expansions.items():
+            tag_ind = None
+            i = 0
+            while i < len(exp):
+                if i >= len(exp):
+                    break
+                char = exp[i]
+                if char == '\\':
+                    i += 1 # skip the character after the \
+                elif char == '<':
+                    tag_ind = i
+                elif tag_ind is not None:
+                    if char in "#$<[]":
+                        raise AttributeError(f"Illegal use of 'special character '{char}' inside tag. Rule: {name} Expansion: {exp}")
+                    if char == '>':
+                        data[1].append(exp[tag_ind+1:i]) # TODO inclusive end index?
+                        exp = exp[0:tag_ind] + exp[i+1:]
+                        i = tag_ind - 1 # the loop will increment
+                        tag_ind = None
+                i += 1
+            # add self to the new dict so we don't need to modify the old one during iteration
+            changed_dict[exp] = data
+        self.expansions = changed_dict
+
     # TODO add argument to filter by tag
-    def select_child(self)->str:
+    def select_child(self, tags=None)->str:
         '''
-        randomly select an expansion by weight
+        Randomly select an expansion by weight
+        If a tag is provided, only consider expansions which have that tag
         '''
         total_weight = 0
-        for exp,weight in self.expansions.items():
-            total_weight += weight
+        for exp,data in self.expansions.items():
+            if tags is not None:
+                should_continue = False
+                for tag in tags:
+                    if tag not in data[1]:
+                        print(f'{tag} not in {data[1]}')
+                        should_continue = True
+                        continue
+                    print(f'{tag} yes in {data[1]}')
+                if should_continue:
+                    continue
+
+            total_weight += data[0]
+
+        if total_weight == 0:
+            raise AttributeError(f"No valid expansions for tags {tags} in rule {self}")
+
         rand = randint(1, total_weight)
-        for exp,weight in self.expansions.items():
-            rand -= weight
+        for exp,data in self.expansions.items():
+            if tags is not None:
+                should_continue = False
+                for tag in tags:
+                    if tag not in data[1]:
+                        should_continue = True
+                        continue
+                if should_continue:
+                    continue
+
+            rand -= data[0]
             if rand <= 0:
                 return exp
         # unreachable
         return None
+    
+    def __repr__(self):
+        return '"' + self.name + '" : ' + str(self.expansions)
+
+    def __str__(self):
+        return '"' + self.name + '" : ' + str(self.expansions)
 
 def read_grammar(fileName:str):
     '''

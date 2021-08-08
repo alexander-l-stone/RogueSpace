@@ -7,7 +7,7 @@ def test_rule():
     rule = Rule(name, expansions)
     assert rule
     assert rule.name == name
-    assert rule.expansions == {"exp1":1,"exp2":23}
+    assert rule.expansions == {"exp1":(1,[]),"exp2":(23,[])}
 
 def test_rule_missing_weight():
     name = "rule_name"
@@ -71,3 +71,25 @@ def test_dynamic_rule():
     output = grammar.generate()
     assert output
     assert output == "This story is the best and dynamic"
+
+def test_tag():
+    rule = Rule('tagged', ["has<tag>"])
+    assert rule
+    exp = rule.select_child()
+    assert "has" == exp
+    exp = rule.select_child([])
+    assert "has" == exp
+
+def test_tag_invoke():
+    rule = Rule('tagged', ["has<tag>", "doesn't have tag"])
+    assert rule
+    for i in range(10):
+        exp = rule.select_child(['tag'])
+        assert "has" == exp
+
+def test_tag_multi_invoke():
+    rule = Rule('tagged', ["has<tag><other>", "doesn't have other tag<tag>", "doesn't have tag tag<other>"])
+    assert rule
+    for i in range(10):
+        exp = rule.select_child(['tag', 'other'])
+        assert "has" == exp
