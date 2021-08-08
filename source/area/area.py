@@ -91,7 +91,7 @@ class Area:
         else:
             return []
     
-    def draw(self, root_console, playerx, playery, screen_width, screen_height, **config) -> None:
+    def draw(self, root_console, playerx, playery, tick_count, screen_width, screen_height, **config) -> None:
         """Draw everything in the visible area
 
         Args:
@@ -101,6 +101,7 @@ class Area:
             screen_height (int): [description]
             config(dict): On occasion there could be configuration flags passed through here
         """
+        tick_count = tick_count//50
         corner_x = playerx - screen_width//2
         corner_y = playery - screen_height//2
         root_console.default_bg = self.background_color
@@ -109,8 +110,12 @@ class Area:
                 entities_at_point = self.get_entities_at_coordinates(drawx, drawy)
                  #TODO: Do the below in a way that doesn't suck
                 if entities_at_point is not None and len(entities_at_point) > 0:
+                    i = tick_count % len(entities_at_point)
                     if len(entities_at_point) > 1:
-                        entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                        if 'priority_draw' in entities_at_point[-1].flags:
+                            entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                        else:
+                            entities_at_point[-i].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
                     else:
                         entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color)
                

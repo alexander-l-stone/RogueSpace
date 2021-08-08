@@ -47,7 +47,7 @@ class Game:
     def start_new_game(self):
         #Code to generate player
         # None,{'x': 1, 'y': 1}
-        player_entity = NewtonianEntity(7, 7, '@', (255,255,255), None, None, {'x': 1, 'y': 1}, is_player=True)
+        player_entity = NewtonianEntity(7, 7, '@', (255,255,255), None, None, {'x': 1, 'y': 1}, is_player=True, priority_draw=True)
         self.player = Player(player_entity)
         
         #Code to generate initial system

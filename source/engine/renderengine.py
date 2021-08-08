@@ -5,6 +5,8 @@ from source.ui.ui_panel import UIPanel
 from source.galaxy.galaxy import Galaxy
 from source.system.system import System
 from source.entity.newtonian_entity import NewtonianEntity
+import time
+import sys
 
 class RenderEngine:
     def __init__(self, tileset, screen_height, screen_width, game):
@@ -14,12 +16,16 @@ class RenderEngine:
         self.game = game
         self.InputHandler = InputHandler()
         self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20, 20, 20))
+        self.tick_count = 0
 
     def render(self, root_console) -> None:
+        self.tick_count += 1
+        if self.tick_count == sys.maxsize:
+            self.tick_count = 0
         if self.game.game_state != 'game':
             self.game.current_menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
         else:
-            self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+            self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.tick_count, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
             self.bot_ui.draw(root_console)
             self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"{self.game.player.current_entity.x}, {-self.game.player.current_entity.y}")//2, 1, f"{self.game.player.current_entity.x}, {-self.game.player.current_entity.y}")
             if not isinstance(self.game.current_location, Galaxy):
@@ -52,7 +58,7 @@ class RenderEngine:
                 self.game.player.current_entity.generate_vector_path()
             self.game.event_engine.global_time += 1
         else:
-            for event in tcod.event.wait():
+            for event in tcod.event.get():
                 if event.type == "KEYDOWN":
                     result = self.InputHandler.handle_keypress(event)
                     self.game.event_engine.resolve_keyboard_input(result)
@@ -61,7 +67,7 @@ class RenderEngine:
 
 
     def menu_loop(self, root_console, menu):
-        for event in tcod.event.wait():
+        for event in tcod.event.get():
             if event.type == "KEYDOWN":
                 result = menu.handle_key_presses(event)
                 self.game.event_engine.resolve_menu_kb_input(result)
