@@ -12,8 +12,8 @@ class Ship:
         self.max_health = 50
         self.max_heat = 50
         self.fuel = self.max_fuel
-        self.health = self.max_health
-        self.heat = 0
+        self.health = 4
+        self.heat = 36
         self.thrust = {'x': 1, 'y': 1} #currently unused
 
     def thrust(self, dx, dy):
