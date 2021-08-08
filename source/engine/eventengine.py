@@ -97,6 +97,7 @@ class EventEngine:
                 self.global_queue.push(action)
         elif(result["type"] == "menu"):
             self.game.game_state = "game_menu"
+            self.game.current_menu = self.game.game_menu
     
     def resolve_menu_kb_input(self, result):
         if result['type'] == 'exit':

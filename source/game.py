@@ -34,14 +34,15 @@ class Game:
         self.main_menu = Menu()
         new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
         load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
-        exit = MenuItem('Exit', select=lambda: {'type': 'exit'})
-        self.main_menu.menu_items.extend([new_game, load_game, exit])
+        exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
+        self.main_menu.menu_items.extend([new_game, load_game, exit_game])
+        self.current_menu = self.main_menu
 
         #generate game menu
         self.game_menu = Menu()
         save_game = MenuItem('Save Game', select=lambda: {'type': 'save'})
         close_menu = MenuItem('Close', select=lambda: {'type': 'close'})
-        self.game_menu.menu_items.extend([save_game, load_game, exit, close_menu])
+        self.game_menu.menu_items.extend([close_menu, save_game, load_game, exit_game])
 
     def start_new_game(self):
         #Code to generate player
