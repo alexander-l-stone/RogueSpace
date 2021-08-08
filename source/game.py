@@ -41,7 +41,7 @@ class Game:
         #generate game menu
         self.game_menu = Menu()
         save_game = MenuItem('Save Game', select=lambda: {'type': 'save'})
-        close_menu = MenuItem('Close', select=lambda: {'type': 'close'})
+        close_menu = MenuItem('Close Menu', select=lambda: {'type': 'close'})
         self.game_menu.menu_items.extend([close_menu, save_game, load_game, exit_game])
 
     def start_new_game(self):
