@@ -14,10 +14,9 @@ class Ship:
         self.fuel = self.max_fuel
         self.health = 4
         self.heat = 36
-        self.thrust = {'x': 1, 'y': 1} #currently unused
 
     def thrust(self, dx, dy):
-        fuel_cost = dx + dy
+        fuel_cost = abs(dx) + abs(dy)
         if fuel_cost > self.fuel:
             self.entity_repr.thrust(0, 0)
         else:
