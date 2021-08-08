@@ -75,7 +75,7 @@ def test_dynamic_rule():
     assert output == "This story is the best and dynamic"
 
 def test_tag():
-    rule = Rule('tagged', ["<tag>has"])
+    rule = Rule('tagged', ["has<tag>"])
     assert rule
     exp = rule.select_child()
     assert "has" == exp
@@ -83,14 +83,14 @@ def test_tag():
     assert "has" == exp
 
 def test_tag_invoke():
-    rule = Rule('tagged', ["<tag>has", "doesn't have tag"])
+    rule = Rule('tagged', ["has<tag>", "doesn't have tag"])
     assert rule
     for i in range(10):
         exp = rule.select_child(['tag'])
         assert "has" == exp
 
 def test_tag_multi_invoke():
-    rule = Rule('tagged', ["<tag><other>has", "<tag>doesn't have other tag", "<other>doesn't have tag tag"])
+    rule = Rule('tagged', ["has<tag><other>", "doesn't have other tag<tag>", "doesn't have tag tag<other>"])
     assert rule
     for i in range(10):
         exp = rule.select_child(['tag', 'other'])
@@ -98,15 +98,15 @@ def test_tag_multi_invoke():
 
 def test_grammar_tag():
     root = Rule('root', ["#tagged<tag>#"])
-    rule = Rule('tagged', ["<tag>has", "doesn't have tag"])
+    rule = Rule('tagged', ["has<tag>", "doesn't have tag"])
     grammar = Grammar({'root':root,'tagged':rule})
     for i in range(10):
         output = grammar.generate()
         assert "has" == output
 
 def test_grammar_multi_tag():
-    root = Rule('root', ["#<tag>tagged<other>#"])
-    rule = Rule('tagged', ["<tag><other>has", "<tag>doesn't have other tag", "<other>doesn't have tag tag"])
+    root = Rule('root', ["#<tag>tagged<other>#"]) # acceptable to invoke tag from anywhere
+    rule = Rule('tagged', ["has<tag><other>", "doesn't have other tag<tag>", "doesn't have tag tag<other>"])
     grammar = Grammar({'root':root,'tagged':rule})
     for i in range(10):
         output = grammar.generate()

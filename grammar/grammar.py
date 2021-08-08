@@ -15,8 +15,6 @@ from random import seed, randint
     Rule
     name = [expansion1, expansion2, ...]
 
-    tagging system?
-
     syntax so far
     #rule#
     [runWithoutOutput]
@@ -35,6 +33,9 @@ from random import seed, randint
 
     reserved chars
     \\[]:#$%<>
+
+    weights must be initial
+    tags for an expansion must be final
 '''
 #TODO: Allow different tags to add a different weight to the same rule
 # TODO consider a way to functionalize scope parses for reusability (don't break trampoline rule)
@@ -260,26 +261,24 @@ class Rule:
         changed_dict = {}
         for exp,data in self.expansions.items():
             tag_ind = None
-            i = 0
-            while i < len(exp):
-                if i >= len(exp):
-                    break
+            i = len(exp) - 1
+            while i >= 0:
                 char = exp[i]
-                if char == '\\':
-                    i += 1 # skip the character after the \
-                elif char == '<':
+                if i > 0 and exp[i-1] == '\\':
+                    i -= 1 # skip the character after the \
+                elif char == '>':
                     tag_ind = i
                 elif tag_ind is not None:
-                    if char in "#$<[]":
+                    if char in "#$>[]":
                         raise AttributeError(f"Illegal use of 'special character '{char}' inside tag. Rule: {name} Expansion: {exp}")
-                    if char == '>':
-                        data[1].append(exp[tag_ind+1:i]) # TODO inclusive end index?
-                        exp = exp[0:tag_ind] + exp[i+1:]
-                        i = tag_ind - 1 # the loop will increment
+                    if char == '<':
+                        data[1].append(exp[i+1:tag_ind]) # TODO inclusive end index?
+                        exp = exp[0:i] + exp[tag_ind+1:]
                         tag_ind = None
                 else:
+                    # TODO maybe actually parse the whole exp and warn on mid-string tags?
                     break
-                i += 1
+                i -= 1
             # add self to the new dict so we don't need to modify the old one during iteration
             changed_dict[exp] = data
         self.expansions = changed_dict
