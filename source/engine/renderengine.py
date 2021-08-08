@@ -39,16 +39,16 @@ class RenderEngine:
     
     def game_loop(self, root_console) -> None:
         self.render(root_console)
-        if self.game.global_queue.player_actions_count > 0:
-            self.game.resolve_actions()
+        if self.game.event_engine.global_queue.player_actions_count > 0:
+            self.game.event_engine.resolve_actions()
             if type(self.game.player.current_entity) is NewtonianEntity:
                 self.game.player.current_entity.generate_vector_path()
-            self.game.global_time += 1
+            self.game.event_engine.global_time += 1
         else:
             for event in tcod.event.wait():
                 if event.type == "KEYDOWN":
                     result = self.InputHandler.handle_keypress(event)
-                    self.game.resolve_keyboard_input(result)
+                    self.game.event_engine.resolve_keyboard_input(result)
                 if event.type == "QUIT":
                     raise SystemExit()
         root_console.clear()
@@ -58,7 +58,7 @@ class RenderEngine:
         for event in tcod.event.wait():
             if event.type == "KEYDOWN":
                 result = menu.handle_key_presses(event)
-                self.game.resolve_menu_kb_input(result)
+                self.game.event_engine.resolve_menu_kb_input(result)
             if event.type == "QUIT":
                 raise SystemExit()
         root_console.clear()
