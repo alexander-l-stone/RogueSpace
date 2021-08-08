@@ -36,6 +36,8 @@ from random import seed, randint
     reserved chars
     \\[]:#$%<>
 '''
+#TODO: Allow different tags to add a different weight to the same rule
+# TODO consider a way to functionalize scope parses for reusability (don't break trampoline rule)
 
 class Grammar:
     def __init__(self, rules:dict):
@@ -44,16 +46,19 @@ class Grammar:
     # TODO make a grammar visualizer
     # TODO preparse rules into a node tree to optimize generation
 
-    def generate(self):
-        if 'root' not in self.rules:
-            raise AttributeError(f"No rule named \"root\" to start from")
-        return self.expand_rule(self.rules['root'])
+    # TODO turn debug prints into logging so they can be toggled
+
+    def generate(self, root='root'):
+        # TODO parse tags
+        if root not in self.rules:
+            raise AttributeError(f"No rule named \"{root}\" to start from")
+        return self.expand_rule(self.rules[root])
 
     def expand_rule(self, rule):
         exp:str = rule.select_child()
         ret = self.__expand_rule_helper({}, [], '', True, exp)
         while True:
-            print(f"EXPAND {ret}")
+            # print(f"EXPAND {ret}")
             if len(ret) == 4:
                 # user_vars, parent_stack, output, rule_name
                 user_vars = ret[0]
@@ -68,7 +73,7 @@ class Grammar:
                     child_expansion = curr_rule.select_child(parent_stack[-1]['scope'][-1]['tags'])
                 else:
                     child_expansion = curr_rule.select_child()
-                print(f"\nrule_name {rule_name} rule {curr_rule} chosen exp {child_expansion}\n")
+                # print(f"\nrule_name {rule_name} rule {curr_rule} chosen exp {child_expansion}\n")
                 ret = self.__expand_rule_helper(user_vars, parent_stack, output, True, child_expansion)
             elif len(ret) == 3:
                 user_vars = ret[0]
@@ -103,9 +108,9 @@ class Grammar:
                 if 'varstore' in last_scope:
                     user_vars[last_scope['varstore']] = child_output
 
-            print(f"\nFRAME UNPACK: ")
+            # print(f"\nFRAME UNPACK: ")
         
-        print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
+        # print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
         
 
         # TODO implement
@@ -149,15 +154,16 @@ class Grammar:
                     scope[-1]['token'] = ''
                     exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
                     parent_stack.append(exp_frame)
-                    print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-2]['token']}\n")
+                    # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-2]['token']}\n")
                     return (user_vars, parent_stack, output, scope[-2]['token'])
-                # TODO properly handle internal var lookup
                 elif char == '$':
                     scope.append({'scope_type':'$', 'token':''})
+                elif char == '<':
+                    scope.append({'scope_type':'<', 'token':''})
                 elif char == '#':
                     exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
                     parent_stack.append(exp_frame)
-                    print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-1]['token']}\n")
+                    # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-1]['token']}\n")
                     return (user_vars, parent_stack, output, scope[-1]['token'])
                 else:
                     scope[-1]['token'] += char
@@ -176,7 +182,9 @@ class Grammar:
                 else:
                     scope[-1]['token'] += char
             elif scope[-1]['scope_type'] == '<':
-                if char == '>':
+                if char == '$':
+                    scope.append({'scope_type':'$', 'token':''})
+                elif char == '>':
                     # output var to outer scope (which may be literal output), clear state
                     tag = scope[-1]['token']
                     popped_scope = scope.pop()
@@ -203,7 +211,7 @@ class Grammar:
             i += 1
         
         # output to higher level
-        print(f"FRAME EXIT\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\n")
+        # print(f"FRAME EXIT\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\n")
         return (user_vars, parent_stack, output)
 
     def __make_exp_frame(self, exp, scope, output, i):
@@ -269,6 +277,8 @@ class Rule:
                         exp = exp[0:tag_ind] + exp[i+1:]
                         i = tag_ind - 1 # the loop will increment
                         tag_ind = None
+                else:
+                    break
                 i += 1
             # add self to the new dict so we don't need to modify the old one during iteration
             changed_dict[exp] = data
