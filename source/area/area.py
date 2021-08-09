@@ -113,9 +113,9 @@ class Area:
                     i = animation_frame % len(entities_at_point)
                     if len(entities_at_point) > 1:
                         if 'priority_draw' in entities_at_point[-1].flags:
-                            entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                            entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, animation_frame, other_entities=entities_at_point[0::-1])
                         else:
-                            entities_at_point[-i].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                            entities_at_point[-i].draw(root_console, corner_x, corner_y, self.background_color, animation_frame, other_entities=entities_at_point[0::-1])
                     else:
-                        entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color)
+                        entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, animation_frame)
                
