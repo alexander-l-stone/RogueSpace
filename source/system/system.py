@@ -31,7 +31,7 @@ class System:
             self.star.radius = 10
         else:
             self.star.radius = 7
-        self.seed = randint(1, 100) + self.x + self.y + self.hyperlimit
+        self.seed = randint(1, 100) + self.x + self.y
     
     def point_inside(self, x, y):
         self.star.point_inside(x, y)
