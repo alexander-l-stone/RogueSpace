@@ -95,6 +95,8 @@ class EventEngine:
             actions = self.game.player.current_entity.generate_move_actions(self.global_time+1)
             for action in actions:
                 self.global_queue.push(action)
+        elif(result["type"] == "cheat-fuel"):
+            self.game.player.current_ship.fuel += 10
         elif(result["type"] == "menu"):
             self.game.game_state = "game_menu"
             self.game.current_menu = self.game.game_menu
