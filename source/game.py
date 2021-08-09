@@ -16,6 +16,7 @@ from source.engine.eventengine import EventEngine
 from source.helper_functions.circle_conversions import *
 from source.system.system import System
 from source.ui.ui_panel import UIPanel
+from source.ship.ship import Ship
 
 class Game:
     def __init__(self, config:Dict={}):
@@ -47,8 +48,13 @@ class Game:
     def start_new_game(self):
         #Code to generate player
         # None,{'x': 1, 'y': 1}
-        player_entity = NewtonianEntity(7, 7, '@', (255,255,255), None, None, {'x': 1, 'y': 1}, is_player=True, priority_draw=True)
-        self.player = Player(player_entity)
+        self.player = Player()
+        player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
+        self.player.assign_ship(player_ship)
+        self.player.current_entity.vector.x = 1
+        self.player.current_entity.vector.y = 1
+        self.player.current_entity.x = 7
+        self.player.current_entity.y = 7
         
         #Code to generate initial system
         self.galaxy = Galaxy()
@@ -58,7 +64,7 @@ class Game:
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
         self.current_area:Area = None
         self.generate_current_area()
-        self.current_area.add_entity(player_entity)
+        self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
 
     def save_game(self):

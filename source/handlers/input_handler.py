@@ -28,6 +28,8 @@ class InputHandler:
             return {"type": "wait"}
         elif(event.sym == tcod.event.K_j):
             return {"type": "jump"}
+        elif(event.sym == tcod.event.K_f):
+            return {"type": "cheat-fuel"}
         elif(event.sym == tcod.event.K_ESCAPE):
             return {"type": "menu", "value": "open"}
         else:

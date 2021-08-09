@@ -1,12 +1,14 @@
 import tcod
-
-from source.handlers.input_handler import InputHandler
-from source.ui.ui_panel import UIPanel
-from source.galaxy.galaxy import Galaxy
-from source.system.system import System
-from source.entity.newtonian_entity import NewtonianEntity
 import time
 import sys
+
+from source.entity.newtonian_entity import NewtonianEntity
+from source.galaxy.galaxy import Galaxy
+from source.handlers.input_handler import InputHandler
+from source.system.system import System
+from source.ui.ui_bar import UIBar
+from source.ui.ui_message import UIMessage
+from source.ui.ui_panel import UIPanel
 
 class RenderEngine:
     def __init__(self, tileset, screen_height, screen_width, game):
@@ -15,7 +17,24 @@ class RenderEngine:
         self.SCREEN_WIDTH = screen_width
         self.game = game
         self.InputHandler = InputHandler()
-        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20, 20, 20))
+
+        STATUS_LABEL_WIDTH = 8
+        STATUS_BAR_WIDTH = 10
+        STATUS_WIDTH = STATUS_LABEL_WIDTH + STATUS_BAR_WIDTH
+        panel = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20, 20, 20))
+        panel.elements['label_health'] = UIMessage(panel, 1, 1, 'Health', (255,255,255))
+        panel.elements['bar_health'] = UIBar(panel, STATUS_LABEL_WIDTH, 1, STATUS_BAR_WIDTH, 1, (0, 255, 0), (0, 120, 0), (0, 0, 0), 45, 100)
+        panel.elements['label_heat'] = UIMessage(panel, 1, 2, 'Heat', (255,255,255))
+        panel.elements['bar_heat'] = UIBar(panel, STATUS_LABEL_WIDTH, 2, STATUS_BAR_WIDTH, 1, (255, 0, 0), (120, 0, 0), (0, 0, 0), 33, 100)
+        panel.elements['label_fuel'] = UIMessage(panel, 1, 3, 'Fuel', (255,255,255))
+        panel.elements['bar_fuel'] = UIBar(panel, STATUS_LABEL_WIDTH, 3, STATUS_BAR_WIDTH, 1, (255, 255, 0), (120, 120, 0), (0, 0, 0), 77, 100)
+
+        MESSAGE_CENTER = (screen_width - STATUS_WIDTH) / 2 + STATUS_WIDTH
+        MESSAGE_LEFT = int(MESSAGE_CENTER - 3)
+        panel.elements['coordinates'] = UIMessage(panel, MESSAGE_LEFT, 2, '(0, 0)', (255, 255, 255))
+        panel.elements['vector'] = UIMessage(panel, MESSAGE_LEFT, 3, '(0, 0)', (255, 255, 255))
+
+        self.ui = {'hud': panel}
         self.tick_count = 0
 
     def render(self, root_console) -> None:
@@ -25,14 +44,24 @@ class RenderEngine:
         if self.game.game_state != 'game':
             self.game.current_menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
         else:
+            self.update_hud()
             self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.tick_count, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-            self.bot_ui.draw(root_console)
-            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"{self.game.player.current_entity.x}, {-self.game.player.current_entity.y}")//2, 1, f"{self.game.player.current_entity.x}, {-self.game.player.current_entity.y}")
-            if not isinstance(self.game.current_location, Galaxy):
-                self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(self.game.current_location.name)//2, 2, self.game.current_location.name, )
-            elif isinstance(self.game.current_location, System):
-                self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Hyperlimit: {self.game.current_location.hyperlimit}")//2, 3, f"Hyperlimit: {self.game.current_location.hyperlimit}", (255, 0, 0))
-                self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Planets: {len(self.game.current_location.planet_list)}")//2, 4, f"Planets: {len(self.game.current_location.planet_list)}")
+            for panel in self.ui.values():
+                # draw all panels
+                panel.draw(root_console)
+
+    def update_hud(self) -> None:
+        hud = self.ui['hud']
+        # TODO if the player becomes not a ship, make this a switch
+        hud.elements['bar_health'].curr_value = self.game.player.current_ship.health
+        hud.elements['bar_health'].max_value = self.game.player.current_ship.max_health
+        hud.elements['bar_heat'].curr_value = self.game.player.current_ship.heat
+        hud.elements['bar_heat'].max_value = self.game.player.current_ship.max_heat
+        hud.elements['bar_fuel'].curr_value = self.game.player.current_ship.fuel
+        hud.elements['bar_fuel'].max_value = self.game.player.current_ship.max_fuel
+
+        hud.elements['coordinates'].message = f"({self.game.player.current_entity.x}, {self.game.player.current_entity.y})"
+        hud.elements['vector'].message = f"({self.game.player.current_entity.vector.x}, {self.game.player.current_entity.vector.y})"
 
     def game_loop(self):
         with tcod.context.new_terminal(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, tileset=self.tileset, title="Rogue Expedition", vsync=True) as context:
