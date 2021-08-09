@@ -4,7 +4,7 @@ from typing import Dict
 from source.entity.entity import Entity
 
 class Area:
-    def __init__(self, bg=(0,0,0), **flags):
+    def __init__(self, parent, bg=(0,0,0), **flags):
         self.entity_dict: dict = {}
         self.background_color = bg
         self.flags = flags

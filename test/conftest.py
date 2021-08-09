@@ -27,11 +27,11 @@ def entity():
 
 @pytest.fixture
 def area():
-    return Area()
+    return Area(None)
 
 @pytest.fixture
 def area_with_entity():
-    area = Area()
+    area = Area(None)
     area.add_entity(Entity(1, 1, '@', (30, 60, 150), None))
     return area
 

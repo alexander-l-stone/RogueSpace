@@ -48,6 +48,7 @@ class EventEngine:
                     self.game.galaxy.galaxy_generator.generate_planets(self.game.current_location)
                     self.game.current_location.explored = True
                 result['entering_entity'].x, result['entering_entity'].y = int(self.game.current_location.hyperlimit*math.cos(theta)), int(self.game.current_location.hyperlimit*math.sin(theta))
+                self.game.game_state = 'game_system'
             self.game.generate_current_area()
             self.game.current_area.add_entity(self.game.player.current_entity)
     
@@ -76,6 +77,7 @@ class EventEngine:
                             self.game.current_location.generate_new_sector(key[0], key[1])
                 self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_entity.x, self.game.player.current_entity.y)
                 self.game.current_area.add_entity(self.game.player.current_entity)
+                self.game.game_state = 'game_galaxy'
                 return True
             else:
                 return False
@@ -98,7 +100,7 @@ class EventEngine:
         elif(result["type"] == "cheat-fuel"):
             self.game.player.current_ship.fuel += 10
         elif(result["type"] == "menu"):
-            self.game.game_state = "game_menu"
+            self.game.game_state = "menu_game"
             self.game.current_menu = self.game.game_menu
     
     def resolve_menu_kb_input(self, result):
@@ -109,9 +111,10 @@ class EventEngine:
                 self.game.start_new_game()
             elif result['value'] == 'load':
                 self.game.load_game()
-            self.game.game_state = 'game'
         elif result['type'] == 'close':
-            self.game.game_state = 'game'
+            if type(self.game.current_location) is System:
+                self.game.game_state = 'game_system'
+            elif type(self.game.current_location) is Galaxy:
+                self.game.game_state = 'game_galaxy'
         elif(result["type"] == "save"):
             self.game.save_game()
-            self.game.game_state = "game"

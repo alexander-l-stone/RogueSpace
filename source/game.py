@@ -29,7 +29,7 @@ class Game:
             self)
         self.event_engine = EventEngine(self)
         self.InputHandler:InputHandler = InputHandler()
-        self.game_state = 'main_menu'
+        self.game_state = 'menu_main'
 
         #generate main menu
         self.main_menu = Menu()
@@ -66,6 +66,7 @@ class Game:
         self.generate_current_area()
         self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
+        self.game_state = 'game_system'
 
     def save_game(self):
         save_dict = {
@@ -75,6 +76,7 @@ class Game:
             'player': self.player,
             'current_location': self.current_location,
             'current_area': self.current_area,
+            'game_state': self.game_state
         }
         try:
             with open('saves/save.p', 'wb+') as save_file:
@@ -93,6 +95,7 @@ class Game:
                 self.player = data['player']
                 self.current_location = data['current_location']
                 self.current_area = data['current_area']
+                self.game_state = data['game_state']
         except FileNotFoundError:
             pass
 

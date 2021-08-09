@@ -6,7 +6,7 @@ def test_can_instantiate_area():
     Test that Area can be instantiated
     """
     assert Area
-    new_area = Area()
+    new_area = Area(None)
     assert type(new_area) is Area
 
 def test_can_add_entity(entity, area):

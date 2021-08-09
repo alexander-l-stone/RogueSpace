@@ -29,3 +29,15 @@ def test_galaxy_create_area(galaxy):
             out_area = True
     assert in_area == True
     assert out_area == False
+
+def test_galaxy_get_sytems_within_radius(galaxy):
+    galaxy.system_dict = {(0,0): (0,0), (5, 0): (5,0), (1, 1): (1,1)}
+    galaxy.explored_dict = {(0,0): True}
+    explored_list = galaxy.get_systems_within_radius(0, 0, 4)
+    assert explored_list == [(0,0), (1,1)]
+
+def test_galaxy_get_systems_returns_right_order(galaxy):
+    galaxy.system_dict = {(0,0): (0,0), (1, 0): (1,0), (1,1): (1,1), (1, 2): (1, 2), (2, 0): (2,0), (2, 1): (2, 1), (2, 2): (2,2)}
+    galaxy.explored_dict = {(0,0): True}
+    explored_list = galaxy.get_systems_within_radius(0, 0, 5)
+    assert explored_list == [(0,0), (1,0), (1,1), (1,2), (2,0), (2,1), (2,2)]

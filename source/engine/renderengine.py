@@ -41,7 +41,7 @@ class RenderEngine:
         self.tick_count += 1
         if self.tick_count == sys.maxsize:
             self.tick_count = 0
-        if self.game.game_state != 'game':
+        if self.game.game_state.split('_')[0] != 'game':
             self.game.current_menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
         else:
             self.update_hud()
@@ -68,11 +68,11 @@ class RenderEngine:
             root_console = tcod.Console(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F')
             while True:
                 context.present(root_console)
-                if (self.game.game_state == 'game'):
+                if (self.game.game_state == 'game_system' or self.game.game_state == 'game_galaxy'):
                     self.event_loop(root_console)
-                elif (self.game.game_state == 'main_menu'):
+                elif (self.game.game_state == 'menu_main'):
                     self.menu_loop(root_console, self.game.main_menu)
-                elif (self.game.game_state == 'game_menu'):
+                elif (self.game.game_state == 'menu_game'):
                     self.menu_loop(root_console, self.game.game_menu)
                 self.render_console(root_console)
     

@@ -40,7 +40,7 @@ class System:
             return dx**2 + dy**2 < tempradius**2
 
     def generate_area(self, entity_list=[]):
-        system_area = Area(self.bgcolor, name=self.name, generate_background=True)
+        system_area = Area(self, self.bgcolor, name=self.name, generate_background=True)
         for entity in self.entity_list:
             if isinstance(entity, Cloud):
                 entity.generate_entities(system_area)

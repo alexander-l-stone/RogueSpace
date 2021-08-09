@@ -16,7 +16,7 @@ def test_can_generate_system_area(system):
     assert isinstance(system.generate_area(), Area)
 
 def test_sector_level_collide(system, action_queue):
-    area = Area()
+    area = Area(None)
     area.add_entity(system.generate_star_entity())
     moving_entity = Entity(-1, 0, 'e', (255,0,0), None)
     area.add_entity(moving_entity)
