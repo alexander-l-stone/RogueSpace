@@ -1,10 +1,13 @@
+import math
+from random import seed, randint
+
 from source.area.area import Area
-from source.entity.entity import Entity
-from source.ring.ring import Ring
 from source.belt.belt import Belt
 from source.cloud.cloud import Cloud
+from source.entity.entity import Entity
+from source.ring.ring import Ring
 from source.system.star import Star
-import math
+
 
 class System:
     def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, bgcolor=(0,0,0), **flags):
@@ -28,6 +31,7 @@ class System:
             self.star.radius = 10
         else:
             self.star.radius = 7
+        self.seed = randint(1, 100) + self.x + self.y + self.hyperlimit
     
     def point_inside(self, x, y):
         self.star.point_inside(x, y)
