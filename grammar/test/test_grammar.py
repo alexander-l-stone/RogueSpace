@@ -1,27 +1,7 @@
 from grammar.grammar import Grammar
-from grammar.grammar import Rule
+from grammar.rule import Rule
 from grammar.grammar import read_grammar
 from random import randint
-
-def test_rule():
-    name = "rule_name"
-    expansions = ["exp1", f"23%exp2"]
-    rule = Rule(name, expansions)
-    assert rule
-    assert rule.name == name
-    assert {"exp1":(1,{}),"exp2":(23,{})} == rule.expansions
-
-def test_rule_missing_weight():
-    name = "rule_name"
-    expansions = ["exp1", f"%exp2"]
-
-    # TODO make sure we have the correct error
-    succeed = "Failed to throw exception"
-    try:
-        rule = Rule(name, expansions)
-    except(AttributeError):
-        succeed = True
-    assert True is succeed
 
 def test_grammar():
     rules = { 'root':Rule('root',["This story is #adj#"]), 'adj':Rule('adj',["the best"]) }
@@ -34,12 +14,12 @@ def test_missing_root():
     grammar = Grammar(rules)
 
     # TODO make sure we have the correct error
-    succeed = "Failed to throw exception"
+    err = "Failed to throw exception"
     try:
         grammar.generate()
-    except(AttributeError):
-        succeed = True
-    assert True is succeed
+    except AttributeError as e:
+        err = e.args[0]
+    assert "No rule named \"root\" to start from" == err
 
 def test_expansion():
     rules = { 'root':Rule('root',["This story is #adj# #adj#"]), 'adj':Rule('adj',["the best"]) }
@@ -53,12 +33,12 @@ def test_missing_variable():
     grammar = Grammar(rules)
 
     # TODO make sure we have the correct error
-    succeed = "Failed to throw exception"
+    err = "Failed to throw exception"
     try:
         grammar.generate()
-    except(AttributeError):
-        succeed = True
-    assert True is succeed
+    except AttributeError as e:
+        err = e.args[0]
+    assert err.startswith("var not defined before use:")
 
 def test_variable():
     rules = { 'root':Rule('root',["This story is #var:adj# $var$"]), 'adj':Rule('adj',["the best"]) }
@@ -73,44 +53,6 @@ def test_dynamic_rule():
     output = grammar.generate()
     assert output
     assert "This story is the best and dynamic" == output
-
-def test_tag():
-    rule = Rule('tagged', ["has<tag>"])
-    assert rule
-    assert {"has":(1,{"tag":None})} == rule.expansions
-    exp = rule.select_child()
-    assert "has" == exp
-    exp = rule.select_child([])
-    assert "has" == exp
-
-def test_tag_invoke():
-    rule = Rule('tagged', ["has<tag>", "doesn't have tag"])
-    assert rule
-    assert {"has":(1,{"tag":None}),"doesn't have tag":(1,{})} == rule.expansions
-    for i in range(10):
-        exp = rule.select_child(['tag'])
-        assert "has" == exp
-
-def test_tag_multi_invoke():
-    rule = Rule('tagged', ["has<tag><other>", "doesn't have 'other' tag<tag>", "doesn't have 'tag' tag<other>"])
-    assert rule
-    assert {"has" : (1,{"tag":None,"other":None}),
-            "doesn't have 'other' tag" : (1,{"tag":None}),
-            "doesn't have 'tag' tag" : (1,{"other":None})
-           } == rule.expansions
-    for i in range(10):
-        exp = rule.select_child(['tag', 'other'])
-        assert "has" == exp
-
-def test_tag_weighted():
-    rule = Rule('tagged', [f"0%weighted<2%tag>", f"unweighted<0%tag>"])
-    assert rule
-    for i in range(10):
-        exp = rule.select_child()
-        assert "unweighted" == exp
-    for i in range(10):
-        exp = rule.select_child(['tag'])
-        assert "weighted" == exp
 
 def test_grammar_tag():
     root = Rule('root', ["#tagged<tag>#"])
@@ -127,6 +69,34 @@ def test_grammar_multi_tag():
     for i in range(10):
         output = grammar.generate()
         assert "has" == output
+
+def test_grammar_tag_root():
+    root = Rule('root', ["untagged", "tagged<tag>"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate('root<tag>')
+    assert "tagged" == output
+
+def test_grammar_tag_unclosed():
+    root = Rule('root', ["untagged", "tagged<tag>"])
+    grammar = Grammar({'root':root})
+
+    succeed = "Failed to throw exception"
+    try:
+        output = grammar.generate('root<tag')
+    except AttributeError as e:
+        succeed = e.args[0]
+    assert "Missing close '>' to tag in root rule: root<tag" == succeed
+
+def test_grammar_tag_unopened():
+    root = Rule('root', ["untagged", "tagged<tag>"])
+    grammar = Grammar({'root':root})
+
+    succeed = "Failed to throw exception"
+    try:
+        output = grammar.generate('root tag>')
+    except AttributeError as e:
+        succeed = e.args[0]
+    assert "Unexpected close tag '>' (was no '<') in root rule: root tag>" == succeed
 
 def test_operation():
     rule = Rule('root', ["[var:text]$var$"])
