@@ -93,66 +93,28 @@ class GalaxyGenerator:
         gal_str = self.grammar.generate()
 
         part = gal_str.split(' ')
-        star_type = part[0]
-        hot_zone = randint(0, int(part[1]))
-        bio_zone = randint(hot_zone, hot_zone + int(part[2]))
-        cold_zone = randint(bio_zone, bio_zone + int(part[3]))
-        gas_zone = randint(cold_zone, cold_zone + int(part[4]))
-        frozen_zone = randint(gas_zone, gas_zone + int(part[5]))
-        if star_type == 'normal-white':
-            #white
-            character = chr(0x263C)
-            color = (randint(200, 255), randint(200, 255), randint(150, 200))
-            star_type = "normal-white"
-            hyperlimit = randint(10, 20)
-        elif star_type == 'normal-yellow':
-            #yellow
-            character = chr(0x263C)
-            color = (randint(200, 255), randint(200, 255), 0)
-            star_type = "normal-yellow"
-            hyperlimit = randint(10, 20)
-        elif star_type == 'normal-orange':
-            #orange
-            character = chr(0x263C)
-            color = (randint(200, 255), randint(120, 165), 0)
-            star_type = "normal-orange"
-            hyperlimit = randint(10, 20)
-        elif star_type == 'normal-red':
-            #red
-            character = chr(0x263C)
-            color = (randint(130, 190), 0, 0)
-            star_type = "normal-red"
-            hyperlimit = randint(10, 20)
-        elif star_type == 'dwarf-white':
-            #white
-            character = chr(0x2022)
-            color = (randint(200, 255), randint(200, 255), randint(150, 200))
-            star_type = "dwarf-white"
-            hyperlimit = randint(5, 15)
-        elif star_type == 'dwarf-red':
-            #red
-            character = chr(0x2022)
-            color = (randint(130, 190), 0, 0)
-            star_type = "dwarf-red"
-            hyperlimit = randint(5, 15)
-        elif star_type == 'giant-red':
-            #red
-            character = 'O'
-            color = (randint(200, 255), 0, 0)
-            star_type = "giant-red"
-            hyperlimit = randint(50, 70)
-        elif star_type == 'giant-blue':
-            #blue
-            character = 'O'
-            color = (0, 0, randint(200, 255))
-            star_type = "giant-blue"
-            hyperlimit = randint(5, 70)
-        else:
-            #anomaly(for now brown dwarf)
-            character = chr(0x2022)
-            color = (randint(120,145), randint(60, 70), randint(12, 18))
-            star_type = "dwarf-brown"
-            hyperlimit = randint(3, 8)
+        i = 0
+        # star data
+        star_type = part[i]
+        i += 1
+        character = chr(int(part[i], 0))
+        i += 1
+        hyperlimit = randint(int(part[i]), int(part[i+1]))
+        i += 2
+        color = (randint(int(part[i]), int(part[i+1])), randint(int(part[i+2]), int(part[i+3])), randint(int(part[i+4]), int(part[i+5])))
+        i += 6
+
+        # zones
+        hot_zone = randint(0, int(part[i]))
+        i += 1
+        bio_zone = randint(hot_zone, hot_zone + int(part[i]))
+        i += 1
+        cold_zone = randint(bio_zone, bio_zone + int(part[i]))
+        i += 1
+        gas_zone = randint(cold_zone, cold_zone + int(part[i]))
+        i += 1
+        frozen_zone = randint(gas_zone, gas_zone + int(part[i]))
+
         return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit * self.system_scalar, hot_zone, bio_zone, cold_zone, gas_zone, frozen_zone)
     
     def generate_planets(self, system):

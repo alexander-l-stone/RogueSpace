@@ -1,7 +1,20 @@
 {
-    "root": ["#star:star# #zones<$star$>#"],
-    "star": ["1%dwarf-brown", "17%dwarf-red", "3%dwarf-white", "15%normal-yellow", "15%normal-orange", "15%normal-red",
-             "10%giant-blue", "9%giant-red"],
+    "root": ["#star# #zones<$star$>#"],
+    "star": [
+            "1%[star:dwarf-brown]dwarf-brown 0x2022 3 8 120 145 60 70 12 18",
+            "17%[star:dwarf-red]dwarf-red #dwarf_star# 130 190 0 0 0 0",
+            "3%[star:dwarf-white]dwarf-white #dwarf_star# 200 255 200 255 150 200",
+            "15%[star:normal-yellow]normal-yellow #normal_star# 200 255 200 255 0 0",
+            "15%[star:normal-orange]normal-orange #normal_star# 200 255 120 165 0 0",
+            "15%[star:normal-red]normal-red #normal_star# 130 190 0 0 0 0",
+            "15%[star:normal-white]normal-white #normal_star# 200 255 200 255 150 200", 
+            "10%[star:giant-blue]giant-blue #giant_star# 0 0 0 0 200 255",
+            "9%[star:giant-red]giant-red #giant_star# 200 255 0 0 0 0"
+        ],
+
+    "dwarf_star" : ["0x2022 5 15"],
+    "normal_star" : ["0x263C 10 20"],
+    "giant_star" : ["0x4F 50 70"],
 
     "zones": ["8 15 20 50 100<normal-yellow><normal-red><normal-orange><normal-white>", "3 7 10 20 40<dwarf-red>",
               "12 8 10 10 20<dwarf-white>", "0 0 3 5 5<dwarf-brown>", "50 0 0 0 0<giant-red><giant-blue>"],
