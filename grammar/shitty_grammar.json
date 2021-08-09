@@ -11,7 +11,7 @@
     
 
     "zones": ["8 15 20 50 100<normal-yellow>"],
-    "planet": ["40%mercury<hot>", "60%venus<hot>", "hot_belt<hot>", "40%temperate<bio>", "10%ocean<bio>", "10%jungle<bio>", "10%arid<bio>", "5%arid<bio>", "25%ast_belt<bio><cold><gas>", "80%mars<cold>", "10%mars<gas>","70%gas<gas>", "10%pluto<frozen>", "70%liquid<frozen>", "20%frozen_belt<frozen>"],
+    "planet": ["40%mercury<hot>", "60%venus<hot>", "hot_belt<hot>", "40%temperate<bio>", "10%ocean<bio>", "10%jungle<bio>", "10%arid<bio>", "5%arid<bio>", "ast_belt<25%bio><20%cold><20%gas>", "mars<80%cold><10%gas>", "70%gas<gas>", "10%pluto<frozen>", "70%liquid<frozen>", "20%frozen_belt<frozen>"],
 
     "planet_hot": ["#planet<hot>#"],
     "planet_bio": ["#planet<bio>#"],

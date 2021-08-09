@@ -228,25 +228,37 @@ class GalaxyGenerator:
                     system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'gold-dust', thin_color=(80, 45, 0)))
         return True
     
+    def generate_mercurial(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        return Planet(xy['x'], xy['y'], 'o', (randint(120,180),randint(120,180),randint(120,180)), f"Mercurial {orbital_radius}", "mercurial", system, randint(5,8))
+
+    def generate_venusian(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(125, 175),randint(190,220),randint(40,60)), f"Venusian {orbital_radius}", "venusian", system, randint(5,10))
+        num_moons = randint(-5, 2)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_hot_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+
+    def generate_hot_belt(self, system, orbital_radius, current_angle):
+        return Belt(orbital_radius, '*', 3, (randint(210, 230), randint(170, 190), randint(130, 140)), randint(0, orbital_radius))
+
     #TODO: add big asteroids as planets inside the belt
     def generate_hot_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
         d100 = randint(1, 100)
         xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
         if d100 <= 40:
             #mercury type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(120,180),randint(120,180),randint(120,180)), f"Mercurial {orbital_radius}", "mercurial", system, randint(5,8))
+            new_planet = self.generate_mercurial(system, orbital_radius, current_angle)
         elif d100 <= 60:
             #venus type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(125, 175),randint(190,220),randint(40,60)), f"Venusian {orbital_radius}", "venusian", system, randint(5,10))
-            num_moons = randint(-5, 2)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_hot_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_venusian(system, orbital_radius, current_angle)
         else:
-            new_planet = Belt(orbital_radius, '*', 3, (randint(210, 230), randint(170, 190), randint(130, 140)), randint(0, orbital_radius))
+            new_planet = self.generate_hot_belt(system, orbital_radius, current_angle)
         system.add_planet(new_planet)
 
     def generate_hot_zone_moons(self, planet:Planet, radius:int):
@@ -254,61 +266,89 @@ class GalaxyGenerator:
         planet.planetary_radius = radius + randint(3,5)
         planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(150, 200), randint(150, 200), randint(150, 200)), 'hot', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
+    def generate_temperate(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(20, 60),randint(100,200),randint(20, 150)), f"Temperate {orbital_radius}", "temperate", system, randint(5,10))
+        num_moons = randint(-1, 2)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_bio_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+    
+    def generate_ocean(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(0, 10),randint(0, 40),randint(150, 255)), f"Ocean {orbital_radius}", "ocean", system, randint(5,10))
+        num_moons = randint(-1, 2)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_bio_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+
+    def generate_jungle(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(20, 60),randint(200,250),randint(20, 60)), f"Jungle {orbital_radius}", "jungle", system, randint(5,10))
+        num_moons = randint(-1, 2)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_bio_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+
+    def generate_arid(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(170, 180),randint(160, 170),randint(130, 140)), f"Arid {orbital_radius}", "arid", system, randint(5,10))
+        num_moons = randint(-1, 2)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_bio_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+    
+    def generate_primordial(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(220, 255),randint(140,180),0), f"Primordial {orbital_radius}", "primordial", system, randint(5,10))
+        num_moons = randint(-1, 2)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_bio_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+    
+    def generate_ast_belt(self, system, orbital_radius, current_angle):
+        return Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
+
     def generate_bio_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
         d100 = randint(1, 100)
         xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
         if d100 <= 40:
             #temperate type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(20, 60),randint(100,200),randint(20, 150)), f"Temperate {orbital_radius}", "temperate", system, randint(5,10))
-            num_moons = randint(-1, 2)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_bio_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_temperate(system, orbital_radius, current_angle)
         elif d100 <= 50:
             #ocean type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(0, 10),randint(0, 40),randint(150, 255)), f"Ocean {orbital_radius}", "ocean", system, randint(5,10))
-            num_moons = randint(-1, 2)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_bio_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_ocean(system, orbital_radius, current_angle)
         elif d100 <= 60:
             #jungle type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(20, 60),randint(200,250),randint(20, 60)), f"Jungle {orbital_radius}", "jungle", system, randint(5,10))
-            num_moons = randint(-1, 2)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_bio_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_jungle(system, orbital_radius, current_angle)
         elif d100 <= 70:
             #arid type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(170, 180),randint(160, 170),randint(130, 140)), f"Arid {orbital_radius}", "arid", system, randint(5,10))
-            num_moons = randint(-1, 2)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_bio_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_arid(system, orbital_radius, current_angle)
         elif d100 <= 75:
             #primordial type
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(220, 255),randint(140,180),0), f"Primordial {orbital_radius}", "primordial", system, randint(5,10))
-            num_moons = randint(-1, 2)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_bio_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_primordial(system, orbital_radius, current_angle)
         else:
-            new_planet = Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
+            new_planet = self.generate_ast_belt(system, orbital_radius, current_angle)
         system.add_planet(new_planet)
 
     def generate_bio_zone_moons(self, planet:Planet, radius:int):
@@ -322,21 +362,26 @@ class GalaxyGenerator:
         else:
             planet.moons.append(Moon(xy['x'], xy['y'], '*', (randint(80, 120), randint(80, 100), randint(80, 90)), 'asteroid', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
+    def generate_martian(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(170,190),randint(35,45),randint(45,55)), f"Martian {orbital_radius}", "martian", system, randint(5,8))
+        num_moons = randint(-2, 3)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_bio_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+
     def generate_cold_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
         #TODO: add more cold zone planet types
         d100 = randint(1, 100)
         xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
         if d100 <= 80:
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(170,190),randint(35,45),randint(45,55)), f"Martian {orbital_radius}", "martian", system, randint(5,8))
-            num_moons = randint(-2, 3)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_bio_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_martian(system, orbital_radius, current_angle)
         else:
-            new_planet = Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
+            new_planet = self.generate_ast_belt(system, orbital_radius, current_angle)
         system.add_planet(new_planet)
 
     def generate_cold_zone_moons(self, planet:Planet, radius:int):
@@ -349,29 +394,27 @@ class GalaxyGenerator:
         else:
             planet.moons.append(Moon(xy['x'], xy['y'], '*', (randint(80, 120), randint(80, 100), randint(80, 90)), 'asteroid', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
+    def generate_gas(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'O', (randint(100, 255),randint(50, 150),randint(0, 100)), f"Gas {orbital_radius}", "gas", system, randint(10,15))
+        num_moons = randint(0, 5)
+        prev_radius = 4
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+3)
+                prev_radius = new_moon_radius
+                self.generate_gas_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+
     def generate_gas_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
         d100 = randint(1, 100)
         xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
         if d100 <= 10:
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(90,100),randint(90,100),randint(90,100)), f"Martian {orbital_radius}", "martian", system, randint(4,8))
-            num_moons = randint(-2, 3)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_cold_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_martian(system, orbital_radius, current_angle)
         elif d100 <= 80:
-            new_planet = Planet(xy['x'], xy['y'], 'O', (randint(100, 255),randint(50, 150),randint(0, 100)), f"Gas {orbital_radius}", "gas", system, randint(10,15))
-            num_moons = randint(0, 5)
-            prev_radius = 4
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+3)
-                    prev_radius = new_moon_radius
-                    self.generate_gas_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_gas(system, orbital_radius, current_angle)
         else:
-            new_planet = Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
+            new_planet = self.generate_ast_belt(system, orbital_radius, current_angle)
         system.add_planet(new_planet)
 
     def generate_gas_zone_moons(self, planet:Planet, radius:int):
@@ -394,29 +437,42 @@ class GalaxyGenerator:
         elif d10 <= 9:
             planet.moons.append(Moon(xy['x'], xy['y'], 'o', (randint(230, 255), randint(230, 255), randint(120, 170)), 'volcanic', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
+    def generate_frozen(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'o', (randint(150, 170), randint(230, 255), randint(230, 255)), f"Frozen {orbital_radius}", "frozen", system, randint(2,3))
+        num_moons = randint(-4, 1)
+        prev_radius = 2
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_frozen_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+    
+    def generate_liquid(self, system, orbital_radius, current_angle):
+        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
+        new_planet = Planet(xy['x'], xy['y'], 'O', (0,randint(50, 255),randint(150, 255)), f"Liquid {orbital_radius}", "liquid", system, randint(10,15))
+        num_moons = randint(0, 8)
+        prev_radius = 3
+        if num_moons > 0:
+            for i in range(0, num_moons):
+                new_moon_radius = randint(prev_radius+1, prev_radius+4)
+                prev_radius = new_moon_radius
+                self.generate_frozen_zone_moons(new_planet, new_moon_radius)
+        return new_planet
+    
+    def generate_frozen_belt(self, system, orbital_radius, current_angle):
+        return Belt(orbital_radius, '*', 3, (randint(150, 170), randint(230, 255), randint(230, 255)), randint(0, orbital_radius))
+
     def generate_frozen_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
         d100 = randint(1, 100)
         xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
         if d100 <= 10:
-            new_planet = Planet(xy['x'], xy['y'], 'o', (randint(150, 170), randint(230, 255), randint(230, 255)), f"Frozen {orbital_radius}", "frozen", system, randint(2,3))
-            num_moons = randint(-4, 1)
-            prev_radius = 2
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_frozen_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_frozen(system, orbital_radius, current_angle)
         elif d100 <= 80:
-            new_planet = Planet(xy['x'], xy['y'], 'O', (0,randint(50, 255),randint(150, 255)), f"Liquid {orbital_radius}", "liquid", system, randint(10,15))
-            num_moons = randint(0, 8)
-            prev_radius = 3
-            if num_moons > 0:
-                for i in range(0, num_moons):
-                    new_moon_radius = randint(prev_radius+1, prev_radius+4)
-                    prev_radius = new_moon_radius
-                    self.generate_frozen_zone_moons(new_planet, new_moon_radius)
+            new_planet = self.generate_liquid(system, orbital_radius, current_angle)
         else:
-            new_planet = Belt(orbital_radius, '*', 3, (randint(150, 170), randint(230, 255), randint(230, 255)), randint(0, orbital_radius))
+            new_planet = self.generate_frozen_belt(system, orbital_radius, current_angle)
         system.add_planet(new_planet)
 
     def generate_frozen_zone_moons(self, planet:Planet, radius:int):
@@ -435,7 +491,7 @@ class GalaxyGenerator:
             planet.moons.append(Moon(xy['x'], xy['y'], '*', (randint(150, 170), randint(230, 255), randint(230, 255)), 'frozen-asteroid', f"{planet.name} {radius}", planet, flags={'on_collide': stop_collision}))
 
     def generate_oort_cloud_planet(self, system:System, orbital_radius:int, current_angle:int):
-        system.add_planet(Belt(orbital_radius, '*', 10, (randint(150, 170), randint(230, 255), randint(230, 255)), randint(0, orbital_radius)))
+        system.add_planet(self.generate_frozen_belt(system, orbital_radius, current_angle))
 
     def get_random_point_on_circle(self, radius):
         randTheta = randint(0, 360) * math.pi/180
