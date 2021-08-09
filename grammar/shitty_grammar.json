@@ -20,11 +20,12 @@
     "planet_frozen": ["#planet<frozen>#"],
 
 
-    "story" : ["The #dec_animal# #verbed# #proximity# the #sec_animal:dec_animal#. The $sec_animal$ was not amused.\n"],
+    "story" : ["The #emo_state# #dec_animal# #verbed# #proximity# the #sec_animal:dec_animal#. The $sec_animal$ was $emo$.\n"],
     "dec_animal" : ["#adv# #color# #animal#"],
     "adv" : ["quick", "slow", "lazy", "erudite", "excitable"],
     "color" : ["red","brown","chartruse","green","amber","orange"],
     "animal" : ["dog","fox","bear","monkey"],
     "verbed" : ["ran", "jumped", "flew", "tunneled", "snuck"],
-    "proximity" : ["over", "around", "through", "onto"]
+    "proximity" : ["over", "around", "through", "onto"],
+    "emo_state" : ["[emo:horrified]amused", "[emo:amused]horrified", "[emo:depressed]enlightened", "[emo:enlightened]depressed", "[emo:ashamed]proud", "[emo:honored]shameful", "[emo:knowingly smug]confused", "[emo:slowly detaching its limbs]contiguous"]
 }

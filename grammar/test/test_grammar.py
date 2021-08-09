@@ -13,7 +13,6 @@ def test_missing_root():
     rules = {}
     grammar = Grammar(rules)
 
-    # TODO make sure we have the correct error
     err = "Failed to throw exception"
     try:
         grammar.generate()
@@ -32,7 +31,6 @@ def test_missing_variable():
     rules = { 'root':Rule('root',["This story is #adj# $var$"]), 'adj':Rule('adj',["the best"]) }
     grammar = Grammar(rules)
 
-    # TODO make sure we have the correct error
     err = "Failed to throw exception"
     try:
         grammar.generate()
