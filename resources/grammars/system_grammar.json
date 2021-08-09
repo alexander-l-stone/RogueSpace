@@ -1,5 +1,4 @@
 {
-    "root_old": ["#star:star# #hot<normal># #bio<normal># #cold<normal># #gas<normal># #frozen<normal>#"],
     "root": ["#star:star# #zones<$star$>#"],
     "star": ["1%dwarf-brown", "17%dwarf-red", "3%dwarf-white", "15%normal-yellow", "15%normal-orange", "15%normal-red",
              "10%giant-blue", "9%giant-red"],
@@ -10,14 +9,5 @@
     "planet": ["40%mercurial<hot>", "60%venusian<hot>", "hot_belt<hot>", "40%temperate<bio>", "10%ocean<bio>",
                "10%jungle<bio>", "10%arid<bio>", "5%arid<bio>", "ast_belt<25%bio><20%cold><20%gas>",
                "martian<80%cold><10%gas>", "70%gas<gas>", "10%frozen<frozen>", "70%liquid<frozen>",
-               "20%frozen_belt<frozen>"],
-
-
-    "story" : ["The #dec_animal# #verbed# #proximity# the #sec_animal:dec_animal#. The $sec_animal$ was not amused.\n"],
-    "dec_animal" : ["#adv# #color# #animal#"],
-    "adv" : ["quick", "slow", "lazy", "erudite", "excitable"],
-    "color" : ["red","brown","chartruse","green","amber","orange"],
-    "animal" : ["dog","fox","bear","monkey"],
-    "verbed" : ["ran", "jumped", "flew", "tunneled", "snuck"],
-    "proximity" : ["over", "around", "through", "onto"]
+               "20%frozen_belt<frozen>"]
 }

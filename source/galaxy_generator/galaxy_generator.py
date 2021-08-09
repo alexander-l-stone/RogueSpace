@@ -7,6 +7,7 @@ from source.belt.belt import Belt
 from source.system.system import System
 from source.cloud.cloud import Cloud
 from random import seed, randint, random
+from grammar.grammar import read_grammar
 
 #TODO: Turn a lot of this into reading out of a grammar
 class GalaxyGenerator:
@@ -14,6 +15,23 @@ class GalaxyGenerator:
         self.generator_queue = []
         self.angleplusminus = 50
         self.system_scalar = 3
+        self.planet_generation_function_dict = {
+            'mercurial': self.generate_mercurial,
+            'venusian': self.generate_venusian,
+            'hot_belt': self.generate_hot_belt,
+            'temperate': self.generate_temperate,
+            'jungle': self.generate_jungle,
+            'ocean': self.generate_ocean,
+            'arid': self.generate_arid,
+            'primordial': self.generate_primordial,
+            'ast_belt': self.generate_ast_belt,
+            'gas': self.generate_gas,
+            'frozen': self.generate_frozen,
+            'liquid': self.generate_liquid,
+            'frozen_belt': self.generate_frozen_belt,
+            'martian': self.generate_martian,
+        }
+        self.grammar = read_grammar("resources/grammars/system_grammar.json")
     
     #TODO: Remove generator queue
     def resolve_generator_queue(self, galaxy):
@@ -71,109 +89,81 @@ class GalaxyGenerator:
                 galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
 
     def generate_solar_system(self, x, y):
-        dieroll = randint(1, 100)
-        if dieroll < 60:
-            #normal(white, yellow, orange, red)
-            d4 = randint(1, 4)
-            if d4 == 1:
-                #white
-                character = chr(0x263C)
-                color = (randint(200, 255), randint(200, 255), randint(150, 200))
-                star_type = "normal-white"
-                hyperlimit = randint(10, 20)
-            elif d4 == 2:
-                #yellow
-                character = chr(0x263C)
-                color = (randint(200, 255), randint(200, 255), 0)
-                star_type = "normal-yellow"
-                hyperlimit = randint(10, 20)
-            elif d4 == 3:
-                #orange
-                character = chr(0x263C)
-                color = (randint(200, 255), randint(120, 165), 0)
-                star_type = "normal-orange"
-                hyperlimit = randint(10, 20)
-            elif d4 == 4:
-                #red
-                character = chr(0x263C)
-                color = (randint(130, 190), 0, 0)
-                star_type = "normal-red"
-                hyperlimit = randint(10, 20)
-        elif dieroll < 80:
-            #dwarf
-            d6 = randint(1, 6)
-            if d6 == 6:
-                #white
-                character = chr(0x2022)
-                color = (randint(200, 255), randint(200, 255), randint(150, 200))
-                star_type = "dwarf-white"
-                hyperlimit = randint(5, 15)
-            else:
-                #red
-                character = chr(0x2022)
-                color = (randint(130, 190), 0, 0)
-                star_type = "dwarf-red"
-                hyperlimit = randint(5, 15)
-        elif dieroll < 99:
-            #supergiant
-            d2 = randint(1, 2)
-            if d2 == 1:
-                #red
-                character = 'O'
-                color = (randint(200, 255), 0, 0)
-                star_type = "giant-red"
-                hyperlimit = randint(50, 70)
-            else:
-                #blue
-                character = 'O'
-                color = (0, 0, randint(200, 255))
-                star_type = "giant-blue"
-                hyperlimit = randint(5, 70)
+
+        gal_str = self.grammar.generate()
+
+        part = gal_str.split(' ')
+        star_type = part[0]
+        hot_zone = randint(0, int(part[1]))
+        bio_zone = randint(hot_zone, hot_zone + int(part[2]))
+        cold_zone = randint(bio_zone, bio_zone + int(part[3]))
+        gas_zone = randint(cold_zone, cold_zone + int(part[4]))
+        frozen_zone = randint(gas_zone, gas_zone + int(part[5]))
+        if star_type == 'normal-white':
+            #white
+            character = chr(0x263C)
+            color = (randint(200, 255), randint(200, 255), randint(150, 200))
+            star_type = "normal-white"
+            hyperlimit = randint(10, 20)
+        elif star_type == 'normal-yellow':
+            #yellow
+            character = chr(0x263C)
+            color = (randint(200, 255), randint(200, 255), 0)
+            star_type = "normal-yellow"
+            hyperlimit = randint(10, 20)
+        elif star_type == 'normal-orange':
+            #orange
+            character = chr(0x263C)
+            color = (randint(200, 255), randint(120, 165), 0)
+            star_type = "normal-orange"
+            hyperlimit = randint(10, 20)
+        elif star_type == 'normal-red':
+            #red
+            character = chr(0x263C)
+            color = (randint(130, 190), 0, 0)
+            star_type = "normal-red"
+            hyperlimit = randint(10, 20)
+        elif star_type == 'dwarf-white':
+            #white
+            character = chr(0x2022)
+            color = (randint(200, 255), randint(200, 255), randint(150, 200))
+            star_type = "dwarf-white"
+            hyperlimit = randint(5, 15)
+        elif star_type == 'dwarf-red':
+            #red
+            character = chr(0x2022)
+            color = (randint(130, 190), 0, 0)
+            star_type = "dwarf-red"
+            hyperlimit = randint(5, 15)
+        elif star_type == 'giant-red':
+            #red
+            character = 'O'
+            color = (randint(200, 255), 0, 0)
+            star_type = "giant-red"
+            hyperlimit = randint(50, 70)
+        elif star_type == 'giant-blue':
+            #blue
+            character = 'O'
+            color = (0, 0, randint(200, 255))
+            star_type = "giant-blue"
+            hyperlimit = randint(5, 70)
         else:
             #anomaly(for now brown dwarf)
             character = chr(0x2022)
             color = (randint(120,145), randint(60, 70), randint(12, 18))
             star_type = "dwarf-brown"
             hyperlimit = randint(3, 8)
-        return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit * self.system_scalar)
+        return System(x, y, character, color, f"{star_type}: {x}, {y}", star_type, hyperlimit * self.system_scalar, hot_zone, bio_zone, cold_zone, gas_zone, frozen_zone)
     
     def generate_planets(self, system):
-        #TODO: Differentiate this by colors
-        #TODO: Figure out what the above todo means
-        hot_zone = 0
-        bio_zone = 0
-        cold_zone = 0
-        gas_zone = 0
-        frozen_zone = 0
         if system.system_type == ("giant-red" or "giant-blue"):
             return False
-        elif (system.system_type == "normal-red") or (system.system_type == "normal-yellow") or (system.system_type == "normal-white") or (system.system_type == "normal-orange"):
-            hot_zone = randint(1, 8)
-            bio_zone = randint(hot_zone + 1, hot_zone + 15)
-            cold_zone = randint(bio_zone + 1, bio_zone + 20)
-            gas_zone = randint(cold_zone + 1, cold_zone + 50)
-            frozen_zone = randint(gas_zone, gas_zone + 100)
-        elif system.system_type == ("dwarf-red"):
-            hot_zone = randint(1, 3)
-            bio_zone = randint(hot_zone + 1, hot_zone + 7)
-            cold_zone = randint(bio_zone + 1, bio_zone + 10)
-            gas_zone = randint(cold_zone + 1, cold_zone + 20)
-            frozen_zone = randint(gas_zone, gas_zone + 40)
-        elif system.system_type == ("dwarf-white"):
-            hot_zone = randint(1, 12)
-            bio_zone = randint(hot_zone + 1, hot_zone + 8)
-            cold_zone = randint(bio_zone + 1, bio_zone + 10)
-            gas_zone = randint(cold_zone + 1, cold_zone + 10)
-            frozen_zone = randint(gas_zone, gas_zone + 20)
-        elif system.system_type == ("dwarf-brown"):
-            cold_zone = randint(1, 3)
-            gas_zone = randint(cold_zone + 1, cold_zone + 5)
-            frozen_zone = randint(gas_zone + 1, gas_zone + 5)
         num_planets = randint(2, 10)
-        p1 = 6 + randint(3, 10)
-        p2 = randint(p1+3, p1+7)
+        p1 = 8 + randint(1, 8)
+        p2 = p1 + 2 + randint(1, 5)
         current_angle = 0
-        for i in range(1,num_planets):
+        planet_array = []
+        for i in range(1, num_planets + 1):
             current_angle = current_angle + 120
             if i == 1:
                 planet_radius = p1 * self.system_scalar
@@ -181,18 +171,22 @@ class GalaxyGenerator:
                 planet_radius = p2 * self.system_scalar
             else:
                 planet_radius = self.titus_bode(p1, p2, i) * self.system_scalar
-            if (planet_radius <= (hot_zone * self.system_scalar)):
-                self.generate_hot_zone_planet(system, planet_radius, current_angle)
-            elif (planet_radius <= (bio_zone * self.system_scalar)):
-                self.generate_bio_zone_planet(system, planet_radius, current_angle)
-            elif (planet_radius <= (cold_zone * self.system_scalar)):
-                self.generate_cold_zone_planet(system, planet_radius, current_angle)
-            elif (planet_radius <= (gas_zone * self.system_scalar)):
-                self.generate_gas_zone_planet(system, planet_radius, current_angle)
-            elif (planet_radius <= (frozen_zone * self.system_scalar)):
-                self.generate_frozen_zone_planet(system, planet_radius, current_angle)
+            if planet_radius < (system.hot_zone * self.system_scalar):
+                planet = self.grammar.generate('planet<hot>')
+            elif planet_radius < (system.bio_zone * self.system_scalar):
+                planet = self.grammar.generate('planet<bio>')
+            elif planet_radius < (system.cold_zone * self.system_scalar):
+                planet = self.grammar.generate('planet<cold>')
+            elif planet_radius < (system.gas_zone * self.system_scalar):
+                planet = self.grammar.generate('planet<gas>')
+            elif planet_radius < (system.frozen_zone * self.system_scalar):
+                planet = self.grammar.generate('planet<frozen>')
             else:
-                self.generate_oort_cloud_planet(system, planet_radius, current_angle)
+                planet = 'frozen_belt'
+            planet_array.append({'radius': planet_radius, 'angle': current_angle, 'planet': planet})
+        for planet in planet_array:
+            system.add_planet(self.planet_generation_function_dict[planet['planet']](system, planet['radius'], planet['angle']))
+
         if len(system.planet_list) > 0:
             try:
                 system.hyperlimit += int((system.planet_list[-1].x**2 + system.planet_list[-1].y**2)**(1/2))

@@ -135,6 +135,7 @@ def test_comma_operation():
     output = grammar.generate()
     assert "text adventure" == output
 
+#TODO: THIS IS TITUS BODE
 def titus_bode(a, b, n):
         return int(a + ((b - a) * 2 * (n-2)))
 
@@ -155,11 +156,11 @@ def test_galaxy():
 
     bit = gal_str.split(' ')
     # skip bit[0] because that is star
-    hot_zone = randint(1, int(bit[1]))
-    bio_zone = randint(hot_zone + 1, hot_zone + int(bit[2]))
-    cold_zone = randint(bio_zone + 1, bio_zone + int(bit[3]))
-    gas_zone = randint(cold_zone + 1, cold_zone + int(bit[4]))
-    frozen_zone = randint(gas_zone + 1, gas_zone + int(bit[5]))
+    hot_zone = randint(0, int(bit[1]))
+    bio_zone = randint(hot_zone, hot_zone + int(bit[2]))
+    cold_zone = randint(bio_zone, bio_zone + int(bit[3]))
+    gas_zone = randint(cold_zone, cold_zone + int(bit[4]))
+    frozen_zone = randint(gas_zone, gas_zone + int(bit[5]))
 
     print(" zones: " + str([hot_zone,bio_zone,cold_zone,gas_zone,frozen_zone]))
     '''
@@ -178,22 +179,35 @@ def test_galaxy():
         else:
             planet_radius = self.titus_bode(p1, p2, i) * self.system_scalar
     '''
-    planet_radius = randint(1,frozen_zone)
-    if planet_radius < hot_zone:
-        planet = grammar.generate('planet_hot')
-    elif planet_radius < bio_zone:
-        planet = grammar.generate('planet_bio')
-    elif planet_radius < cold_zone:
-        planet = grammar.generate('planet_cold')
-    elif planet_radius < gas_zone:
-        planet = grammar.generate('planet_gas')
-    elif planet_radius < frozen_zone:
-        planet = grammar.generate('planet_frozen')
-    else:
-        pass
+    num_planets = randint(2, 10)
+    p1 = 8 + randint(1, 8)
+    p2 = p1 + 2 + randint(1, 5)
+    current_angle = 0
+    planet_array = []
+    for i in range(1, num_planets + 1):
+        current_angle = current_angle + 120
+        if i == 1:
+            planet_radius = p1
+        elif i == 2:
+            planet_radius = p2
+        else:
+            planet_radius = titus_bode(p1, p2, i)
+        if planet_radius < hot_zone:
+            planet = grammar.generate('planet<hot>')
+        elif planet_radius < bio_zone:
+            planet = grammar.generate('planet<bio>')
+        elif planet_radius < cold_zone:
+            planet = grammar.generate('planet<cold>')
+        elif planet_radius < gas_zone:
+            planet = grammar.generate('planet<gas>')
+        elif planet_radius < frozen_zone:
+            planet = grammar.generate('planet<frozen>')
+        else:
+            planet = 'frozen_belt'
+        planet_array.append({'radius': planet_radius, 'angle': current_angle, 'planet': planet})
 
-    print(f"PLANET {planet}")
-    # assert False
+    print(f"PLANET {planet_array}")
+    assert False
 
 def test_story():
     # grammar generation demo for non-programmers
