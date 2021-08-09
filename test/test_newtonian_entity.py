@@ -5,7 +5,7 @@ from source.action.resolution_functions import resolve_no_action
 
 def test_can_instantiate_newtonian_entity(area):
     assert NewtonianEntity
-    new_object = NewtonianEntity(0, 0, '@', (0,0,0), None, area, {'x': 0, 'y': 0}, None)
+    new_object = NewtonianEntity(0, 0, '@', (0,0,0), None, area, {'x': 0, 'y': 0})
     assert type(new_object) == NewtonianEntity
 
 def test_can_generate_vector_path(area):
