@@ -241,20 +241,6 @@ class GalaxyGenerator:
     def generate_hot_belt(self, system, orbital_radius, current_angle):
         return Belt(orbital_radius, '*', 3, (randint(210, 230), randint(170, 190), randint(130, 140)), randint(0, orbital_radius))
 
-    #TODO: add big asteroids as planets inside the belt
-    def generate_hot_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
-        d100 = randint(1, 100)
-        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
-        if d100 <= 40:
-            #mercury type
-            new_planet = self.generate_mercurial(system, orbital_radius, current_angle)
-        elif d100 <= 60:
-            #venus type
-            new_planet = self.generate_venusian(system, orbital_radius, current_angle)
-        else:
-            new_planet = self.generate_hot_belt(system, orbital_radius, current_angle)
-        system.add_planet(new_planet)
-
     def generate_hot_zone_moons(self, planet:Planet, radius:int):
         xy = self.get_random_point_on_circle(radius)
         planet.planetary_radius = radius + randint(3,5)
@@ -323,28 +309,6 @@ class GalaxyGenerator:
     def generate_ast_belt(self, system, orbital_radius, current_angle):
         return Belt(orbital_radius, '*', 5, (randint(80, 120), randint(80, 100), randint(80, 90)), randint(0, orbital_radius))
 
-    def generate_bio_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
-        d100 = randint(1, 100)
-        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
-        if d100 <= 40:
-            #temperate type
-            new_planet = self.generate_temperate(system, orbital_radius, current_angle)
-        elif d100 <= 50:
-            #ocean type
-            new_planet = self.generate_ocean(system, orbital_radius, current_angle)
-        elif d100 <= 60:
-            #jungle type
-            new_planet = self.generate_jungle(system, orbital_radius, current_angle)
-        elif d100 <= 70:
-            #arid type
-            new_planet = self.generate_arid(system, orbital_radius, current_angle)
-        elif d100 <= 75:
-            #primordial type
-            new_planet = self.generate_primordial(system, orbital_radius, current_angle)
-        else:
-            new_planet = self.generate_ast_belt(system, orbital_radius, current_angle)
-        system.add_planet(new_planet)
-
     def generate_bio_zone_moons(self, planet:Planet, radius:int):
         xy = self.get_random_point_on_circle(radius)
         planet.planetary_radius = radius + randint(3,5)
@@ -368,16 +332,6 @@ class GalaxyGenerator:
                 self.generate_bio_zone_moons(new_planet, new_moon_radius)
         return new_planet
 
-    def generate_cold_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
-        #TODO: add more cold zone planet types
-        d100 = randint(1, 100)
-        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
-        if d100 <= 80:
-            new_planet = self.generate_martian(system, orbital_radius, current_angle)
-        else:
-            new_planet = self.generate_ast_belt(system, orbital_radius, current_angle)
-        system.add_planet(new_planet)
-
     def generate_cold_zone_moons(self, planet:Planet, radius:int):
         #TODO: Add more cold zone moon types
         xy = self.get_random_point_on_circle(radius)
@@ -399,17 +353,6 @@ class GalaxyGenerator:
                 prev_radius = new_moon_radius
                 self.generate_gas_zone_moons(new_planet, new_moon_radius)
         return new_planet
-
-    def generate_gas_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
-        d100 = randint(1, 100)
-        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
-        if d100 <= 10:
-            new_planet = self.generate_martian(system, orbital_radius, current_angle)
-        elif d100 <= 80:
-            new_planet = self.generate_gas(system, orbital_radius, current_angle)
-        else:
-            new_planet = self.generate_ast_belt(system, orbital_radius, current_angle)
-        system.add_planet(new_planet)
 
     def generate_gas_zone_moons(self, planet:Planet, radius:int):
         #TODO: Add more gas zone moon types
@@ -457,17 +400,6 @@ class GalaxyGenerator:
     
     def generate_frozen_belt(self, system, orbital_radius, current_angle):
         return Belt(orbital_radius, '*', 3, (randint(150, 170), randint(230, 255), randint(230, 255)), randint(0, orbital_radius))
-
-    def generate_frozen_zone_planet(self, system:System, orbital_radius:int, current_angle:int):
-        d100 = randint(1, 100)
-        xy = self.get_random_point_within_angle(orbital_radius, current_angle - self.angleplusminus, current_angle + self.angleplusminus)
-        if d100 <= 10:
-            new_planet = self.generate_frozen(system, orbital_radius, current_angle)
-        elif d100 <= 80:
-            new_planet = self.generate_liquid(system, orbital_radius, current_angle)
-        else:
-            new_planet = self.generate_frozen_belt(system, orbital_radius, current_angle)
-        system.add_planet(new_planet)
 
     def generate_frozen_zone_moons(self, planet:Planet, radius:int):
         #TODO: Add more frozen zone moon types
