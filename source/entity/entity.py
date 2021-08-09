@@ -1,6 +1,5 @@
 import tcod
 
-#TODO: Change flags to a **kwargs field
 class Entity:
     def __init__(self, x:int, y:int, char:str, color:tuple, parent, **flags:dict):
         self.x:int = x
