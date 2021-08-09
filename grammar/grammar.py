@@ -113,13 +113,9 @@ class Grammar:
         
         # print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
         
-
-        # TODO implement
-        # weight should be preparsed
         # pick an expansion at random
         # parse out the rule invocations, variable assignments, function invocations, etc
         # execute and recurse as necessary
-        
         while i < len(exp):
             # in #
             # with .func()
@@ -153,6 +149,7 @@ class Grammar:
                 elif char == '.':
                     scope.append({'scope_type':'.'})
                     scope[-1]['token'] = ''
+                    # recurse
                     exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
                     parent_stack.append(exp_frame)
                     # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-2]['token']}\n")
@@ -163,6 +160,7 @@ class Grammar:
                     scope.append({'scope_type':'<', 'token':''})
                 elif char == '#':
                     exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
+                    # recurse
                     parent_stack.append(exp_frame)
                     # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-1]['token']}\n")
                     return (user_vars, parent_stack, output, scope[-1]['token'])
@@ -244,7 +242,7 @@ class Rule:
                 if char == '\\':
                     continue
                 if not char.isdigit() and char != '%':
-                    self.expansions[exp] = (1, [])
+                    self.expansions[exp] = (1, {})
                     inserted = True
                     break
                 if char != '%':
@@ -252,15 +250,16 @@ class Rule:
                 elif numstr == '':
                     raise AttributeError(f"Null weight. Rule: {name} Expansion: {exp}")
                 else:
-                    self.expansions[exp[len(numstr)+1:]] = (int(numstr), [])
+                    self.expansions[exp[len(numstr)+1:]] = (int(numstr), {})
                     inserted = True
                     break
             if not inserted:
-                self.expansions[exp] = (1, [])
+                self.expansions[exp] = (1, {})
         # strip tags and escapes
         changed_dict = {}
         for exp,data in self.expansions.items():
             tag_ind = None
+            tag_pct = None
             i = len(exp) - 1
             while i >= 0:
                 char = exp[i]
@@ -271,10 +270,20 @@ class Rule:
                 elif tag_ind is not None:
                     if char in "#$>[]":
                         raise AttributeError(f"Illegal use of 'special character '{char}' inside tag. Rule: {name} Expansion: {exp}")
+                    if char == '%':
+                        if tag_pct is not None:
+                            raise AttributeError(f"Illegal second '%' inside tag. Rule: {name} Expansion: {exp}")
+                        tag_pct = i
                     if char == '<':
-                        data[1].append(exp[i+1:tag_ind]) # TODO inclusive end index?
+                        weight = None
+                        if tag_pct is None:
+                            tag_pct = i
+                        else:
+                            weight = int(exp[i+1:tag_pct])
+                        data[1][exp[tag_pct+1:tag_ind]] = weight
                         exp = exp[0:i] + exp[tag_ind+1:]
                         tag_ind = None
+                        tag_pct = None
                 else:
                     # TODO maybe actually parse the whole exp and warn on mid-string tags?
                     break
@@ -291,24 +300,33 @@ class Rule:
         '''
         total_weight = 0
         for exp,data in self.expansions.items():
+            # do not add weight for exp without required tags
             if tags is not None:
                 should_continue = False
                 for tag in tags:
                     if tag not in data[1]:
-                        print(f'{tag} not in {data[1]}')
                         should_continue = True
                         continue
-                    print(f'{tag} yes in {data[1]}')
                 if should_continue:
                     continue
 
-            total_weight += data[0]
+            # use weight of last tag, if present
+            weight = data[0]
+            if tags is not None and len(tags) > 0:
+                for i in range(len(tags) - 1, -1, -1):
+                    tag_weight = data[1][tags[i]]
+                    if tag_weight is not None:
+                        weight = tag_weight
+                        break
+            # exp contributes its weight to generation
+            total_weight += weight
 
         if total_weight == 0:
             raise AttributeError(f"No valid expansions for tags {tags} in rule {self}")
 
         rand = randint(1, total_weight)
         for exp,data in self.expansions.items():
+            # do not count weight for exp without required tags
             if tags is not None:
                 should_continue = False
                 for tag in tags:
@@ -318,7 +336,16 @@ class Rule:
                 if should_continue:
                     continue
 
-            rand -= data[0]
+            # use weight of last tag, if present
+            weight = data[0]
+            if tags is not None and len(tags) > 0:
+                for i in range(len(tags) - 1, -1, -1):
+                    tag_weight = data[1][tags[i]]
+                    if tag_weight is not None:
+                        weight = tag_weight
+                        break
+            rand -= weight
+            # did we land in weight band for this exp
             if rand <= 0:
                 return exp
         # unreachable
