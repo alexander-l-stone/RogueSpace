@@ -13,6 +13,12 @@ class Star:
         self.flags = flags
         self.bgcolor = bgcolor
     
+    def __str__(self):
+        return f"[Star]"
+    
+    def __repr__(self) -> str:
+        return f"[Star]"
+
     def point_inside(self, x, y):
         dx = abs(x - self.x)
         dy = abs(y - self.y)

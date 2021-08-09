@@ -107,15 +107,19 @@ class Area:
         root_console.default_bg = self.background_color
         for drawx in range(playerx - screen_width//2, playerx + screen_width//2):
             for drawy in range(playery - screen_height//2, playery + screen_height//2):
-                entities_at_point = self.get_entities_at_coordinates(drawx, drawy)
+                entities_at_point = self.get_entities_at_coordinates(drawx, drawy).copy()
                  #TODO: Do the below in a way that doesn't suck
                 if entities_at_point is not None and len(entities_at_point) > 0:
                     i = animation_frame % len(entities_at_point)
                     if len(entities_at_point) > 1:
                         if 'priority_draw' in entities_at_point[-1].flags:
-                            entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, animation_frame, other_entities=entities_at_point[0::-1])
+                            drawn_entity = entities_at_point[-1]
+                            entities_at_point.remove(drawn_entity)
+                            drawn_entity.draw(root_console, corner_x, corner_y, self.background_color, animation_frame, other_entities=entities_at_point)
                         else:
-                            entities_at_point[-i].draw(root_console, corner_x, corner_y, self.background_color, animation_frame, other_entities=entities_at_point[0::-1])
+                            drawn_entity = entities_at_point[-i]
+                            entities_at_point.remove(drawn_entity)
+                            drawn_entity.draw(root_console, corner_x, corner_y, self.background_color, animation_frame, other_entities=entities_at_point, debug=True)
                     else:
                         entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, animation_frame)
                
