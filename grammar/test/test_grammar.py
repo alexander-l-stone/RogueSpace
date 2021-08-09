@@ -128,6 +128,43 @@ def test_grammar_multi_tag():
         output = grammar.generate()
         assert "has" == output
 
+def test_operation():
+    rule = Rule('root', ["[var:text]$var$"])
+    grammar = Grammar({'root':rule})
+    output = grammar.generate('root')
+    assert "text" == output
+
+def test_comma_rule():
+    rule_rule = Rule('root', ['#a,b#'])
+    rule_a = Rule('a', '1')
+    rule_b = Rule('b', '2')
+    rules = {}
+    for rule in [rule_rule, rule_a, rule_b]:
+        rules[rule.name] = rule
+    grammar = Grammar(rules)
+    output = grammar.generate()
+    assert "12" == output
+
+def test_comma_var():
+    rule_var = Rule('root', ["[var1:text][var2: adventure]$var1,var2$"])
+    grammar = Grammar({'root':rule_var})
+    output = grammar.generate()
+    assert "text adventure" == output
+
+def test_comma_tag():
+    root = Rule('root', ["#child<tag1><tag2>#"])
+    child = Rule('child', ["wrong<tag1>", "wrong<tag2>", "wrong", "right<tag1><tag2>"])
+    grammar = Grammar({'root':root,'child':child})
+    for i in range(10):
+        output = grammar.generate()
+        assert "right" == output
+
+def test_comma_operation():
+    rule_var = Rule('root', ["[var1:text,var2: adventure]$var1,var2$"])
+    grammar = Grammar({'root':rule_var})
+    output = grammar.generate()
+    assert "text adventure" == output
+
 def titus_bode(a, b, n):
         return int(a + ((b - a) * 2 * (n-2)))
 

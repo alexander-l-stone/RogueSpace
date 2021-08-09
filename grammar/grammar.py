@@ -108,6 +108,8 @@ class Grammar:
                     scope[-1]['token'] += child_output
                 if 'varstore' in last_scope:
                     user_vars[last_scope['varstore']] = child_output
+                if 'comma_rule' in last_scope:
+                    scope.append({'scope_type':'#', 'token':''})
 
             # print(f"\nFRAME UNPACK: ")
         
@@ -138,11 +140,19 @@ class Grammar:
                 else:
                     output += char
             # below: handle each scope context
+
+            # RULE INVOCATION
             elif scope[-1]['scope_type'] == '#':
                 # check if scope starts with a varstore
                 # parse scope body as a rule name to expand
                 # check for final func execution
-                if char == ':':
+                if char == '$':
+                    scope.append({'scope_type':'$', 'token':''})
+                elif char == '<':
+                    scope.append({'scope_type':'<', 'token':''})
+                elif char == '[':
+                    scope.append({'scope_type':'[', 'token':''})
+                elif char == ':':
                     # previous is a var store
                     scope[-1]['varstore'] = scope[-1]['token']
                     scope[-1]['token'] = ''
@@ -154,11 +164,9 @@ class Grammar:
                     parent_stack.append(exp_frame)
                     # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-2]['token']}\n")
                     return (user_vars, parent_stack, output, scope[-2]['token'])
-                elif char == '$':
-                    scope.append({'scope_type':'$', 'token':''})
-                elif char == '<':
-                    scope.append({'scope_type':'<', 'token':''})
-                elif char == '#':
+                elif char == '#' or char == ',':
+                    if char == ',':
+                        scope[-1]['comma_rule'] = True
                     exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
                     # recurse
                     parent_stack.append(exp_frame)
@@ -167,8 +175,16 @@ class Grammar:
                 else:
                     scope[-1]['token'] += char
                 # print(f"token {scope[-1]['token']}")
+
+            # VARIABLE DEREFERENCE
             elif scope[-1]['scope_type'] == '$':
-                if char == '$':
+                if char == '#':
+                    scope.append({'scope_type':'#', 'token':''})
+                elif char == '<':
+                    raise AttributeError(f"Illegal tag invocation in variable dereference ('<' in '$$' block): {scope[-1]['token']}\ncurrent output: {output}\nstack:{parent_stack}")
+                elif char == '[':
+                    scope.append({'scope_type':'[', 'token':''})
+                if char == '$' or char == ',':
                     # output var to outer scope (which may be literal output), clear state
                     var_name = scope[-1]['token']
                     if var_name not in user_vars:
@@ -178,31 +194,69 @@ class Grammar:
                         output += user_vars[var_name]
                     else:
                         scope[-1]['token'] += user_vars[var_name]
+                    if char == ',':
+                        scope.append({'scope_type':'$', 'token':''})
                 else:
                     scope[-1]['token'] += char
+
+            # TAG INVOCATION
             elif scope[-1]['scope_type'] == '<':
-                if char == '$':
+                if char == '#':
+                    scope.append({'scope_type':'#', 'token':''})
+                elif char == '$':
                     scope.append({'scope_type':'$', 'token':''})
-                elif char == '>':
+                elif char == '[':
+                    scope.append({'scope_type':'[', 'token':''})
+                elif char == '>' or char == ',':
                     # output var to outer scope (which may be literal output), clear state
                     tag = scope[-1]['token']
                     popped_scope = scope.pop()
                     if len(scope) == 0:
                         # impossible
-                        raise AttributeError(f"impossible tag lookup in outside scope: tag: {tag}\nscope: {popped_scope}\ncurrent output: {output}\nstack:{parent_stack}")
+                        raise AttributeError(f"impossible tag lookup in outside scope ('<>' block survived parse strip): tag: {tag}\nscope: {popped_scope}\ncurrent output: {output}\nstack:{parent_stack}")
                     elif scope[-1]['scope_type'] == "#":
                         if 'tags' not in scope[-1]:
                             scope[-1]['tags'] = [tag]
                         else:
                             scope[-1]['tags'].append(tag)
+                    if char == ',':
+                        scope.append({'scope_type':'<', 'token':''})
                 else:
                     scope[-1]['token'] += char
+
+            # OPERATION EXECUTION
             elif scope[-1]['scope_type'] == '[':
-                # TODO
-                pass
+                if char == '#':
+                    scope.append({'scope_type':'#', 'token':''})
+                if char == '$':
+                    scope.append({'scope_type':'$', 'token':''})
+                elif char == '<':
+                    raise AttributeError(f"Illegal tag invocation in operation execution ('<' in '[]' block): {scope[-1]['token']}\ncurrent output: {output}\nstack:{parent_stack}")
+                elif char == '[':
+                    raise AttributeError(f"Illegal nested operation (open '[' in '[]' block): {scope[-1]['token']}\ncurrent output: {output}\nstack:{parent_stack}")
+                elif char == '.':
+                    raise AttributeError(f"Illegal function execution ('.' in '[]' block) in operation: {scope[-1]['token']}\ncurrent output: {output}\nstack:{parent_stack}")
+                elif char == ':':
+                    # previous is a var store
+                    scope[-1]['varstore'] = scope[-1]['token']
+                    scope[-1]['token'] = ''
+                elif char == ']' or char == ',':
+                    exec_ret = scope[-1]['token']
+                    popped_scope = scope.pop()
+                    if 'varstore' in popped_scope:
+                        user_vars[popped_scope['varstore']] = exec_ret
+                    if char == ',':
+                        scope.append({'scope_type':'[', 'token':''})
+                else:
+                    scope[-1]['token'] += char
+
+            # FUNCTION INVOCATION
             elif scope[-1]['scope_type'] == '.':
                 # TODO
+                # TODO check for enclosing scope close as alternate to '('
                 pass
+
+            # FUNCTION ARGUMENTS
             elif scope[-1]['scope_type'] == '.(':
                 # TODO
                 pass
@@ -268,7 +322,7 @@ class Rule:
                 elif char == '>':
                     tag_ind = i
                 elif tag_ind is not None:
-                    if char in "#$>[]":
+                    if char in "#$>[].":
                         raise AttributeError(f"Illegal use of 'special character '{char}' inside tag. Rule: {name} Expansion: {exp}")
                     if char == '%':
                         if tag_pct is not None:
