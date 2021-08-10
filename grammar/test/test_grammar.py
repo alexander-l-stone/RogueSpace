@@ -136,7 +136,7 @@ def test_comma_operation():
     assert "text adventure" == output
 
 #TODO: THIS IS TITUS BODE
-def titus_bode(a, b, n):
+def titius_bode(a, b, n):
         return int(a + ((b - a) * 2 * (n-2)))
 
 def test_galaxy():
@@ -177,7 +177,7 @@ def test_galaxy():
         elif i == 2:
             planet_radius = p2 * self.system_scalar
         else:
-            planet_radius = self.titus_bode(p1, p2, i) * self.system_scalar
+            planet_radius = self.titius_bode(p1, p2, i) * self.system_scalar
     '''
     num_planets = randint(2, 10)
     p1 = 8 + randint(1, 8)
@@ -191,7 +191,7 @@ def test_galaxy():
         elif i == 2:
             planet_radius = p2
         else:
-            planet_radius = titus_bode(p1, p2, i)
+            planet_radius = titius_bode(p1, p2, i)
         if planet_radius < hot_zone:
             planet = grammar.generate('planet<hot>')
         elif planet_radius < bio_zone:

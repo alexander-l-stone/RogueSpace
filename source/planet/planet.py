@@ -20,19 +20,12 @@ class Planet:
         self.planetary_radius:int = planetary_radius
         self.entity_list = []
         self.bgcolor = bgcolor
-        #TODO: Pass radius in
-        if self.planet_type == 'gas':
-            self.radius = 4
-        elif self.planet_type == 'liquid':
-            self.radius = 3
-        else:
-            self.radius = 2
 
     def point_inside(self, x, y):
         dx = abs(x - self.x)
         dy = abs(y - self.y)
-        tempradius = self.radius + 0.5
-        if self.radius <= 2:
+        tempradius = self.planetary_radius + 0.5
+        if self.planetary_radius <= 2:
             return dx**2 + dy**2 <= tempradius**2
         else:
             return dx**2 + dy**2 < tempradius**2
@@ -44,8 +37,8 @@ class Planet:
         return {'type': 'stop'}
     
     def generate_entities(self, area):
-        for x in range(self.x - self.radius, self.x + self.radius + 1):
-            for y in range(self.y - self.radius, self.y + self.radius + 1):
+        for x in range(self.x - self.planetary_radius, self.x + self.planetary_radius + 1):
+            for y in range(self.y - self.planetary_radius, self.y + self.planetary_radius + 1):
                 if self.point_inside(x, y):
                     area.add_entity(Entity(x, y, self.char, self.color, self))
         for moon in self.moons:

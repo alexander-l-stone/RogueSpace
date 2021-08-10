@@ -13,8 +13,8 @@ def test_galaxy_exploration(galaxy):
 
 def test_galaxy_create_area(galaxy):
     galaxy.explored_dict = {(0,0): True, (1,0): True}
-    in_area_system = System(50,50, 'O', (255,0,0), 'in-area', 'test', 10)
-    out_of_area_system = System(520, 20, 'O', (255, 0, 0), 'test', 'test', 10)
+    in_area_system = System(50,50, 'O', (255,0,0), 'in-area', 'test', 10, 0, 0, 0, 0, 0)
+    out_of_area_system = System(520, 20, 'O', (255, 0, 0), 'test', 'test', 10, 0, 0, 0, 0, 0)
     galaxy.system_dict[(in_area_system.x, in_area_system.y)] = in_area_system
     galaxy.system_dict[(out_of_area_system.x, out_of_area_system.y)] = out_of_area_system
     galaxy_area = galaxy.generate_local_area(250, 250)
