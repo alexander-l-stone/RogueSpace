@@ -3,9 +3,6 @@ import tcod
 import tcod.event
 from typing import Dict
 
-from source.action.action import Action
-from source.action.resolution_functions import *
-from source.action.action_queue import ActionQueue
 from source.area.area import Area
 from source.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
@@ -14,41 +11,50 @@ from source.menu.menu import Menu
 from source.menu.menu_item import MenuItem
 from source.planet.planet import Planet
 from source.player.player import Player
+from source.engine.renderengine import RenderEngine
+from source.engine.eventengine import EventEngine
 from source.helper_functions.circle_conversions import *
 from source.system.system import System
 from source.ui.ui_panel import UIPanel
+from source.ship.ship import Ship
 
 class Game:
     def __init__(self, config:Dict={}):
         self.config = config
         #set up font
-        self.tileset = tcod.tileset.load_tilesheet("terminal12x12_gs_ro.png", 16, 16, tcod.tileset.CHARMAP_CP437)
-        self.SCREEN_WIDTH:int = 50
-        self.SCREEN_HEIGHT:int = 50
-        self.global_time:int = 0
-        self.global_queue = ActionQueue()
+        self.render_engine = RenderEngine(
+            tcod.tileset.load_tilesheet("terminal12x12_gs_ro.png", 16, 16, tcod.tileset.CHARMAP_CP437),
+            50,
+            50,
+            self)
+        self.event_engine = EventEngine(self)
         self.InputHandler:InputHandler = InputHandler()
-        self.bot_ui = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20,20,20))
         self.game_state = 'main_menu'
 
         #generate main menu
         self.main_menu = Menu()
         new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
         load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
-        exit = MenuItem('Exit', select=lambda: {'type': 'exit'})
-        self.main_menu.menu_items.extend([new_game, load_game, exit])
+        exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
+        self.main_menu.menu_items.extend([new_game, load_game, exit_game])
+        self.current_menu = self.main_menu
 
         #generate game menu
         self.game_menu = Menu()
         save_game = MenuItem('Save Game', select=lambda: {'type': 'save'})
-        close_menu = MenuItem('Close', select=lambda: {'type': 'close'})
-        self.game_menu.menu_items.extend([save_game, load_game, exit, close_menu])
+        close_menu = MenuItem('Close Menu', select=lambda: {'type': 'close'})
+        self.game_menu.menu_items.extend([close_menu, save_game, load_game, exit_game])
 
     def start_new_game(self):
         #Code to generate player
         # None,{'x': 1, 'y': 1}
-        player_entity = NewtonianEntity(7, 7, '@', (255,255,255), None, None, {'x': 1, 'y': 1}, is_player=True)
-        self.player = Player(player_entity)
+        self.player = Player()
+        player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
+        self.player.assign_ship(player_ship)
+        self.player.current_entity.vector.x = 1
+        self.player.current_entity.vector.y = 1
+        self.player.current_entity.x = 7
+        self.player.current_entity.y = 7
         
         #Code to generate initial system
         self.galaxy = Galaxy()
@@ -58,7 +64,7 @@ class Game:
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
         self.current_area:Area = None
         self.generate_current_area()
-        self.current_area.add_entity(player_entity)
+        self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
 
     def save_game(self):
@@ -93,151 +99,3 @@ class Game:
     def generate_current_area(self):
         self.current_area = self.current_location.generate_area()
 
-    def render(self, root_console) -> None:
-        self.current_area.draw(root_console, self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.bot_ui.draw(root_console)
-        self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"{self.player.current_entity.x}, {-self.player.current_entity.y}")//2, 1, f"{self.player.current_entity.x}, {-self.player.current_entity.y}")
-        if not isinstance(self.current_location, Galaxy):
-            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(self.current_location.name)//2, 2, self.current_location.name, )
-        elif isinstance(self.current_location, System):
-            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Hyperlimit: {self.current_location.hyperlimit}")//2, 3, f"Hyperlimit: {self.current_location.hyperlimit}", (255, 0, 0))
-            self.bot_ui.print_string(root_console, self.SCREEN_WIDTH//2 - len(f"Planets: {len(self.current_location.planet_list)}")//2, 4, f"Planets: {len(self.current_location.planet_list)}")
-
-    def resolve_actions(self):
-        results = self.global_queue.resolve_actions(self.global_time)
-        for result in results:
-            if result["type"] == "enter":
-                self.resolve_enter(result)
-            elif result["type"] == "jump":
-                self.resolve_jump(result)
-            elif result["type"] == "move" and isinstance(self.current_location, Galaxy):
-                for key, value in self.current_location.check_explored_corners(self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT).items():
-                    if (value == False):
-                        self.current_location.generate_new_sector(key[0], key[1])
-                if (
-                self.player.current_entity.x <= self.current_area.flags['center_x'] - self.SCREEN_WIDTH//2
-                or
-                self.player.current_entity.x >= self.current_area.flags['center_x'] + self.SCREEN_WIDTH//2
-                or
-                self.player.current_entity.y <= self.current_area.flags['center_y'] - self.SCREEN_HEIGHT//2
-                or
-                self.player.current_entity.y >= self.current_area.flags['center_y'] - self.SCREEN_HEIGHT//2
-                ):
-                    self.current_area = self.current_location.generate_local_area(self.player.current_entity.x, self.player.current_entity.y)
-                    self.current_area.add_entity(self.player.current_entity)
-
-    def resolve_enter(self, result):
-    #TODO: figure out what to do for non-player entities
-        if (result['entering_entity'].flags['is_player']) is True:
-            self.current_location = result['target_entity']
-            dx, dy = result['entering_entity'].x - result['target_entity'].x, result['entering_entity'].y - result['target_entity'].y
-            theta = convert_delta_to_theta(dx, dy)
-            self.current_location.entity_list.append(result['entering_entity'])
-            if (isinstance(self.current_location, System)):
-                if(self.current_location.explored == False):
-                    self.galaxy.galaxy_generator.generate_planets(self.current_location)
-                    self.current_location.explored = True
-                result['entering_entity'].x, result['entering_entity'].y = int(self.current_location.hyperlimit*math.cos(theta)), int(self.current_location.hyperlimit*math.sin(theta))
-            self.generate_current_area()
-            self.current_area.add_entity(self.player.current_entity)
-
-    def resolve_exit(self, result):
-        if ('is_player' in result['exiting_entity'].flags and result['exiting_entity'].flags['is_player'] is True):
-            theta = convert_delta_to_theta(result['exiting_entity'].x, result['exiting_entity'].y)
-            delta = convert_theta_to_delta(theta)
-            result['exiting_entity'].x, result['exiting_entity'].y = self.current_location.x + delta[0], self.current_location.y + delta[1]
-            self.current_location.entity_list.append(result['exiting_entity'])
-            self.generate_current_area()
-            self.current_area.add_entity(self.player.current_entity)
-        
-    def resolve_jump(self, result):
-        if(not isinstance(self.current_location, System) ==True):
-            return False
-        else:
-            if (((self.player.current_entity.x**2) + (self.player.current_entity.y**2))**(1/2)) > self.current_location.hyperlimit:
-                delta = convert_theta_to_delta(convert_delta_to_theta(result['x'], result['y']))
-                new_x = self.current_location.x + delta[0]
-                new_y = self.current_location.y + delta[1]
-                self.current_location = self.galaxy
-                self.player.current_entity.x = new_x
-                self.player.current_entity.y = new_y
-                for key, value in self.current_location.check_explored_corners(self.player.current_entity.x, self.player.current_entity.y, self.SCREEN_WIDTH, self.SCREEN_HEIGHT).items():
-                        if (value == False):
-                            self.current_location.generate_new_sector(key[0], key[1])
-                self.current_area = self.current_location.generate_local_area(self.player.current_entity.x, self.player.current_entity.y)
-                self.current_area.add_entity(self.player.current_entity)
-                return True
-            else:
-                return False
-
-    def resolve_keyboard_input(self, result):
-        if(result["type"] == "move"):
-            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.current_area, is_player=True))
-        elif(result["type"] == "jump"):
-            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, resolve_jump_action, y=self.player.current_entity.x, x=self.player.current_entity.y, area=self.current_area, is_player=True))
-        elif(result["type"] == "wait"):
-            actions = self.player.current_entity.generate_move_actions(self.global_time+1)
-            for action in actions:
-                self.global_queue.push(action)
-            self.global_queue.push(Action(self.player.current_entity, self.global_time+1, resolve_wait_action, is_player=True))
-        elif(result["type"] == "thrust"):
-            self.player.current_entity.thrust(result["value"][0], result["value"][1])
-            actions = self.player.current_entity.generate_move_actions(self.global_time+1)
-            for action in actions:
-                self.global_queue.push(action)
-        elif(result["type"] == "menu"):
-            self.game_state = "game_menu"
-
-    def resolve_menu_kb_input(self, result):
-        if result['type'] == 'exit':
-            raise SystemExit()
-        elif result['type'] == 'game':
-            if result['value'] == 'new':
-                self.start_new_game()
-            elif result['value'] == 'load':
-                self.load_game()
-            self.game_state = 'game'
-        elif result['type'] == 'close':
-            self.game_state = 'game'
-        elif(result["type"] == "save"):
-            self.save_game()
-            self.game_state = "game"
-
-    def menu_loop(self, root_console, menu):
-            for event in tcod.event.wait():
-                if event.type == "KEYDOWN":
-                    result = menu.handle_key_presses(event)
-                    self.resolve_menu_kb_input(result)
-                if event.type == "QUIT":
-                    raise SystemExit()
-            root_console.clear()
-            menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
-
-    def console_loop(self) -> None:
-        with tcod.context.new_terminal(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, tileset=self.tileset, title="Rogue Expedition", vsync=True) as context:
-            root_console = tcod.Console(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, order='F')
-            while True:
-                context.present(root_console)
-                if (self.game_state == 'game'):
-                    self.game_loop(root_console)
-                elif (self.game_state == 'main_menu'):
-                    self.menu_loop(root_console, self.main_menu)
-                elif (self.game_state == 'game_menu'):
-                    self.menu_loop(root_console, self.game_menu)
-
-    def game_loop(self, root_console) -> None:
-            self.render(root_console)
-            if self.global_queue.player_actions_count > 0:
-                self.resolve_actions()
-                if type(self.player.current_entity) is NewtonianEntity:
-                    self.player.current_entity.generate_vector_path()
-                self.global_time += 1
-            else:
-                for event in tcod.event.wait():
-                    if event.type == "KEYDOWN":
-                        result = self.InputHandler.handle_keypress(event)
-                        self.resolve_keyboard_input(result)
-                    if event.type == "QUIT":
-                        raise SystemExit()
-            root_console.clear()
-            self.render(root_console)

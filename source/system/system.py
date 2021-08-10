@@ -6,7 +6,7 @@ from source.cloud.cloud import Cloud
 import math
 
 class System:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, bgcolor=(0,0,0), **flags):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, hot_zone, bio_zone, cold_zone, gas_zone, frozen_zone, bgcolor=(0,0,0), **flags):
         self.x = x
         self.y = y
         self.star_x = 0
@@ -21,6 +21,11 @@ class System:
         self.bgcolor = bgcolor
         self.explored = False
         self.radius = 1
+        self.hot_zone = hot_zone
+        self.bio_zone = bio_zone
+        self.cold_zone = cold_zone
+        self.gas_zone = gas_zone
+        self.frozen_zone = frozen_zone
         if self.system_type == 'dwarf-red' or self.system_type == 'dwarf-white':
             self.radius = 6
         elif self.system_type == 'dwarf-brown':

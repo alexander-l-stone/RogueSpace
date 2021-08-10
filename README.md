@@ -12,3 +12,5 @@ Type `python main.py` while in the top level directory of this game to run it.
 
 Use the numpad, arrow keys, or wasd to move. Use j to jump when outside a planets hyper limit and enter hyperspace(the red x's around the edge of stars)
 
+Press f to add 10 fuel to your ship.
+
