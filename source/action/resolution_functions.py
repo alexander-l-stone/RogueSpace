@@ -28,8 +28,8 @@ def resolve_move_action(originator, flags):
             if not collision:
                 flags['area'].transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
                 result_list.append({"type": "move"})
-        if flags['area'].entity_array[originator.x + flags['dx']][originator.y + flags['dy']].flags["on_collide"]:
-            result_list.append(flags['area'].entity_array[originator.x + flags['dx']][originator.y + flags['dy']].flags["on_collide"])
+        if flags['area'].tileset.tiles[flags['area'].entity_array[originator.x + flags['dx']][originator.y + flags['dy']]].flags["on_collide"]:
+            result_list.append(flags['area'].tileset.tiles[flags['area'].entity_array[originator.x + flags['dx']][originator.y + flags['dy']]].flags["on_collide"])
         else:
             flags['area'].transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
             result_list.append({"type": "move"})

@@ -18,7 +18,7 @@ class TilesetArea(Area):
         #TODO Figure out if we want an array of vision blocking tiles
     
     def init_area(self, key=0):
-        self.entity_array = numpy.array([[self.tileset.tiles[key] for y in range(self.height)] for x in range(self.width)])
+        self.entity_array = numpy.array([[key for y in range(self.height)] for x in range(self.width)])
         self.explored_array = numpy.array([[False for y in range(self.height)] for x in range(self.width)])
     
     def draw(self, root_console, playerx, playery, tick_count, screen_width, screen_height, **config) -> None:
