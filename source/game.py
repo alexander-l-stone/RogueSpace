@@ -3,13 +3,13 @@ import tcod
 import tcod.event
 from typing import Dict
 
-from source.area.area import Area
-from source.entity.newtonian_entity import NewtonianEntity
+from source.draw.area.area import Area
+from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
-from source.menu.menu import Menu
-from source.menu.menu_item import MenuItem
-from source.planet.planet import Planet
+from source.ui.menu.menu import Menu
+from source.ui.menu.menu_item import MenuItem
+from source.stellar_objects.planet import Planet
 from source.player.player import Player
 from source.engine.renderengine import RenderEngine
 from source.engine.eventengine import EventEngine

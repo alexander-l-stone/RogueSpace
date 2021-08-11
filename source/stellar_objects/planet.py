@@ -1,7 +1,6 @@
-from source.entity.entity import Entity
-from source.area.area import Area
-from source.planet.moon import Moon
-from source.ring.ring import Ring
+from source.draw.entity.entity import Entity
+from source.stellar_objects.moon import Moon
+from source.stellar_objects.ring import Ring
 import math
 
 class Planet:

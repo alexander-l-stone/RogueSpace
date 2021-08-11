@@ -1,5 +1,5 @@
-from source.area.area import Area
-from source.entity.entity import Entity
+from source.draw.area.area import Area
+from source.draw.entity.entity import Entity
 
 def test_can_instantiate_area():
     """

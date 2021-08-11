@@ -1,4 +1,4 @@
-from source.entity.newtonian_entity import NewtonianEntity
+from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.ui.ui_bar import UIBar
 from source.ui.ui_message import UIMessage
 

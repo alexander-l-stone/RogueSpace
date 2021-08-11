@@ -1,11 +1,11 @@
 import math
-from source.planet.planet import Planet
-from source.planet.moon import Moon
+from source.stellar_objects.planet import Planet
+from source.stellar_objects.moon import Moon
 from source.helper_functions.colliders import stop_collision
-from source.ring.ring import Ring
-from source.belt.belt import Belt
+from source.stellar_objects.ring import Ring
+from source.stellar_objects.belt import Belt
 from source.system.system import System
-from source.cloud.cloud import Cloud
+from source.stellar_objects.cloud import Cloud
 from random import seed, randint, random
 
 #TODO: Turn a lot of this into reading out of a grammar

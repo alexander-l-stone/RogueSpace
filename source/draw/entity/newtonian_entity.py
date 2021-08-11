@@ -1,8 +1,10 @@
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 from source.action.action import Action
 from source.action.resolution_functions import resolve_move_action
 from source.helper_functions.is_negative import is_negative
 from source.vector.vector import Vector
+
+#TODO Seperate Newtonian Movement from Entity. Should either be on ship, or more likely, a seperate set of functions that anything with thrust can use.
 
 class NewtonianEntity(Entity):
     def __init__(self, x:int, y:int, char:str, color:tuple, parent, area, vector:dict, **flags):

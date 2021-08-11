@@ -1,7 +1,7 @@
 import tcod
 
 from typing import Dict
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 
 class Area:
     def __init__(self, bg=(0,0,0), **flags):

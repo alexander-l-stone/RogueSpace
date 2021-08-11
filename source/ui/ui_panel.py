@@ -1,5 +1,4 @@
 import tcod
-from source.ui.ui_message import UIMessage
 
 class UIPanel:
     def __init__(self, x:int, y:int, panel_height:int, panel_width:int, panel_color:tuple, border_char:str = ' ', **flags):

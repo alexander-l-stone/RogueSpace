@@ -1,4 +1,3 @@
-from source.entity.entity import Entity
 from source.action.resolution_functions import resolve_no_action
 class Action:
     """

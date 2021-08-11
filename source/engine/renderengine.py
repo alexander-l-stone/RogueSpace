@@ -2,7 +2,7 @@ import tcod
 import time
 import sys
 
-from source.entity.newtonian_entity import NewtonianEntity
+from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.system.system import System
