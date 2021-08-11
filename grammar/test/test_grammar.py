@@ -13,7 +13,6 @@ def test_missing_root():
     rules = {}
     grammar = Grammar(rules)
 
-    # TODO make sure we have the correct error
     err = "Failed to throw exception"
     try:
         grammar.generate()
@@ -32,7 +31,6 @@ def test_missing_variable():
     rules = { 'root':Rule('root',["This story is #adj# $var$"]), 'adj':Rule('adj',["the best"]) }
     grammar = Grammar(rules)
 
-    # TODO make sure we have the correct error
     err = "Failed to throw exception"
     try:
         grammar.generate()
@@ -55,12 +53,25 @@ def test_dynamic_rule():
     assert "This story is the best and dynamic" == output
 
 def test_grammar_tag():
+    # if we pass a tag, we should be allowed to get tagged results
     root = Rule('root', ["#tagged<tag>#"])
-    rule = Rule('tagged', ["has<tag>", "doesn't have tag"])
+    rule = Rule('tagged', ["has<tag>"])
     grammar = Grammar({'root':root,'tagged':rule})
-    for i in range(10):
+
+    output = grammar.generate()
+    assert "has" == output
+
+    # if we don't pass a tag, we should not be allowed to get tagged results
+    root = Rule('root', ["#tagged#"])
+    rule = Rule('tagged', ["has<tag>"])
+    grammar = Grammar({'root':root,'tagged':rule})
+
+    output = "Failed to throw exception"
+    try:
         output = grammar.generate()
-        assert "has" == output
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("No valid expansions for tags")
 
 def test_grammar_multi_tag():
     root = Rule('root', ["#<tag>tagged<other>#"]) # acceptable to invoke tag from anywhere
@@ -71,7 +82,7 @@ def test_grammar_multi_tag():
         assert "has" == output
 
 def test_grammar_tag_root():
-    root = Rule('root', ["untagged", "tagged<tag>"])
+    root = Rule('root', ["tagged<tag>"])
     grammar = Grammar({'root':root})
     output = grammar.generate('root<tag>')
     assert "tagged" == output
@@ -122,12 +133,22 @@ def test_comma_var():
     assert "text adventure" == output
 
 def test_comma_tag():
-    root = Rule('root', ["#child<tag1><tag2>#"])
-    child = Rule('child', ["wrong<tag1>", "wrong<tag2>", "wrong", "right<tag1><tag2>"])
+    root = Rule('root', ["#child<tag1,tag2>#"])
+    child = Rule('child', ["right<tag1><tag2>"])
     grammar = Grammar({'root':root,'child':child})
-    for i in range(10):
+    output = grammar.generate()
+    assert "right" == output
+
+    root = Rule('root', ["#child<tag1,tag2>#"])
+    child = Rule('child', ["wrong<tag1>"])
+    grammar = Grammar({'root':root,'child':child})
+
+    output = "Failed to throw exception"
+    try:
         output = grammar.generate()
-        assert "right" == output
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("No valid expansions for tags")
 
 def test_comma_operation():
     rule_var = Rule('root', ["[var1:text,var2: adventure]$var1,var2$"])
@@ -135,79 +156,179 @@ def test_comma_operation():
     output = grammar.generate()
     assert "text adventure" == output
 
-#TODO: THIS IS TITUS BODE
-def titus_bode(a, b, n):
-        return int(a + ((b - a) * 2 * (n-2)))
+def test_function():
+    root = Rule('root', ["[var:ant.capitalize]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ant" == output
 
-def test_galaxy():
-    '''
-    hot_zone = randint(1, 8)
-    bio_zone = randint(hot_zone + 1, hot_zone + 15)
-    cold_zone = randint(bio_zone + 1, bio_zone + 20)
-    gas_zone = randint(cold_zone + 1, cold_zone + 50)
-    frozen_zone = randint(gas_zone, gas_zone + 100)
-    '''
-    grammar = read_grammar("grammar/shitty_grammar.json")
-    assert grammar
-    gal_str = grammar.generate()
-    assert gal_str
-    assert len(gal_str) > 0
-    print("gal_str " + gal_str)
+def test_function_args():
+    root = Rule('root', ["[var:ant.capitalize()]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ant" == output
 
-    bit = gal_str.split(' ')
-    # skip bit[0] because that is star
-    hot_zone = randint(0, int(bit[1]))
-    bio_zone = randint(hot_zone, hot_zone + int(bit[2]))
-    cold_zone = randint(bio_zone, bio_zone + int(bit[3]))
-    gas_zone = randint(cold_zone, cold_zone + int(bit[4]))
-    frozen_zone = randint(gas_zone, gas_zone + int(bit[5]))
+    root = Rule('root', ["[var:pants.remove(ant)]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ps" == output
 
-    print(" zones: " + str([hot_zone,bio_zone,cold_zone,gas_zone,frozen_zone]))
-    '''
-    "_dynamic_tag": ["[star_type:#star_type<$star$>#]"],
+def test_function_multi():
+    root = Rule('root', ["[var:pants.remove(p).capitalize]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ants" == output
+    
+    root = Rule('root', ["[var:pants.capitalize.remove(P)]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ants" == output
 
-    num_planets = randint(2, 10)
-    p1 = 6 + randint(3, 10)
-    p2 = randint(p1+3, p1+7)
-    current_angle = 0
-    for i in range(1,num_planets):
-        current_angle = current_angle + 120
-        if i == 1:
-            planet_radius = p1 * self.system_scalar
-        elif i == 2:
-            planet_radius = p2 * self.system_scalar
-        else:
-            planet_radius = self.titus_bode(p1, p2, i) * self.system_scalar
-    '''
-    num_planets = randint(2, 10)
-    p1 = 8 + randint(1, 8)
-    p2 = p1 + 2 + randint(1, 5)
-    current_angle = 0
-    planet_array = []
-    for i in range(1, num_planets + 1):
-        current_angle = current_angle + 120
-        if i == 1:
-            planet_radius = p1
-        elif i == 2:
-            planet_radius = p2
-        else:
-            planet_radius = titus_bode(p1, p2, i)
-        if planet_radius < hot_zone:
-            planet = grammar.generate('planet<hot>')
-        elif planet_radius < bio_zone:
-            planet = grammar.generate('planet<bio>')
-        elif planet_radius < cold_zone:
-            planet = grammar.generate('planet<cold>')
-        elif planet_radius < gas_zone:
-            planet = grammar.generate('planet<gas>')
-        elif planet_radius < frozen_zone:
-            planet = grammar.generate('planet<frozen>')
-        else:
-            planet = 'frozen_belt'
-        planet_array.append({'radius': planet_radius, 'angle': current_angle, 'planet': planet})
+def test_function_rule():
+    root = Rule('root', ["#child.capitalize#"])
+    child = Rule('child', ["ant"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "Ant" == output
 
-    print(f"PLANET {planet_array}")
-    assert False
+def test_function_rule_args():
+    root = Rule('root', ["#child.remove(ant)#"])
+    child = Rule('child', ["pants"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "ps" == output
+
+def test_function_rule_multi():
+    root = Rule('root', ["#child.remove(p).capitalize#"])
+    child = Rule('child', ["pants"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "Ants" == output
+    
+    root = Rule('root', ["#child.capitalize.remove(P)#"])
+    child = Rule('child', ["pants"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "ants" == output
+
+def test_function_var():
+    root = Rule('root', ["[var:ant]$var.capitalize$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ant" == output
+
+def test_function_rule_var():
+    root = Rule('root', ["[var:pants]$var.remove(ant)$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ps" == output
+
+def test_function_var_multi():
+    root = Rule('root', ["[var:pants]$var.remove(p).capitalize$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ants" == output
+    
+    root = Rule('root', ["[var:pants]$var.capitalize.remove(P)$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ants" == output
+
+def test_function_tag():
+    root = Rule('root', ["#child<ant.capitalize>#"])
+    child = Rule('child', ["text<Ant>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+
+def test_function_tag_args():
+    root = Rule('root', ["#child<pants.remove(ant)>#"])
+    child = Rule('child', ["text<ps>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+
+def test_function_tag_multi():
+    root = Rule('root', ["#child<pants.remove(p).capitalize>#"])
+    child = Rule('child', ["text<Ants>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+    
+    root = Rule('root', ["#child<pants.capitalize.remove(P)>#"])
+    child = Rule('child', ["text<ants>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+
+def test_function_args_missing_close():
+    root = Rule('root', ["[a.capitalize() ]"])
+    grammar = Grammar({'root':root})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+    root = Rule('root', ["#child.capitalize() #"])  
+    child = Rule('child', ["a"])
+    grammar = Grammar({'root':root,'child':child})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+    root = Rule('root', ["[var:a]$var.capitalize() $"])
+    grammar = Grammar({'root':root})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+    root = Rule('root', ["#child<tag.capitalize() >#"])  
+    child = Rule('child', ["a"])
+    grammar = Grammar({'root':root,'child':child})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+def test_function_exec_comma():
+    root = Rule('root', ["[var:a.capitalize,var2:b.capitalize(),var3:c.capitalize]$var,var2,var3$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert 'ABC' == output
+
+def test_function_rule_comma():
+    root = Rule('root', ["#child.capitalize,child.remove(b),child.capitalize#"])
+    child = Rule('child', ["abc"])
+    grammar = Grammar({'root':root,'child':child})
+    output = grammar.generate()
+    assert 'AbcacAbc' == output
+
+def test_function_var_comma():
+    root = Rule('root', ["[var:abc]$var.capitalize,var.remove(b),var.capitalize$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert 'AbcacAbc' == output
+
+def test_function_tag_comma():
+    root = Rule('root', ["#child<tag.capitalize,tag.remove(a),tag.remove(t)>#"])
+    child = Rule('child', ["text<Tag&tg&ag>"])
+    grammar = Grammar({'root':root,'child':child})
+    output = grammar.generate()
+    assert 'text' == output
 
 def test_story():
     # grammar generation demo for non-programmers
