@@ -35,6 +35,7 @@ class Game:
         self.main_menu = Menu()
         new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
         load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
+        dev_mode = MenuItem('Launch Dev Mode', select=lambda: {'type': 'game', 'value': 'dev'})
         exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
         self.main_menu.menu_items.extend([new_game, load_game, exit_game])
         self.current_menu = self.main_menu
