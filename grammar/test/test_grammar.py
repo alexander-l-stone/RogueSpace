@@ -157,18 +157,152 @@ def test_comma_operation():
     assert "text adventure" == output
 
 def test_function():
+    root = Rule('root', ["[var:ant.capitalize]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ant" == output
+
+def test_function_args():
+    root = Rule('root', ["[var:ant.capitalize()]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ant" == output
+
+    root = Rule('root', ["[var:pants.remove(ant)]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ps" == output
+
+def test_function_multi():
+    root = Rule('root', ["[var:pants.remove(p).capitalize]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ants" == output
+    
+    root = Rule('root', ["[var:pants.capitalize.remove(P)]$var$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ants" == output
+
+def test_function_rule():
     root = Rule('root', ["#child.capitalize#"])
     child = Rule('child', ["ant"])
     grammar = Grammar({'root':root, 'child':child})
     output = grammar.generate()
     assert "Ant" == output
 
-def test_function_args():
+def test_function_rule_args():
     root = Rule('root', ["#child.remove(ant)#"])
     child = Rule('child', ["pants"])
     grammar = Grammar({'root':root, 'child':child})
     output = grammar.generate()
     assert "ps" == output
+
+def test_function_rule_multi():
+    root = Rule('root', ["#child.remove(p).capitalize#"])
+    child = Rule('child', ["pants"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "Ants" == output
+    
+    root = Rule('root', ["#child.capitalize.remove(P)#"])
+    child = Rule('child', ["pants"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "ants" == output
+
+def test_function_var():
+    root = Rule('root', ["[var:ant]$var.capitalize$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ant" == output
+
+def test_function_rule_var():
+    root = Rule('root', ["[var:pants]$var.remove(ant)$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ps" == output
+
+def test_function_var_multi():
+    root = Rule('root', ["[var:pants]$var.remove(p).capitalize$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "Ants" == output
+    
+    root = Rule('root', ["[var:pants]$var.capitalize.remove(P)$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert "ants" == output
+
+def test_function_tag():
+    root = Rule('root', ["#child<ant.capitalize>#"])
+    child = Rule('child', ["text<Ant>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+
+def test_function_tag_args():
+    root = Rule('root', ["#child<pants.remove(ant)>#"])
+    child = Rule('child', ["text<ps>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+
+def test_function_tag_multi():
+    root = Rule('root', ["#child<pants.remove(p).capitalize>#"])
+    child = Rule('child', ["text<Ants>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+    
+    root = Rule('root', ["#child<pants.capitalize.remove(P)>#"])
+    child = Rule('child', ["text<ants>"])
+    grammar = Grammar({'root':root, 'child':child})
+    output = grammar.generate()
+    assert "text" == output
+
+def test_function_args_missing_close():
+    root = Rule('root', ["[a.capitalize() ]"])
+    grammar = Grammar({'root':root})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+    root = Rule('root', ["#child.capitalize() #"])  
+    child = Rule('child', ["a"])
+    grammar = Grammar({'root':root,'child':child})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+    root = Rule('root', ["[var:a]$var.capitalize() $"])
+    grammar = Grammar({'root':root})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
+
+    root = Rule('root', ["#child<tag.capitalize() >#"])  
+    child = Rule('child', ["a"])
+    grammar = Grammar({'root':root,'child':child})
+
+    output = "Failed to throw exception"
+    try:
+        output = grammar.generate()
+    except AttributeError as e:
+        output = e.args[0]
+    assert output.startswith("Function call not at end of invocation.")
 
 def test_story():
     # grammar generation demo for non-programmers
