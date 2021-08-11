@@ -304,6 +304,32 @@ def test_function_args_missing_close():
         output = e.args[0]
     assert output.startswith("Function call not at end of invocation.")
 
+def test_function_exec_comma():
+    root = Rule('root', ["[var:a.capitalize,var2:b.capitalize(),var3:c.capitalize]$var,var2,var3$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert 'ABC' == output
+
+def test_function_rule_comma():
+    root = Rule('root', ["#child.capitalize,child.remove(b),child.capitalize#"])
+    child = Rule('child', ["abc"])
+    grammar = Grammar({'root':root,'child':child})
+    output = grammar.generate()
+    assert 'AbcacAbc' == output
+
+def test_function_var_comma():
+    root = Rule('root', ["[var:abc]$var.capitalize,var.remove(b),var.capitalize$"])
+    grammar = Grammar({'root':root})
+    output = grammar.generate()
+    assert 'AbcacAbc' == output
+
+def test_function_tag_comma():
+    root = Rule('root', ["#child<tag.capitalize,tag.remove(a),tag.remove(t)>#"])
+    child = Rule('child', ["text<Tag&tg&ag>"])
+    grammar = Grammar({'root':root,'child':child})
+    output = grammar.generate()
+    assert 'text' == output
+
 def test_story():
     # grammar generation demo for non-programmers
     grammar = read_grammar("grammar/shitty_grammar.json")
