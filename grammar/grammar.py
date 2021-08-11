@@ -349,9 +349,9 @@ class Grammar:
                 elif char == scope[-1]['close_char'] or char == ',' or char == '.':
                     popped_scope = scope.pop()
                     func_name = popped_scope['token']
-                    func = self.func_lib[func_name]
+                    func_to_exec = self.func_lib[func_name]
                     print(f"FUNCTION INVOCATION {func_name} args {popped_scope['args']}\nscope {scope}\nparent_stack {parent_stack})")
-                    func_ret = func(scope, parent_stack, user_vars, popped_scope['args'])
+                    func_ret = func_to_exec(scope, parent_stack, user_vars, popped_scope['args'])
                     # if close was a dot, chain to another function
                     if char == '.':
                         scope.append({'scope_type':'.', 'token':'', 'close_char':popped_scope['close_char'], 'args':[func_ret]})
@@ -399,13 +399,13 @@ class Grammar:
                     # get func
                     popped_scope = scope.pop()
                     func_name = popped_scope['token']
-                    func = self.func_lib[func_name]
+                    func_to_exec = self.func_lib[func_name]
 
                     # put parent_output back into args list
                     args = popped_scope['args'] + args
 
                     # execute
-                    func_ret = func(scope, parent_stack, user_vars, args)
+                    func_ret = func_to_exec(scope, parent_stack, user_vars, args)
                     # treat the character after the paren as our close
                     i += 1
                     char = exp[i]
