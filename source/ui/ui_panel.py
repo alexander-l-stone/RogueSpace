@@ -15,12 +15,12 @@ class UIPanel:
         self.elements = {}
         self.hidden = False
 
-    def draw(self, root_console) -> None:
+    def draw(self, root_console, tick_count) -> None:
         if self.hidden:
             return
         self.draw_background(root_console)
         for elem in self.elements.values():
-            elem.draw(root_console)
+            elem.draw(root_console, tick_count)
 
     def draw_background(self, root_console):
         """

@@ -12,7 +12,7 @@ class UIBar:
         self.max_value = max_value
         self.hidden = False
 
-    def draw(self, root_console) -> None:
+    def draw(self, root_console, tick_count) -> None:
         if self.hidden:
             return
         full_width = int(self.width * (self.curr_value / self.max_value))

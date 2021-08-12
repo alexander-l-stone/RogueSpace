@@ -14,6 +14,7 @@ from source.engine.renderengine import RenderEngine
 from source.engine.eventengine import EventEngine
 from source.helper_functions.circle_conversions import *
 from source.system.system import System
+from source.ui.game_window import GameWindow
 from source.ui.ui_panel import UIPanel
 from source.ship.ship import Ship
 
@@ -65,6 +66,8 @@ class Game:
         self.generate_current_area()
         self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
+        main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
+        self.render_engine.ui['game_window'] = main_game_window
 
     def start_dev(self):
         self.player = Player()

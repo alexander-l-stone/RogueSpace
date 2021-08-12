@@ -6,7 +6,7 @@ class UIMessage:
         self.color = color
         self.hidden = False
     
-    def draw(self, root_console) -> None:
+    def draw(self, root_console, tick_count) -> None:
         if self.hidden:
             return
         root_console.print(self.x, self.y, self.message, fg=self.color)

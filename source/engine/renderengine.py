@@ -5,6 +5,7 @@ import sys
 from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
+from source.handlers.menu_handler import MenuHandler
 from source.system.system import System
 from source.ui.menu.generate_menu import generate_dev_command_menu, generate_spawn_entity_menu
 from source.ui.menu.menu import Menu
@@ -25,6 +26,7 @@ class RenderEngine:
         self.SCREEN_WIDTH = screen_width
         self.game = game
         self.InputHandler = InputHandler()
+        self.MenuHandler = MenuHandler()
 
         STATUS_LABEL_WIDTH = 8
         STATUS_BAR_WIDTH = 10
@@ -62,13 +64,13 @@ class RenderEngine:
         if self.tick_count == sys.maxsize:
             self.tick_count = 0
         if self.game.game_state != 'game' and self.game.game_state.split('_')[-1] != 'render':
-            self.game.current_menu.draw(root_console)
+            self.game.current_menu.draw(root_console, self.tick_count)
         else:
             self.update_hud()
-            self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.tick_count, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+            # self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.tick_count, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
             for panel in self.ui.values():
                 # draw all panels
-                panel.draw(root_console)
+                panel.draw(root_console, self.tick_count)
 
     def update_hud(self) -> None:
         hud = self.ui['hud']
@@ -90,16 +92,28 @@ class RenderEngine:
                 context.present(root_console)
                 if (self.game.game_state == 'game'):
                     self.event_loop(root_console)
-                elif (self.game.game_state == 'main_menu'):
-                    self.menu_loop(root_console, self.game.main_menu)
-                elif (self.game.game_state == 'game_menu'):
-                    self.menu_loop(root_console, self.game.game_menu)
-                elif (self.game.game_state == 'menu_command_menu_render'):
-                    self.menu_loop(root_console, self.game.render_engine.ui['dev'].elements['command_menu'])
-                elif (self.game.game_state == 'menu_spawn_entity_render'):
-                    self.menu_loop(root_console, self.game.render_engine.ui['dev'].elements['spawn_entity'])
+                else:
+                    self.menu_loop(root_console)
                 self.render_console(root_console)
     
+    def handle_key_presses(self, result) -> dict:
+        if event.type == 'KEYDOWN':
+            result = self.MenuHandler.handle_keypress(event)
+            key_result = {'type': 'none'}
+            if result['type'] == 'select':
+                key_result = self.menu_items[self.active_item].kwargs['select']()
+            elif result['type'] == 'up':
+                if self.active_item > 0:
+                    self.active_item -= 1
+                key_result = {'type': 'move', 'value': 'up'}
+            elif result['type'] == 'down':
+                if self.active_item < len(self.menu_items) - 1:
+                    self.active_item += 1
+                key_result = {'type': 'move', 'value': 'down'}
+            return key_result
+        else:
+            return {'type': 'none'}
+
     def render_console(self, root_console) -> None:
         root_console.clear()
         self.render(root_console)
@@ -119,10 +133,12 @@ class RenderEngine:
                     raise SystemExit()
 
 
-    def menu_loop(self, root_console, menu):
+    def menu_loop(self, root_console):
         for event in tcod.event.get():
             if event.type == "KEYDOWN":
-                result = menu.handle_key_presses(event)
+                #TODO: simplify this to grab results, process result
+                result = self.MenuHandler.handle_keypress(event)
+                result = self.game.event_engine.handle_menu_key_presses(result)
                 self.game.event_engine.resolve_menu_kb_input(result)
             if event.type == "QUIT":
                 raise SystemExit()

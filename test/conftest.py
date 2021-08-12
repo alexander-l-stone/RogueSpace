@@ -12,6 +12,7 @@ from source.action.resolution_functions import resolve_no_action
 from source.vector.vector import Vector
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
+#TODO: Figure out ways to test heavily tcod dependent classes(UI for example)
 
 @pytest.fixture
 def action():

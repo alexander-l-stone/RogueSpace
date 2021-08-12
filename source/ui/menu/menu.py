@@ -1,13 +1,8 @@
-import tcod
-
-from source.handlers.menu_handler import MenuHandler
-
 class Menu:
     def __init__(self, x, y):
         self.menu_items:list = []
         self.active_item:int = 0
         self.menu_title:str = ''
-        self.MenuHandler:MenuHandler = MenuHandler()
         self.x = x
         self.y = y
         self.hidden = False
@@ -25,13 +20,7 @@ class Menu:
         return return_string
 
     
-    def draw(self, root_console):
-        """Render this menu. Only works if there is more than 0 menu items.
-
-        Args:
-            sh (int): Screen Height
-            sw (int): Screen Width
-        """
+    def draw(self, root_console, tick_count):
         if self.hidden:
             return
         try:
@@ -49,22 +38,3 @@ class Menu:
                             root_console.print(start_width + char_index, start_height + index, self.menu_items[index].message[char_index],fg=self.menu_items[index].default_color)
         except IndexError:
             raise IndexError
-    
-    def handle_key_presses(self, event) -> dict:
-        if event.type == 'KEYDOWN':
-            result = self.MenuHandler.handle_keypress(event)
-            key_result = {'type': 'none'}
-            if result['type'] == 'select':
-                if not self.menu_items[self.active_item].disabled:
-                    key_result = self.menu_items[self.active_item].kwargs['select']()
-            elif result['type'] == 'up':
-                if self.active_item > 0:
-                    self.active_item -= 1
-                key_result = {'type': 'move', 'value': 'up'}
-            elif result['type'] == 'down':
-                if self.active_item < len(self.menu_items) - 1:
-                    self.active_item += 1
-                key_result = {'type': 'move', 'value': 'down'}
-            return key_result
-        else:
-            return {'type': 'none'}
