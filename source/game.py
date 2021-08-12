@@ -95,6 +95,11 @@ class Game:
         self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
         self.state_flags['no-jump'] = True
+
+        #self.spawn_planet = MenuItem('Spawn Planet', disabled=True) # Wait for grammar generator to be done
+        #self.spawn_belt = MenuItem('Spawn Belt', disabled=True) # See Above
+        #TODO Add Spawn Ring, Spawn Star, and Spawn Moon
+
         self.render_engine.generate_dev_panel()
 
     def save_game(self):

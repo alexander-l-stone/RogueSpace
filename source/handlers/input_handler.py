@@ -2,6 +2,7 @@ import tcod.event
 from typing import Dict
 
 #TODO: Figure out a good way of doing input handling.
+#TODO: Add Import/Export of key commands to/from a config file. Probably json for now.
 
 class InputHandler:
     def __init__(self):

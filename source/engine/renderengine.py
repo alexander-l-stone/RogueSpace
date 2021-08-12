@@ -6,6 +6,8 @@ from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.system.system import System
+from source.ui.menu.menu import Menu
+from source.ui.menu.menu_item import MenuItem
 from source.ui.ui_bar import UIBar
 from source.ui.ui_message import UIMessage
 from source.ui.ui_panel import UIPanel
@@ -38,9 +40,15 @@ class RenderEngine:
         self.tick_count = 0
     
     def generate_dev_panel(self):
-        dev_panel = UIPanel(0, 0, self.SCREEN_HEIGHT - 8, 8, (0, 0, 50))
+        dev_panel = UIPanel(0, 0, self.SCREEN_HEIGHT - 8, 15, (0, 0, 50))
+        dev_menu = Menu(0, 1)
+        spawn_entity = MenuItem('Spawn Entity', disabled=True)
+        dev_menu.menu_items.extend([spawn_entity])
+        dev_panel.elements['dev-menu'] = dev_menu
         self.ui['dev'] = dev_panel
 
+    #TODO: Change the center of the screen that the player character knows to be the center of the visible area not taken up by ui.
+    # Probably make a seprate UI element that is the game panel?
     def render(self, root_console) -> None:
         self.tick_count += 1
         if self.tick_count == sys.maxsize:
