@@ -36,7 +36,7 @@ class Game:
             self.state_flags = {}
 
         #generate main menu
-        self.main_menu = Menu()
+        self.main_menu = Menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
         new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
         load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
         exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
@@ -49,7 +49,7 @@ class Game:
         self.current_menu = self.main_menu
 
         #generate game menu
-        self.game_menu = Menu()
+        self.game_menu = Menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
         save_game = MenuItem('Save Game', select=lambda: {'type': 'save'})
         close_menu = MenuItem('Close Menu', select=lambda: {'type': 'close'})
         self.game_menu.menu_items.extend([close_menu, save_game, load_game, exit_game])
@@ -95,6 +95,7 @@ class Game:
         self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
         self.state_flags['no-jump'] = True
+        self.render_engine.generate_dev_panel()
 
     def save_game(self):
         save_dict = {

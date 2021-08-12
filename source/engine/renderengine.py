@@ -36,13 +36,17 @@ class RenderEngine:
 
         self.ui = {'hud': panel}
         self.tick_count = 0
+    
+    def generate_dev_panel(self):
+        dev_panel = UIPanel(0, 0, self.SCREEN_HEIGHT - 8, 8, (0, 0, 50))
+        self.ui['dev'] = dev_panel
 
     def render(self, root_console) -> None:
         self.tick_count += 1
         if self.tick_count == sys.maxsize:
             self.tick_count = 0
         if self.game.game_state != 'game':
-            self.game.current_menu.render(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, root_console)
+            self.game.current_menu.draw(root_console)
         else:
             self.update_hud()
             self.game.current_area.draw(root_console, self.game.player.current_entity.x, self.game.player.current_entity.y, self.tick_count, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)

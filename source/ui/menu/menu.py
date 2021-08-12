@@ -3,13 +3,15 @@ import tcod
 from source.handlers.menu_handler import MenuHandler
 
 class Menu:
-    def __init__(self):
+    def __init__(self, x, y):
         self.menu_items:list = []
         self.active_item:int = 0
         self.menu_title:str = ''
         self.MenuHandler:MenuHandler = MenuHandler()
+        self.x = x
+        self.y = y
     
-    def render(self, sh, sw, root_console):
+    def draw(self, root_console):
         """Render this menu. Only works if there is more than 0 menu items.
 
         Args:
@@ -17,9 +19,10 @@ class Menu:
             sw (int): Screen Width
         """
         try:
-            start_height = int(sh//3 + len(self.menu_items)//2)
-            start_width = int(sw//2 - len(self.menu_items[0].message)//2)
+            start_height = self.y
+            start_width = self.x
             for index in range(len(self.menu_items)):
+                #TODO: Print entire string not by char index
                 for char_index in range(len(self.menu_items[index].message)):
                     if self.menu_items[index].disabled:
                         root_console.print(start_width + char_index, start_height + index, self.menu_items[index].message[char_index],fg=self.menu_items[index].disabled_color)
