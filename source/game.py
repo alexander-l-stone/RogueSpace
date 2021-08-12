@@ -7,7 +7,7 @@ from source.draw.area.area import Area
 from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
-from source.ui.menu.generate_menu import generate_main_menu, generate_dev_menu, generate_game_menu
+from source.ui.menu.generate_menu import generate_main_menu, generate_dev_menu, generate_game_menu, generate_dev_command_menu, generate_spawn_entity_menu
 from source.stellar_objects.planet import Planet
 from source.player.player import Player
 from source.engine.renderengine import RenderEngine
@@ -41,9 +41,12 @@ class Game:
         else:
             self.main_menu = generate_main_menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
         self.current_menu = self.main_menu
+        self.render_engine.add_element_to_ui('main_menu', self.main_menu)
 
         #generate game menu
         self.game_menu = generate_game_menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
+        self.render_engine.add_element_to_ui('game_menu', self.game_menu)
+        self.game_menu.visible = False
 
     def start_new_game(self):
         #Code to generate player
@@ -67,7 +70,9 @@ class Game:
         self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
         main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
-        self.render_engine.ui['game_window'] = main_game_window
+        self.render_engine.add_element_to_ui('game_window', main_game_window)
+        self.render_engine.ui['main_menu'].visible = False
+        self.render_engine.ui['hud'].visible = True
 
     def start_dev(self):
         self.player = Player()
@@ -87,22 +92,30 @@ class Game:
         self.generate_current_area()
         self.current_area.add_entity(self.player.current_entity)
         self.player.current_entity.generate_vector_path()
-        self.state_flags['no-jump'] = True
-
-        #self.spawn_planet = MenuItem('Spawn Planet', disabled=True) # Wait for grammar generator to be done
-        #self.spawn_belt = MenuItem('Spawn Belt', disabled=True) # See Above
-        #TODO Add Spawn Ring, Spawn Star, and Spawn Moon
-
-        self.render_engine.generate_dev_panel()
+        self.generate_dev_panel()
         self.render_engine.InputHandler.key_command_dict[tcod.event.K_F10] = {"type": "menu", "value": "dev"}
+        main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
+        self.state_flags['no-jump'] = True
+        self.render_engine.add_element_to_ui('game_window', main_game_window)
+        self.render_engine.ui['main_menu'].visible = False
+        self.render_engine.ui['hud'].visible = True
 
+    def generate_dev_panel(self):
+        dev_panel = UIPanel(0, 0, self.render_engine.SCREEN_HEIGHT - 8, 15, (0, 0, 50))
+        dev_menu = generate_dev_command_menu(0, 1)
+        spawn_entity_menu = generate_spawn_entity_menu(0, 1)
+        spawn_entity_menu.visible = False
+        dev_panel.elements['command_menu'] = dev_menu
+        dev_panel.elements['spawn_entity'] = spawn_entity_menu
+        self.render_engine.add_element_to_ui('dev', dev_panel)
+        self.render_engine.ui['dev'].visible = False
 
     #TODO: Look at save load after core game structure is more settled.
     def save_game(self):
         save_dict = {
             'galaxy': self.galaxy,
-            'renderengine': self.render_engine,
-            'eventengine': self.event_engine,
+            'global_time': self.event_engine.global_time,
+            'global_queue': self.event_engine.global_queue,
             'player': self.player,
             'current_location': self.current_location,
             'current_area': self.current_area,
@@ -120,8 +133,8 @@ class Game:
             with open('saves/save.p', 'rb') as save_file:
                 data = pickle.load(save_file)
                 self.galaxy = data['galaxy']
-                self.event_engine = data['eventengine']
-                self.render_engine = data['renderengine']
+                self.event_engine.global_time = data['global_time']
+                self.event_engine.global_queue = data['global_queue']
                 self.player = data['player']
                 self.current_location = data['current_location']
                 self.current_area = data['current_area']

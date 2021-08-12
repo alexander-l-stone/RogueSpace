@@ -10,10 +10,11 @@ class UIBar:
         self.text_color = text_color
         self.curr_value = curr_value
         self.max_value = max_value
-        self.hidden = False
+        self.visible = True
+        self.priority = 2
 
     def draw(self, root_console, tick_count) -> None:
-        if self.hidden:
+        if not self.visible:
             return
         full_width = int(self.width * (self.curr_value / self.max_value))
         empty_width = self.width - full_width

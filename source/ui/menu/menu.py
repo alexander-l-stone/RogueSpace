@@ -5,7 +5,8 @@ class Menu:
         self.menu_title:str = ''
         self.x = x
         self.y = y
-        self.hidden = False
+        self.visible = True
+        self.priority = 2
 
     def __str__(self) -> str:
         return_string = ''
@@ -21,7 +22,7 @@ class Menu:
 
     
     def draw(self, root_console, tick_count):
-        if self.hidden:
+        if not self.visible:
             return
         try:
             start_height = self.y

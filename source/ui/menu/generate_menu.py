@@ -5,7 +5,7 @@ from source.ui.menu.menu_item import MenuItem
 def generate_main_menu(x, y):
     main_menu = Menu(x, y)
     new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
-    load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
+    load_game = MenuItem('Load Game', disabled=True, select=lambda: {'type': 'game', 'value': 'load'})
     exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
     main_menu.menu_items.extend([new_game, load_game, exit_game])
     return main_menu
@@ -20,8 +20,8 @@ def generate_dev_menu(x, y):
 def generate_game_menu(x, y):
     game_menu = Menu(x, y)
     close_menu = MenuItem('Close Menu', select=lambda: {'type': 'close'})
-    save_game = MenuItem('Save Game', select=lambda: {'type': 'save'})
-    load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
+    save_game = MenuItem('Save Game', disabled=True, select=lambda: {'type': 'save'})
+    load_game = MenuItem('Load Game', disabled=True, select=lambda: {'type': 'game', 'value': 'load'})
     exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
     game_menu.menu_items.extend([close_menu, save_game, load_game, exit_game])
     return game_menu

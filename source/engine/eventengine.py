@@ -106,11 +106,14 @@ class EventEngine:
             if result["value"] == 'game':
                 self.game.game_state = "game_menu"
                 self.game.current_menu = self.game.game_menu
+                self.game.render_engine.ui['game_menu'].visible = True
+                self.game.render_engine.ui['game_window'].visible = False
+                self.game.render_engine.ui['hud'].visible = False
             elif result["value"] == 'dev':
                 self.game.game_state = "menu_command_menu_render"
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
-                self.game.render_engine.ui["dev"].hidden = False
-    
+                self.game.render_engine.ui["dev"].visible = True
+
     def handle_menu_key_presses(self, result) -> dict:
         key_result = {'type': 'none'}
         if result['type'] == 'select':
@@ -139,18 +142,21 @@ class EventEngine:
         elif result['type'] == 'close':
             self.game.game_state = 'game'
             if 'debug' in self.game.state_flags and self.game.state_flags['debug']:
-                self.game.render_engine.ui['dev'].hidden = True
+                self.game.render_engine.ui['dev'].visible = False
+            self.game.render_engine.ui['game_menu'].visible = False
+            self.game.render_engine.ui['game_window'].visible = True
+            self.game.render_engine.ui['hud'].visible = True
         elif result['type'] == 'open':
             if result["value"] == 'spawn_entity':
                 self.game.current_menu = self.game.render_engine.ui['dev'].elements['spawn_entity']
                 self.game.game_state = 'menu_spawn_entity_render'
-                self.game.render_engine.ui['dev'].elements['command_menu'].hidden = True
-                self.game.render_engine.ui['dev'].elements['spawn_entity'].hidden = False
+                self.game.render_engine.ui['dev'].elements['command_menu'].visible = False
+                self.game.render_engine.ui['dev'].elements['spawn_entity'].visible = True
             elif result["value"] == 'command_menu':
                 self.game.current_menu = self.game.render_engine.ui['dev'].elements['command_menu']
                 self.game.game_state = 'menu_command_menu_render'
-                self.game.render_engine.ui['dev'].elements['command_menu'].hidden = False
-                self.game.render_engine.ui['dev'].elements['spawn_entity'].hidden = True
+                self.game.render_engine.ui['dev'].elements['command_menu'].visible = True
+                self.game.render_engine.ui['dev'].elements['spawn_entity'].visible = False
         elif(result["type"] == "save"):
             self.game.save_game()
             self.game.game_state = "game"
