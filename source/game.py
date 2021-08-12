@@ -7,8 +7,7 @@ from source.draw.area.area import Area
 from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
-from source.ui.menu.menu import Menu
-from source.ui.menu.menu_item import MenuItem
+from source.ui.menu.generate_menu import generate_main_menu, generate_dev_menu, generate_game_menu
 from source.stellar_objects.planet import Planet
 from source.player.player import Player
 from source.engine.renderengine import RenderEngine
@@ -36,23 +35,14 @@ class Game:
             self.state_flags = {}
 
         #generate main menu
-        self.main_menu = Menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
-        new_game = MenuItem('New Game', select=lambda: {'type': 'game', 'value': 'new'})
-        load_game = MenuItem('Load Game', select=lambda: {'type': 'game', 'value': 'load'})
-        exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
         if 'debug' in self.state_flags and self.state_flags['debug']:
-            #TODO Figure what options should be available with debug set to true
-            dev_mode = MenuItem('Launch Dev Mode', select=lambda: {'type': 'game', 'value': 'dev'})
-            self.main_menu.menu_items.extend([dev_mode, exit_game])
+            self.main_menu = generate_dev_menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
         else:
-            self.main_menu.menu_items.extend([new_game, load_game, exit_game])
+            self.main_menu = generate_main_menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
         self.current_menu = self.main_menu
 
         #generate game menu
-        self.game_menu = Menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
-        save_game = MenuItem('Save Game', select=lambda: {'type': 'save'})
-        close_menu = MenuItem('Close Menu', select=lambda: {'type': 'close'})
-        self.game_menu.menu_items.extend([close_menu, save_game, load_game, exit_game])
+        self.game_menu = generate_game_menu(self.render_engine.SCREEN_WIDTH//3, self.render_engine.SCREEN_HEIGHT//3)
 
     def start_new_game(self):
         #Code to generate player

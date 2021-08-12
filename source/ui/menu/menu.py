@@ -10,6 +10,20 @@ class Menu:
         self.MenuHandler:MenuHandler = MenuHandler()
         self.x = x
         self.y = y
+        self.hidden = False
+
+    def __str__(self) -> str:
+        return_string = ''
+        for item in self.menu_items:
+            return_string = f"{return_string}\n{item}"
+        return return_string
+
+    def __repr__(self) -> str:
+        return_string = ''
+        for item in self.menu_items:
+            return_string = f"{return_string}\n{item}"
+        return return_string
+
     
     def draw(self, root_console):
         """Render this menu. Only works if there is more than 0 menu items.
@@ -18,6 +32,8 @@ class Menu:
             sh (int): Screen Height
             sw (int): Screen Width
         """
+        if self.hidden:
+            return
         try:
             start_height = self.y
             start_width = self.x
