@@ -19,6 +19,8 @@ class EventEngine:
             if result["type"] == "enter":
                 self.resolve_enter(result)
             elif result["type"] == "jump":
+                if ('no-jump' in self.game.state_flags):
+                    return
                 self.resolve_jump(result)
             elif result["type"] == "move" and isinstance(self.game.current_location, Galaxy):
                 for key, value in self.game.current_location.check_explored_corners(self.game.player.current_entity.x, self.game.player.current_entity.y, self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
@@ -109,6 +111,8 @@ class EventEngine:
                 self.game.start_new_game()
             elif result['value'] == 'load':
                 self.game.load_game()
+            elif result['value'] == 'dev':
+                self.game.start_dev()
             self.game.game_state = 'game'
         elif result['type'] == 'close':
             self.game.game_state = 'game'
