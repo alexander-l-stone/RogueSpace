@@ -29,17 +29,17 @@ def generate_game_menu(x, y):
 def generate_dev_command_menu(x, y):
     dev_menu = Menu(x, y)
     close_menu = MenuItem('Close Menu', select=lambda: {'type': "close"})
-    spawn_entity = MenuItem('Spawn Entity', select=lambda: {'type': "open", "value": "spawn-entity"})
+    spawn_entity = MenuItem('Spawn Entity', select=lambda: {'type': "open", "value": "spawn_entity"})
     dev_menu.menu_items.extend([close_menu, spawn_entity])
     return dev_menu
 
 def generate_spawn_entity_menu(x, y):
     spawn_entity_menu = Menu(x, y)
-    go_back = MenuItem('Go Back', select=lambda: {'type': "back"})
+    go_back = MenuItem('Go Back', select=lambda: {'type': "open", "value": "command_menu"})
     adjust_character = MenuItem('Character: @', disabled=True, select=lambda: {'type': 'string-input', 'value': 'spawn-entity-char', 'max-length': 1})
     adjust_red = MenuItem('Red: 255', disabled=True, select=lambda: {'type': 'numeric-input', 'value': 'red', 'min-value': 0, 'max-value': 255})
     adjust_green = MenuItem('Green: 255', disabled=True, select=lambda: {'type': 'numeric-input', 'value': 'green', 'min-value': 0, 'max-value': 255})
-    adjust_blue = MenuItem('Red: blue', disabled=True, select=lambda: {'type': 'numeric-input', 'value': 'blue', 'min-value': 0, 'max-value': 255})
+    adjust_blue = MenuItem('Blue: 255', disabled=True, select=lambda: {'type': 'numeric-input', 'value': 'blue', 'min-value': 0, 'max-value': 255})
     spawn_entity = MenuItem('Spawn Entity', disabled=True, select=lambda: {'type': "open", "value": "spawn-entity"})
     #TODO Show example entity at button
     #TODO Allow adjust background color as well as foreground

@@ -27,7 +27,7 @@ class InputHandler:
             53: {"type": "wait"}, #The number 5
             tcod.event.K_j: {"type": "jump"},
             tcod.event.K_f: {"type": "cheat-fuel"},
-            tcod.event.K_ESCAPE: {"type": "menu", "value": "open"},
+            tcod.event.K_ESCAPE: {"type": "menu", "value": "game"},
         }
     
     def handle_keypress(self, event) -> Dict[str,str]:

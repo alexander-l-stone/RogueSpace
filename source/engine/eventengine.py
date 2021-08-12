@@ -100,8 +100,13 @@ class EventEngine:
         elif(result["type"] == "cheat-fuel"):
             self.game.player.current_ship.fuel += 10
         elif(result["type"] == "menu"):
-            self.game.game_state = "game_menu"
-            self.game.current_menu = self.game.game_menu
+            if result["value"] == 'game':
+                self.game.game_state = "game_menu"
+                self.game.current_menu = self.game.game_menu
+            elif result["value"] == 'dev':
+                self.game.game_state = "menu_command_menu_render"
+                self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
+                self.game.render_engine.ui["dev"].hidden = False
     
     def resolve_menu_kb_input(self, result):
         if result['type'] == 'exit':
@@ -116,6 +121,19 @@ class EventEngine:
             self.game.game_state = 'game'
         elif result['type'] == 'close':
             self.game.game_state = 'game'
+            if 'debug' in self.game.state_flags and self.game.state_flags['debug']:
+                self.game.render_engine.ui['dev'].hidden = True
+        elif result['type'] == 'open':
+            if result["value"] == 'spawn_entity':
+                self.game.current_menu = self.game.render_engine.ui['dev'].elements['spawn_entity']
+                self.game.game_state = 'menu_spawn_entity_render'
+                self.game.render_engine.ui['dev'].elements['command_menu'].hidden = True
+                self.game.render_engine.ui['dev'].elements['spawn_entity'].hidden = False
+            elif result["value"] == 'command_menu':
+                self.game.current_menu = self.game.render_engine.ui['dev'].elements['command_menu']
+                self.game.game_state = 'menu_command_menu_render'
+                self.game.render_engine.ui['dev'].elements['command_menu'].hidden = False
+                self.game.render_engine.ui['dev'].elements['spawn_entity'].hidden = True
         elif(result["type"] == "save"):
             self.game.save_game()
             self.game.game_state = "game"

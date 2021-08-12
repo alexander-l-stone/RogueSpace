@@ -91,15 +91,19 @@ class Game:
         #TODO Add Spawn Ring, Spawn Star, and Spawn Moon
 
         self.render_engine.generate_dev_panel()
+        self.render_engine.InputHandler.key_command_dict[tcod.event.K_F10] = {"type": "menu", "value": "dev"}
 
+
+    #TODO: Look at save load after core game structure is more settled.
     def save_game(self):
         save_dict = {
             'galaxy': self.galaxy,
-            'global_time': self.global_time,
-            'global_queue': self.global_queue,
+            'renderengine': self.render_engine,
+            'eventengine': self.event_engine,
             'player': self.player,
             'current_location': self.current_location,
             'current_area': self.current_area,
+            'state_flags': self.state_flags
         }
         try:
             with open('saves/save.p', 'wb+') as save_file:
@@ -113,11 +117,12 @@ class Game:
             with open('saves/save.p', 'rb') as save_file:
                 data = pickle.load(save_file)
                 self.galaxy = data['galaxy']
-                self.global_time = data['global_time']
-                self.global_queue = data['global_queue']
+                self.event_engine = data['eventengine']
+                self.render_engine = data['renderengine']
                 self.player = data['player']
                 self.current_location = data['current_location']
                 self.current_area = data['current_area']
+                self.state_flags = data['state_flags']
         except FileNotFoundError:
             pass
 

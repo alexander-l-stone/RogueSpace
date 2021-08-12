@@ -13,8 +13,11 @@ class UIPanel:
                                     ord(self.border_char), ord(' '), ord(self.border_char), 
                                     ord(self.border_char), ord(self.border_char), ord(self.border_char))
         self.elements = {}
+        self.hidden = False
 
     def draw(self, root_console) -> None:
+        if self.hidden:
+            return
         self.draw_background(root_console)
         for elem in self.elements.values():
             elem.draw(root_console)

@@ -13,6 +13,11 @@ from source.ui.ui_bar import UIBar
 from source.ui.ui_message import UIMessage
 from source.ui.ui_panel import UIPanel
 
+#TODO Rework entire render framework
+"""
+    Should have a list of things to render and just render those. Game Window should be a ui element that can be rendered/not rendered.
+    The Menu/Current menu should be replaced by the abo
+"""
 class RenderEngine:
     def __init__(self, tileset, screen_height, screen_width, game):
         self.tileset = tileset
@@ -48,6 +53,7 @@ class RenderEngine:
         dev_panel.elements['command_menu'] = dev_menu
         dev_panel.elements['spawn_entity'] = spawn_entity_menu
         self.ui['dev'] = dev_panel
+        self.ui['dev'].hidden = True
 
     #TODO: Change the center of the screen that the player character knows to be the center of the visible area not taken up by ui.
     # Probably make a seprate UI element that is the game panel?
@@ -55,8 +61,7 @@ class RenderEngine:
         self.tick_count += 1
         if self.tick_count == sys.maxsize:
             self.tick_count = 0
-        if self.game.game_state != 'game':
-            print(f"Current Menu: {self.game.current_menu}")
+        if self.game.game_state != 'game' and self.game.game_state.split('_')[-1] != 'render':
             self.game.current_menu.draw(root_console)
         else:
             self.update_hud()
@@ -89,6 +94,10 @@ class RenderEngine:
                     self.menu_loop(root_console, self.game.main_menu)
                 elif (self.game.game_state == 'game_menu'):
                     self.menu_loop(root_console, self.game.game_menu)
+                elif (self.game.game_state == 'menu_command_menu_render'):
+                    self.menu_loop(root_console, self.game.render_engine.ui['dev'].elements['command_menu'])
+                elif (self.game.game_state == 'menu_spawn_entity_render'):
+                    self.menu_loop(root_console, self.game.render_engine.ui['dev'].elements['spawn_entity'])
                 self.render_console(root_console)
     
     def render_console(self, root_console) -> None:

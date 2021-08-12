@@ -55,7 +55,8 @@ class Menu:
             result = self.MenuHandler.handle_keypress(event)
             key_result = {'type': 'none'}
             if result['type'] == 'select':
-                key_result = self.menu_items[self.active_item].kwargs['select']()
+                if not self.menu_items[self.active_item].disabled:
+                    key_result = self.menu_items[self.active_item].kwargs['select']()
             elif result['type'] == 'up':
                 if self.active_item > 0:
                     self.active_item -= 1
