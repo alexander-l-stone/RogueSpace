@@ -1,9 +1,5 @@
 
-from source.planet.planet import Planet
-from source.entity.entity import Entity
-from source.area.area import Area
-from source.action.action import Action
-from source.action.resolution_functions import resolve_move_action
+from source.stellar_objects.planet import Planet
 
 def test_can_instantiate_planet():
     """

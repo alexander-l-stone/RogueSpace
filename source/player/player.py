@@ -1,5 +1,3 @@
-from source.entity.entity import Entity
-
 class Player:
     def __init__(self):
         self.current_entity = None

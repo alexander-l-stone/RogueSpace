@@ -1,4 +1,4 @@
-from source.menu.menu_item import MenuItem
+from source.ui.menu.menu_item import MenuItem
 
 def test_can_instantiate_menu_item():
     assert MenuItem

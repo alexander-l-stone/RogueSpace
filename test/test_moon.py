@@ -1,4 +1,4 @@
-from source.planet.moon import Moon
+from source.stellar_objects.moon import Moon
 
 def test_can_instantiate_moon():
     assert Moon

@@ -2,10 +2,10 @@
 import pytest
 
 from source.action.action import Action
-from source.entity.entity import Entity
-from source.area.area import Area
+from source.draw.entity.entity import Entity
+from source.draw.area.area import Area
 from source.galaxy.galaxy import Galaxy
-from source.planet.planet import Planet
+from source.stellar_objects.planet import Planet
 from source.system.system import System
 from source.action.action_queue import ActionQueue
 from source.action.resolution_functions import resolve_no_action
@@ -13,6 +13,7 @@ from source.vector.vector import Vector
 from source.tileset.tileset import Tileset
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
+#TODO: Figure out ways to test heavily tcod dependent classes(UI for example)
 
 @pytest.fixture
 def action():
@@ -43,7 +44,7 @@ def planet():
 
 @pytest.fixture
 def system():
-    system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50)
+    system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50, 0, 0, 0, 0, 0)
     return system
 
 @pytest.fixture
@@ -52,7 +53,7 @@ def tileset():
 
 @pytest.fixture
 def system_with_planet():
-    system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50)
+    system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50, 0, 0, 0, 0, 0)
     planet = Planet(4, 5, 'o', (0, 0, 200), 'Test Planet', 'test', None, 5)
     system.add_planet(planet)
     return system

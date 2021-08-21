@@ -1,5 +1,5 @@
-from source.entity.newtonian_entity import NewtonianEntity
-from source.entity.entity import Entity
+from source.draw.entity.newtonian_entity import NewtonianEntity
+from source.draw.entity.entity import Entity
 from source.action.action import Action
 from source.action.resolution_functions import resolve_no_action
 
