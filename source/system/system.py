@@ -1,12 +1,12 @@
 import math
 from random import seed, randint
 
-from source.area.area import Area
-from source.belt.belt import Belt
-from source.cloud.cloud import Cloud
-from source.entity.entity import Entity
-from source.ring.ring import Ring
-from source.system.star import Star
+from source.draw.area.area import Area
+from source.draw.entity.entity import Entity
+from source.stellar_objects.belt import Belt
+from source.stellar_objects.cloud import Cloud
+from source.stellar_objects.ring import Ring
+from source.stellar_objects.star import Star
 
 
 class System:

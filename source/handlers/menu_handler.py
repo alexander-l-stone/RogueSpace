@@ -5,16 +5,20 @@ from typing import Dict
 
 class MenuHandler:
     def __init__(self):
-        pass
+        self.key_command_dict = {
+            tcod.event.K_UP: {"type": "up"},
+            tcod.event.K_w: {"type": "up"},
+            tcod.event.K_KP_8: {"type": "up"},
+            tcod.event.K_DOWN: {"type": "down"},
+            tcod.event.K_s: {"type": "down"},
+            tcod.event.K_KP_2: {"type": "down"},
+            32: {"type": "select"}, #What key is this? Space I think
+            13: {"type": "select"}, #What key is this? Enter I think
+        }
     
     #TODO: figure out if these need to be dicts or if they can be strings
     def handle_keypress(self, event) -> Dict[str, str]:
-        if(event.sym == tcod.event.K_UP or event.sym == tcod.event.K_w or event.sym == tcod.event.K_KP_8):
-            return {"type": "up"}
-        elif(event.sym == tcod.event.K_DOWN or event.sym == tcod.event.K_s or event.sym == tcod.event.K_KP_2):
-            return {"type": "down"}
-        #TODO: figure out the actual tcod.event enums for these numbers, they appear to be space and enter
-        elif(event.sym == 32 or event.sym == 13):
-            return {"type": "select"}
+        if event.sym in self.key_command_dict:
+            return self.key_command_dict[event.sym]
         else:
             return {"type": "none"}

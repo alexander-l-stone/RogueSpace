@@ -1,4 +1,4 @@
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 
 def test_can_instantiate_entity():
     """
