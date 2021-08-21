@@ -1,4 +1,4 @@
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 from source.action.action import Action
 from source.action.action_queue import ActionQueue
 from source.action.resolution_functions import resolve_move_action

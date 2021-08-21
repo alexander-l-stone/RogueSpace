@@ -1,7 +1,7 @@
 import tcod
 
 from typing import Dict
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 
 class Area:
     def __init__(self, bg=(0,0,0), **flags):
@@ -91,31 +91,35 @@ class Area:
         else:
             return []
     
-    def draw(self, root_console, playerx, playery, tick_count, screen_width, screen_height, **config) -> None:
+    def draw(self, root_console, centerx, centery, tick_count, screen_width, screen_height, corner_l_x=0, corner_b_y=0, **config) -> None:
         """Draw everything in the visible area
 
         Args:
-            playerx (int): The x coordinate the player is at
-            playery (int): The y coordinate the player is at
+            centerx (int): The x coordinate the player is at
+            centery (int): The y coordinate the player is at
             screen_width (int): [description]
             screen_height (int): [description]
+            corner_d_x (int): The x coordinate of the corner(leftmost) this draws from
+            corner_d_y (int): The y coordinate of the cornery(bottomost) this draws from
             config(dict): On occasion there could be configuration flags passed through here
         """
         animation_frame = tick_count//50
-        corner_x = playerx - screen_width//2
-        corner_y = playery - screen_height//2
         root_console.default_bg = self.background_color
-        for drawx in range(playerx - screen_width//2, playerx + screen_width//2):
-            for drawy in range(playery - screen_height//2, playery + screen_height//2):
-                entities_at_point = self.get_entities_at_coordinates(drawx, drawy)
+        for drawx in range(centerx - screen_width//2, centerx + screen_width//2):
+            for drawy in range(centery - screen_height//2, centery + screen_height//2):
+                entities_at_point = self.get_entities_at_coordinates(drawx, drawy).copy()
                  #TODO: Do the below in a way that doesn't suck
                 if entities_at_point is not None and len(entities_at_point) > 0:
                     i = animation_frame % len(entities_at_point)
                     if len(entities_at_point) > 1:
                         if 'priority_draw' in entities_at_point[-1].flags:
-                            entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                            drawn_entity = entities_at_point[-1]
+                            entities_at_point.remove(drawn_entity)
+                            drawn_entity.draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame, other_entities=entities_at_point)
                         else:
-                            entities_at_point[-i].draw(root_console, corner_x, corner_y, self.background_color, other_entities=entities_at_point[0::-1])
+                            drawn_entity = entities_at_point[-i]
+                            entities_at_point.remove(drawn_entity)
+                            drawn_entity.draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame, other_entities=entities_at_point, debug=True)
                     else:
-                        entities_at_point[-1].draw(root_console, corner_x, corner_y, self.background_color)
+                        entities_at_point[-1].draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame)
                

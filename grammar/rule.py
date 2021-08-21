@@ -172,46 +172,33 @@ class Rule:
                         if inv_tag[0] == '^':
                             inv_neg = True
                             inv_tag = inv_tag[1:]
-                        print(f"exp ({'neg' if exp_neg else 'pos'}) {exp_tag}\ninv ({'neg' if inv_neg else 'pos'}) {inv_tag}")
                         # Negative declarations and invocations are not tags and do not interact; valid combination (see below)
                         if exp_neg and inv_neg:
-                            print(f"both neg, continue")
                             continue
                         # A negated tag declation is invalidated if a positive tag invocation is present
                         # A negated tag invocation is invalidated if a positive tag declation is present
                         if exp_neg or inv_neg and exp_tag == inv_tag:
                             tag_satisfied = False
-                            print(f"one neg and match, fail")
                             break
                         # A positive tag declatation is satisfied if an invocation tag is present
                         if not exp_neg and exp_tag == inv_tag:
-                            print(f"pos exp and match, succeed")
                             positive_matched = True
-                            print(f"inv_tag '{inv_tag}' inv_matched {inv_matched}")
                             inv_matched[inv_tag] = True
-                            print(f'post inv_matched {inv_matched}')
                             break
                         # continue implicitly to next invoked tag
                     if not positive_matched:
                         tag_satisfied = False
-                        print(f'positive was not matched, fail')
-                    print(f'tag_satisfied? {tag_satisfied}\n\n')
                     if not tag_satisfied:
                         break
                 if tag_satisfied:
                     skip_expansion = False
             
-            print(f'post exp parse inv_matched {inv_matched}')
             for inv_tag,matched in inv_matched.items():
                 if not matched:
-                    print(f'not matched: {inv_tag}')
                     skip_expansion = True
                     break
-            print(f'skip_expansion? {skip_expansion}')
             if skip_expansion:
-                print("return false")
                 return False
-            print("return true")
         return True
     
     def __repr__(self):

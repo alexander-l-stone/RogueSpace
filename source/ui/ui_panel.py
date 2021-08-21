@@ -1,5 +1,4 @@
 import tcod
-from source.ui.ui_message import UIMessage
 
 class UIPanel:
     def __init__(self, x:int, y:int, panel_height:int, panel_width:int, panel_color:tuple, border_char:str = ' ', **flags):
@@ -14,11 +13,15 @@ class UIPanel:
                                     ord(self.border_char), ord(' '), ord(self.border_char), 
                                     ord(self.border_char), ord(self.border_char), ord(self.border_char))
         self.elements = {}
+        self.visible = True
+        self.priority = 1
 
-    def draw(self, root_console) -> None:
+    def draw(self, root_console, tick_count) -> None:
+        if not self.visible:
+            return
         self.draw_background(root_console)
         for elem in self.elements.values():
-            elem.draw(root_console)
+            elem.draw(root_console, tick_count)
 
     def draw_background(self, root_console):
         """

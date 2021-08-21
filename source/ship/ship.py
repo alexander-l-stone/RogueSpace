@@ -1,4 +1,4 @@
-from source.entity.newtonian_entity import NewtonianEntity
+from source.draw.entity.newtonian_entity import NewtonianEntity
 from source.ui.ui_bar import UIBar
 from source.ui.ui_message import UIMessage
 
@@ -14,6 +14,12 @@ class Ship:
         self.fuel = self.max_fuel
         self.health = 4
         self.heat = 36
+    
+    def __str__(self):
+        return f"[Ship]"
+    
+    def __repr__(self) -> str:
+        return f"[Ship]"
 
     def thrust(self, dx, dy):
         fuel_cost = abs(dx) + abs(dy)

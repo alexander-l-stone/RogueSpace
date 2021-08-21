@@ -2,16 +2,17 @@
 import pytest
 
 from source.action.action import Action
-from source.entity.entity import Entity
-from source.area.area import Area
+from source.draw.entity.entity import Entity
+from source.draw.area.area import Area
 from source.galaxy.galaxy import Galaxy
-from source.planet.planet import Planet
+from source.stellar_objects.planet import Planet
 from source.system.system import System
 from source.action.action_queue import ActionQueue
 from source.action.resolution_functions import resolve_no_action
 from source.vector.vector import Vector
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
+#TODO: Figure out ways to test heavily tcod dependent classes(UI for example)
 
 @pytest.fixture
 def action():

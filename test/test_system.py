@@ -1,6 +1,6 @@
 from source.system.system import System
-from source.entity.entity import Entity
-from source.area.area import Area
+from source.draw.entity.entity import Entity
+from source.draw.area.area import Area
 from source.action.action import Action
 from source.action.resolution_functions import resolve_move_action
 

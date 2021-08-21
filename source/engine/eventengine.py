@@ -19,6 +19,8 @@ class EventEngine:
             if result["type"] == "enter":
                 self.resolve_enter(result)
             elif result["type"] == "jump":
+                if ('no-jump' in self.game.state_flags):
+                    return
                 self.resolve_jump(result)
             elif result["type"] == "move" and isinstance(self.game.current_location, Galaxy):
                 for key, value in self.game.current_location.check_explored_corners(self.game.player.current_entity.x, self.game.player.current_entity.y, self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
@@ -35,6 +37,7 @@ class EventEngine:
                 ):
                     self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_entity.x, self.game.player.current_entity.y)
                     self.game.current_area.add_entity(self.game.player.current_entity)
+                    self.game.render_engine.ui['game_window'].area = self.game.current_area
     
     def resolve_enter(self, result):
     #TODO: figure out what to do for non-player entities
@@ -50,6 +53,7 @@ class EventEngine:
                 result['entering_entity'].x, result['entering_entity'].y = int(self.game.current_location.hyperlimit*math.cos(theta)), int(self.game.current_location.hyperlimit*math.sin(theta))
             self.game.generate_current_area()
             self.game.current_area.add_entity(self.game.player.current_entity)
+            self.game.render_engine.ui['game_window'].area = self.game.current_area
     
     def resolve_exit(self, result):
         if ('is_player' in result['exiting_entity'].flags and result['exiting_entity'].flags['is_player'] is True):
@@ -76,10 +80,11 @@ class EventEngine:
                             self.game.current_location.generate_new_sector(key[0], key[1])
                 self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_entity.x, self.game.player.current_entity.y)
                 self.game.current_area.add_entity(self.game.player.current_entity)
+                self.game.render_engine.ui['game_window'].area = self.game.current_area
                 return True
             else:
                 return False
-    
+
     def resolve_keyboard_input(self, result):
         if(result["type"] == "move"):
             self.global_queue.push(Action(self.game.player.current_entity, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.game.current_area, is_player=True))
@@ -98,9 +103,31 @@ class EventEngine:
         elif(result["type"] == "cheat-fuel"):
             self.game.player.current_ship.fuel += 10
         elif(result["type"] == "menu"):
-            self.game.game_state = "game_menu"
-            self.game.current_menu = self.game.game_menu
-    
+            if result["value"] == 'game':
+                self.game.game_state = "game_menu"
+                self.game.current_menu = self.game.game_menu
+                self.game.render_engine.ui['game_menu'].visible = True
+                self.game.render_engine.ui['game_window'].visible = False
+                self.game.render_engine.ui['hud'].visible = False
+            elif result["value"] == 'dev':
+                self.game.game_state = "menu_command_menu_render"
+                self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
+                self.game.render_engine.ui["dev"].visible = True
+
+    def handle_menu_key_presses(self, result) -> dict:
+        key_result = {'type': 'none'}
+        if result['type'] == 'select':
+            key_result = self.game.current_menu.menu_items[self.game.current_menu.active_item].kwargs['select']()
+        elif result['type'] == 'up':
+            if self.game.current_menu.active_item > 0:
+                self.game.current_menu.active_item -= 1
+            key_result = {'type': 'move', 'value': 'up'}
+        elif result['type'] == 'down':
+            if self.game.current_menu.active_item < len(self.game.current_menu.menu_items) - 1:
+                self.game.current_menu.active_item += 1
+            key_result = {'type': 'move', 'value': 'down'}
+        return key_result
+
     def resolve_menu_kb_input(self, result):
         if result['type'] == 'exit':
             raise SystemExit()
@@ -109,9 +136,27 @@ class EventEngine:
                 self.game.start_new_game()
             elif result['value'] == 'load':
                 self.game.load_game()
+            elif result['value'] == 'dev':
+                self.game.start_dev()
             self.game.game_state = 'game'
         elif result['type'] == 'close':
             self.game.game_state = 'game'
+            if 'debug' in self.game.state_flags and self.game.state_flags['debug']:
+                self.game.render_engine.ui['dev'].visible = False
+            self.game.render_engine.ui['game_menu'].visible = False
+            self.game.render_engine.ui['game_window'].visible = True
+            self.game.render_engine.ui['hud'].visible = True
+        elif result['type'] == 'open':
+            if result["value"] == 'spawn_entity':
+                self.game.current_menu = self.game.render_engine.ui['dev'].elements['spawn_entity']
+                self.game.game_state = 'menu_spawn_entity_render'
+                self.game.render_engine.ui['dev'].elements['command_menu'].visible = False
+                self.game.render_engine.ui['dev'].elements['spawn_entity'].visible = True
+            elif result["value"] == 'command_menu':
+                self.game.current_menu = self.game.render_engine.ui['dev'].elements['command_menu']
+                self.game.game_state = 'menu_command_menu_render'
+                self.game.render_engine.ui['dev'].elements['command_menu'].visible = True
+                self.game.render_engine.ui['dev'].elements['spawn_entity'].visible = False
         elif(result["type"] == "save"):
             self.game.save_game()
             self.game.game_state = "game"

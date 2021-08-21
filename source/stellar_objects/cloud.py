@@ -1,4 +1,4 @@
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 from random import seed, randint
 import math
 
@@ -15,6 +15,12 @@ class Cloud:
         if ('generation_type' in flags):
             self.generation_type = flags['generation_type']
         self.flags = flags
+
+    def __str__(self) -> str:
+        return f"[Cloud]"
+    
+    def __repr__(self) -> str:
+        return f"[Cloud]"
     
     def get_random_point_in_cloud(self):
         randTheta = randint(0, 360) * math.pi/180

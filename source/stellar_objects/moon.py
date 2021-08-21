@@ -1,4 +1,4 @@
-from source.entity.entity import Entity
+from source.draw.entity.entity import Entity
 
 class Moon:
     def __init__(self, x:int, y:int, char:str, color:tuple, moon_type:str, name:str, planet, **flags):

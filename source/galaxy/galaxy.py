@@ -1,4 +1,4 @@
-from source.area.area import Area
+from source.draw.area.area import Area
 from source.galaxy_generator.galaxy_generator import GalaxyGenerator
 
 class Galaxy:
