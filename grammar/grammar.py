@@ -51,7 +51,6 @@ class Grammar:
         self.rules = rules # name to obj
         if function_library is None:
             function_library = {}
-        # TODO merge in a "standard function" library
         self.func_lib = parse_library_file(universal_function_library)
         self.func_lib |= function_library
 
@@ -61,8 +60,6 @@ class Grammar:
     # TODO handle unclosed scope errors
 
     # TODO turn debug prints into logging so they can be toggled
-
-    # TODO replace 'output' with a top-level scope
 
     def generate(self, root='root'):
         # parse tags
@@ -100,355 +97,328 @@ class Grammar:
             raise AttributeError(f"No rule named \"{root}\" to start from")
         return self.expand_rule(self.rules[root], tags)
 
-    def expand_rule(self, rule, tags):
+    def expand_rule(self, rule:object, tags:list):
+        
+        user_vars = {}
+        frame_stack = []
         exp:str = rule.select_child(tags)
-        ret = self.__expand_rule_helper({}, [], '', True, exp)
-        while True:
-            # print(f"EXPAND {ret}")
-            if len(ret) == 4:
-                # user_vars, parent_stack, output, rule_name
-                user_vars = ret[0]
-                parent_stack = ret[1]
-                output = ret[2]
-                rule_name = ret[3]
-                if ret[3] in self.rules:
-                    curr_rule = self.rules[rule_name]
-                else:
-                    self.raise_parse_error(f"rule name not found: {rule_name}", output, user_vars, parent_stack)
-                if 'tags' in parent_stack[-1]['scope'][-1]:
-                    child_expansion = curr_rule.select_child(parent_stack[-1]['scope'][-1]['tags'])
-                else:
-                    child_expansion = curr_rule.select_child()
-                # print(f"\nrule_name {rule_name} rule {curr_rule} chosen exp {child_expansion}\n")
-                ret = self.__expand_rule_helper(user_vars, parent_stack, output, True, child_expansion)
-            elif len(ret) == 3:
-                user_vars = ret[0]
-                parent_stack = ret[1]
-                output = ret[2]
-                if len(parent_stack) > 0:
-                    ret = self.__expand_rule_helper(user_vars, parent_stack, output, False, '')
-                else:
-                    break
-        if len(ret[1]) != 0:
-            user_vars = ret[0]
-            parent_stack = ret[1]
-            output = ret[2]
-            self.raise_parse_error(f"Missing close '{parent_stack[-1]['scope_type']}'\ntoken: {parent_stack[-1]['token']}", output, user_vars, parent_stack)
-        return ret[2]
-
-    def __expand_rule_helper(self, user_vars:dict, parent_stack:list, child_output:str, newFrame:bool, exp:str):
-        # TODO when turning output into a scope, remember that a scope is inside a frame
-        if newFrame:
-            scope:list = [] # TODO that means this should be the [{'scope_type':'output', 'token':''}]
-            output = ''
-            i = 0
-        else:
-            exp_frame = parent_stack.pop()
-
-            exp = exp_frame['exp']
-            scope:list = exp_frame['scope']
-            output = exp_frame['output']
-            i = exp_frame['i']
-            
-            # process output from previous rec level
-            if scope[-1]['scope_type'] == '#':
-                last_scope = scope.pop()
-                # instead transition to function parse if it was 'closed' with a dot
-                if 'dot_rule' in last_scope:
-                    scope.append({'scope_type':'.', 'token':'', 'close_char':'#', 'args':[child_output]})
-                    if 'varstore' in last_scope:
-                        scope[-1]['varstore'] = last_scope['varstore']
-                else:
-                    # output
-                    if len(scope) == 0:
-                        output += child_output
-                    else:
-                        scope[-1]['token'] += child_output
-                    if 'varstore' in last_scope:
-                        user_vars[last_scope['varstore']] = child_output
-                    # chain the # parse if it was 'closed' with a comma
-                    if 'comma_rule' in last_scope:
-                        scope.append({'scope_type':'#', 'token':''})
-
-            # print(f"\nFRAME UNPACK: ")
         
-        # print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
-        
-        # pick an expansion at random
-        # parse out the rule invocations, variable assignments, function invocations, etc
-        # execute and recurse as necessary
-        while i < len(exp):
-            # in #
-            # with .func()
-            # in $
-            # in []
-            # in <>
-            char = exp[i]
-            if char == '\\':
-                # if escaped, output next char directly
-                if len(scope) > 0:
-                    scope['token'] += exp[i+1]
-                else:
-                    output += exp[i+1]
-                i += 2
-                continue
+        scope:list = None # it will get clobbered soon, it just needs to exist outside loop scope
+        natural_exp_end = False
+        first = True
+        while first or frame_stack:
+            first = False
+            # print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
+            if natural_exp_end:
+                exp_frame = frame_stack.pop()
 
-            # print(f"i {i} char {char}")
+                child_output = scope[0]['token']
 
-            if len(scope) == 0:
-                # top level no scope
-                # check for a scope begin char, else character is plaintext to output
-                # no top level <> scope! preprocess tags
-                if char == '#':
-                    scope.append({'scope_type':'#', 'token':''})
-                elif char == '$':
-                    scope.append({'scope_type':'$', 'token':''})
-                elif char == '[':
-                    scope.append({'scope_type':'[', 'token':''})
-                else:
-                    output += char
-
-            # below: handle each scope context
-
-            # RULE INVOCATION
-            elif scope[-1]['scope_type'] == '#':
-                # check if scope starts with a varstore
-                # parse scope body as a rule name to expand
-                # check for final func execution
-                if char == '$':
-                    scope.append({'scope_type':'$', 'token':''})
-                elif char == '<':
-                    scope.append({'scope_type':'<', 'token':''})
-                elif char == '[':
-                    scope.append({'scope_type':'[', 'token':''})
-                elif char == ':':
-                    # previous is a var store
-                    scope[-1]['varstore'] = scope[-1]['token']
-                    scope[-1]['token'] = ''
-                elif char in '#,.':
-                    # if close was a comma, chain
-                    # because the execution is done in the main function b/c trampoline, pass it as a flag
-                    if char == ',':
-                        scope[-1]['comma_rule'] = True
-                    # if close was a dot, invoke function
-                    if char == '.':
-                        scope[-1]['dot_rule'] = True
-                    exp_frame = self.__make_exp_frame(exp, scope, output, i+1)
-                    # recurse
-                    parent_stack.append(exp_frame)
-                    # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-1]['token']}\n")
-                    return (user_vars, parent_stack, output, scope[-1]['token'])
-                else:
-                    scope[-1]['token'] += char
-                # print(f"token {scope[-1]['token']}")
-
-            # VARIABLE DEREFERENCE
-            elif scope[-1]['scope_type'] == '$':
-                if char == '#':
-                    scope.append({'scope_type':'#', 'token':''})
-                elif char == '<':
-                    raise AttributeError(f"Illegal tag invocation in variable dereference ('<' in '$$' block): {scope[-1]['token']}", output, user_vars, parent_stack)
-                elif char == '[':
-                    scope.append({'scope_type':'[', 'token':''})
-                if char in '$.,':
-                    # output var to outer scope (which may be literal output), clear state
-                    popped_scope = scope.pop()
-                    var_name = popped_scope['token']
-                    if var_name not in user_vars:
-                        self.raise_parse_error(f"var not defined before use: {popped_scope['token']}", output, user_vars, parent_stack)
-                    deref_val = user_vars[var_name]
-                    # if close was a dot, invoke function before output
-                    if char == '.':
-                        scope.append({'scope_type':'.', 'token':'', 'close_char':'$', 'args':[deref_val]})
-                        if 'varstore' in popped_scope:
-                            scope[-1]['varstore'] = popped_scope['varstore']
+                exp = exp_frame['exp']
+                scope = exp_frame['scope']
+                i = exp_frame['i']
+                
+                # process output from previous rec level
+                if scope[-1]['scope_type'] == '#':
+                    last_scope = scope.pop()
+                    # instead transition to function parse if it was 'closed' with a dot
+                    if 'dot_rule' in last_scope:
+                        scope.append({'scope_type':'.', 'token':'', 'close_char':'#', 'args':[child_output]})
+                        if 'varstore' in last_scope:
+                            scope[-1]['varstore'] = last_scope['varstore']
                     else:
                         # output
-                        if len(scope) == 0:
-                            output += deref_val
-                        else:
-                            scope[-1]['token'] += deref_val
-                        # if close was a comma, chain
-                        if char == ',':
-                            scope.append({'scope_type':'$', 'token':''})
-                else:
-                    scope[-1]['token'] += char
+                        scope[-1]['token'] += child_output
+                        if 'varstore' in last_scope:
+                            user_vars[last_scope['varstore']] = child_output
+                        # chain the # parse if it was 'closed' with a comma
+                        if 'comma_rule' in last_scope:
+                            scope.append({'scope_type':'#', 'token':''})
+                # print(f"\nFRAME UNPACK: ")
+            else:
+                scope:list = [{'scope_type':'output', 'token':''}]
+                i = 0
+            natural_exp_end = True
 
-            # TAG INVOCATION
-            elif scope[-1]['scope_type'] == '<':
-                if char == '#':
-                    scope.append({'scope_type':'#', 'token':''})
-                elif char == '$':
-                    scope.append({'scope_type':'$', 'token':''})
-                elif char == '[':
-                    scope.append({'scope_type':'[', 'token':''})
-                elif char == ':':
-                    self.raise_parse_error(f"Illegal variable store in tag invocation (':' in '<>' block): {scope[-1]['token']}", output, user_vars, parent_stack)
-                elif char in '>,.':
-                    # output var to outer scope (which may be literal output), clear state
-                    tag = scope[-1]['token']
-                    if len(scope) < 2:
-                        # impossible
-                        self.raise_parse_error(f"impossible tag lookup in outside scope ('<>' block survived parse strip): tag: {tag}\nscope: {scope[-1]}", output, user_vars, parent_stack)
-                    elif scope[-2]['scope_type'] == "#":
-                        popped_scope = scope.pop()
-                         # if close was a dot, invoke function before output
+            # pick an expansion at random
+            # parse out the rule invocations, variable assignments, function invocations, etc
+            # execute and recurse as necessary
+            while i < len(exp):
+                # in #
+                # with .func()
+                # in $
+                # in []
+                # in <>
+                char = exp[i]
+                if char == '\\':
+                    # if escaped, output next char directly
+                    scope[-1]['token'] += exp[i+1]
+                    i += 2
+                    continue
+
+                # print(f"i {i} char {char}")
+
+                if scope[-1]['scope_type'] == 'output':
+                    # top level no scope
+                    # check for a scope begin char, else character is plaintext to output
+                    # no top level <> scope! preprocess tags
+                    if char == '#':
+                        scope.append({'scope_type':'#', 'token':''})
+                    elif char == '$':
+                        scope.append({'scope_type':'$', 'token':''})
+                    elif char == '[':
+                        scope.append({'scope_type':'[', 'token':''})
+                    else:
+                        scope[-1]['token'] += char
+                elif len(scope) == 1:
+                    self.raise_parse_error(f"Root scopt is not output", scope, user_vars, frame_stack)
+                # below: handle each scope context
+
+                # RULE INVOCATION
+                elif scope[-1]['scope_type'] == '#':
+                    # check if scope starts with a varstore
+                    # parse scope body as a rule name to expand
+                    # check for final func execution
+                    if char == '$':
+                        scope.append({'scope_type':'$', 'token':''})
+                    elif char == '<':
+                        scope.append({'scope_type':'<', 'token':''})
+                    elif char == '[':
+                        scope.append({'scope_type':'[', 'token':''})
+                    elif char == ':':
+                        # previous is a var store
+                        scope[-1]['varstore'] = scope[-1]['token']
+                        scope[-1]['token'] = ''
+                    elif char in '#,.':
+                        # if close was a comma, chain
+                        # because the execution is done in the main function b/c trampoline, pass it as a flag
+                        if char == ',':
+                            scope[-1]['comma_rule'] = True
+                        # if close was a dot, invoke function
                         if char == '.':
-                            scope.append({'scope_type':'.', 'token':'', 'close_char':'>', 'args':[tag]})
+                            scope[-1]['dot_rule'] = True
+                        exp_frame = self.__make_exp_frame(exp, scope, i+1)
+                        # recurse
+                        frame_stack.append(exp_frame)
+                        # print(f"\nFRAME ADD\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\nRULE CALL {scope[-1]['token']}\n")
+                        # TODO lookup rule name, overwrite current frame
+                        rule_name = scope[-1]['token']
+                        tags = scope[-1]['tags'] if 'tags' in scope[-1] else []
+                        if rule_name in self.rules:
+                            exp = self.rules[rule_name].select_child(tags)
+                        else:
+                            self.raise_parse_error(f"rule name not found: {rule_name}", scope, user_vars, frame_stack)
+                        natural_exp_end = False
+                        break
+                    else:
+                        scope[-1]['token'] += char
+                    # print(f"token {scope[-1]['token']}")
+
+                # VARIABLE DEREFERENCE
+                elif scope[-1]['scope_type'] == '$':
+                    if char == '#':
+                        scope.append({'scope_type':'#', 'token':''})
+                    elif char == '<':
+                        raise AttributeError(f"Illegal tag invocation in variable dereference ('<' in '$$' block): {scope[-1]['token']}", user_vars, frame_stack)
+                    elif char == '[':
+                        scope.append({'scope_type':'[', 'token':''})
+                    if char in '$.,':
+                        # output var to outer scope (which may be literal output), clear state
+                        popped_scope = scope.pop()
+                        var_name = popped_scope['token']
+                        if var_name not in user_vars:
+                            self.raise_parse_error(f"var not defined before use: {popped_scope['token']}", scope, user_vars, frame_stack)
+                        deref_val = user_vars[var_name]
+                        # if close was a dot, invoke function before output
+                        if char == '.':
+                            scope.append({'scope_type':'.', 'token':'', 'close_char':'$', 'args':[deref_val]})
                             if 'varstore' in popped_scope:
                                 scope[-1]['varstore'] = popped_scope['varstore']
-                        if 'tags' not in scope[-1]:
-                            scope[-1]['tags'] = [tag]
                         else:
-                            scope[-1]['tags'].append(tag)
-                    # if close was a comma, chain
-                    if char == ',':
-                        scope.append({'scope_type':'<', 'token':''})
-                else:
-                    scope[-1]['token'] += char
-
-            # OPERATION EXECUTION
-            elif scope[-1]['scope_type'] == '[':
-                if char == '#':
-                    scope.append({'scope_type':'#', 'token':''})
-                elif char == '$':
-                    scope.append({'scope_type':'$', 'token':''})
-                elif char == '<':
-                    self.raise_parse_error(f"Illegal tag invocation in operation execution ('<' in '[]' block): {scope[-1]['token']}", output, user_vars, parent_stack)
-                elif char == '[':
-                    self.raise_parse_error(f"Illegal nested operation (open '[' in '[]' block): {scope[-1]['token']}", output, user_vars, parent_stack)
-                elif char == ':':
-                    # previous is a var store
-                    scope[-1]['varstore'] = scope[-1]['token']
-                    scope[-1]['token'] = ''
-                elif char in '],.':
-                    popped_scope = scope.pop()
-                    exec_ret = popped_scope['token']
-                    # if close was a dot, invoke function before output
-                    if char == '.':
-                        popped_scope['token'] = ''
-                        scope.append({'scope_type':'.', 'token':'', 'close_char':']', 'args':[exec_ret]})
-                        if 'varstore' in popped_scope:
-                            scope[-1]['varstore'] = popped_scope['varstore']
+                            # output
+                            scope[-1]['token'] += deref_val
+                            # if close was a comma, chain
+                            if char == ',':
+                                scope.append({'scope_type':'$', 'token':''})
                     else:
-                        if 'varstore' in popped_scope:
-                            user_vars[popped_scope['varstore']] = exec_ret
+                        scope[-1]['token'] += char
+
+                # TAG INVOCATION
+                elif scope[-1]['scope_type'] == '<':
+                    if char == '#':
+                        scope.append({'scope_type':'#', 'token':''})
+                    elif char == '$':
+                        scope.append({'scope_type':'$', 'token':''})
+                    elif char == '[':
+                        scope.append({'scope_type':'[', 'token':''})
+                    elif char == ':':
+                        self.raise_parse_error(f"Illegal variable store in tag invocation (':' in '<>' block): {scope[-1]['token']}", scope, user_vars, frame_stack)
+                    elif char in '>,.':
+                        # output var to outer scope (which may be literal output), clear state
+                        tag = scope[-1]['token']
+                        if len(scope) < 3:
+                            # impossible
+                            self.raise_parse_error(f"impossible tag lookup in outside scope ('<>' block survived parse strip): tag: {tag}\nscope: {scope[-1]}", scope, user_vars, frame_stack)
+                        elif scope[-2]['scope_type'] == "#":
+                            popped_scope = scope.pop()
+                            # if close was a dot, invoke function before output
+                            if char == '.':
+                                scope.append({'scope_type':'.', 'token':'', 'close_char':'>', 'args':[tag]})
+                                if 'varstore' in popped_scope:
+                                    scope[-1]['varstore'] = popped_scope['varstore']
+                            if 'tags' not in scope[-1]:
+                                scope[-1]['tags'] = [tag]
+                            else:
+                                scope[-1]['tags'].append(tag)
                         # if close was a comma, chain
                         if char == ',':
-                            scope.append({'scope_type':'[', 'token':''})
-                else:
-                    scope[-1]['token'] += char
-
-            # FUNCTION INVOCATION
-            elif scope[-1]['scope_type'] == '.':
-                if char == '(':
-                    scope.append({'scope_type':'.(', 'token':''})
-                elif char == scope[-1]['close_char'] or char == ',' or char == '.':
-                    popped_scope = scope.pop()
-                    func_name = popped_scope['token']
-                    func_to_exec = self.func_lib[func_name]
-                    func_ret = func_to_exec(scope, parent_stack, user_vars, popped_scope['args'])
-                    # if close was a dot, chain to another function
-                    if char == '.':
-                        scope.append({'scope_type':'.', 'token':'', 'close_char':popped_scope['close_char'], 'args':[func_ret]})
-                        if 'varstore' in popped_scope:
-                            scope[-1]['varstore'] = popped_scope['varstore']
+                            scope.append({'scope_type':'<', 'token':''})
                     else:
-                        if popped_scope['close_char'] == '>':
-                             # tags are not output
-                            if 'tags' not in scope[-1]:
-                                scope[-1]['tags'] = [func_ret]
-                            else:
-                                scope[-1]['tags'].append(func_ret)
-                        elif popped_scope['close_char'] != ']':
-                            if len(scope) == 0:
-                                output += func_ret
-                            else:
-                                scope[-1]['token'] += func_ret
-                        if 'varstore' in popped_scope:
-                            user_vars[popped_scope['varstore']] = func_ret
-                        # if close was a comma, chain the invocation scope
-                        if char == ',':
-                            scope.append({'scope_type':popped_scope['close_char'], 'token':''})
-                            if popped_scope['close_char'] == '>':
-                                scope[-1]['scope_type'] = '<'
-                            if popped_scope['close_char'] == ']':
-                                scope[-1]['scope_type'] = '['
-                elif char in "#$<>[]:":
-                    self.raise_parse_error(f"Illegal character '{char}' in function name '{scope[-1]['token']}'", output, user_vars, parent_stack)
-                else:
-                    scope[-1]['token'] += char
+                        scope[-1]['token'] += char
 
-            # FUNCTION ARGUMENTS
-            elif scope[-1]['scope_type'] == '.(':
-                if char in "#$<>[]:":
-                    self.raise_parse_error(f"Illegal character '{char}' in function arguments '{scope[-1]['token']}'", output, user_vars, parent_stack)
-                if char == ')':
-                    # get args
-                    popped_scope = scope.pop()
-                    arg_str = popped_scope['token']
-                    args = arg_str.split(',')
-
-                    # get func
-                    popped_scope = scope.pop()
-                    func_name = popped_scope['token']
-                    func_to_exec = self.func_lib[func_name]
-
-                    # put parent_output back into args list
-                    args = popped_scope['args'] + args
-
-                    # execute
-                    func_ret = func_to_exec(scope, parent_stack, user_vars, args)
-                    # treat the character after the paren as our close
-                    i += 1
-                    char = exp[i]
-                    if char == '.':
-                        # pass output to next function if dot
-                        scope.append({'scope_type':'.', 'token':'', 'close_char':popped_scope['close_char'], 'args':[func_ret]})
-                        if 'varstore' in popped_scope:
-                            scope[-1]['varstore'] = popped_scope['varstore']
-                    elif char == popped_scope['close_char'] or char == ',' or char == '.':
-                        if popped_scope['close_char'] == '>':
-                             # tags are not output
-                            if 'tags' not in scope[-1]:
-                                scope[-1]['tags'] = [func_ret]
-                            else:
-                                scope[-1]['tags'].append(func_ret)
-                        elif popped_scope['close_char'] != ']':
-                            if len(scope) == 0:
-                                output += func_ret
-                            else:
-                                scope[-1]['token'] += func_ret
-                        if 'varstore' in popped_scope:
-                            user_vars[popped_scope['varstore']] = func_ret
-                        # if close was a comma, chain the invocation scope
-                        if char == ',':
-                            scope.append({'scope_type':popped_scope['close_char'], 'token':''})
-                            if popped_scope['close_char'] == '>':
-                                scope[-1]['scope_type'] = '<'
-                            if popped_scope['close_char'] == ']':
-                                scope[-1]['scope_type'] = '['
+                # OPERATION EXECUTION
+                elif scope[-1]['scope_type'] == '[':
+                    if char == '#':
+                        scope.append({'scope_type':'#', 'token':''})
+                    elif char == '$':
+                        scope.append({'scope_type':'$', 'token':''})
+                    elif char == '<':
+                        self.raise_parse_error(f"Illegal tag invocation in operation execution ('<' in '[]' block): {scope[-1]['token']}", scope, user_vars, frame_stack)
+                    elif char == '[':
+                        self.raise_parse_error(f"Illegal nested operation (open '[' in '[]' block): {scope[-1]['token']}", scope, user_vars, frame_stack)
+                    elif char == ':':
+                        # previous is a var store
+                        scope[-1]['varstore'] = scope[-1]['token']
+                        scope[-1]['token'] = ''
+                    elif char in '],.':
+                        popped_scope = scope.pop()
+                        exec_ret = popped_scope['token']
+                        # if close was a dot, invoke function before output
+                        if char == '.':
+                            popped_scope['token'] = ''
+                            scope.append({'scope_type':'.', 'token':'', 'close_char':']', 'args':[exec_ret]})
+                            if 'varstore' in popped_scope:
+                                scope[-1]['varstore'] = popped_scope['varstore']
+                        else:
+                            if 'varstore' in popped_scope:
+                                user_vars[popped_scope['varstore']] = exec_ret
+                            # if close was a comma, chain
+                            if char == ',':
+                                scope.append({'scope_type':'[', 'token':''})
                     else:
-                        self.raise_parse_error(f"Function call not at end of invocation. Expression: {exp} function call: {popped_scope['close_char']}{args[0]}.{func_name}({str(args)[1:-1]}){char}", output, user_vars, parent_stack)
-                else:
-                    scope[-1]['token'] += char
+                        scope[-1]['token'] += char
 
-            i += 1
+                # FUNCTION INVOCATION
+                elif scope[-1]['scope_type'] == '.':
+                    if char == '(':
+                        scope.append({'scope_type':'.(', 'token':''})
+                    elif char == scope[-1]['close_char'] or char == ',' or char == '.':
+                        popped_scope = scope.pop()
+                        func_name = popped_scope['token']
+                        func_to_exec = self.func_lib[func_name]
+                        func_ret = func_to_exec(scope, frame_stack, user_vars, popped_scope['args'])
+                        # if close was a dot, chain to another function
+                        if char == '.':
+                            scope.append({'scope_type':'.', 'token':'', 'close_char':popped_scope['close_char'], 'args':[func_ret]})
+                            if 'varstore' in popped_scope:
+                                scope[-1]['varstore'] = popped_scope['varstore']
+                        else:
+                            if popped_scope['close_char'] == '>':
+                                # tags are not output
+                                if 'tags' not in scope[-1]:
+                                    scope[-1]['tags'] = [func_ret]
+                                else:
+                                    scope[-1]['tags'].append(func_ret)
+                            elif popped_scope['close_char'] != ']':
+                                scope[-1]['token'] += func_ret
+                            if 'varstore' in popped_scope:
+                                user_vars[popped_scope['varstore']] = func_ret
+                            # if close was a comma, chain the invocation scope
+                            if char == ',':
+                                scope.append({'scope_type':popped_scope['close_char'], 'token':''})
+                                if popped_scope['close_char'] == '>':
+                                    scope[-1]['scope_type'] = '<'
+                                if popped_scope['close_char'] == ']':
+                                    scope[-1]['scope_type'] = '['
+                    elif char in "#$<>[]:":
+                        self.raise_parse_error(f"Illegal character '{char}' in function name '{scope[-1]['token']}'", scope, user_vars, frame_stack)
+                    else:
+                        scope[-1]['token'] += char
+
+                # FUNCTION ARGUMENTS
+                elif scope[-1]['scope_type'] == '.(':
+                    if char in "#$<>[]:":
+                        self.raise_parse_error(f"Illegal character '{char}' in function arguments '{scope[-1]['token']}'", scope, user_vars, frame_stack)
+                    if char == ')':
+                        # get args
+                        popped_scope = scope.pop()
+                        arg_str = popped_scope['token']
+                        args = arg_str.split(',')
+
+                        # get func
+                        popped_scope = scope.pop()
+                        func_name = popped_scope['token']
+                        func_to_exec = self.func_lib[func_name]
+
+                        # put parent_output back into args list
+                        args = popped_scope['args'] + args
+
+                        # execute
+                        func_ret = func_to_exec(scope, frame_stack, user_vars, args)
+                        # treat the character after the paren as our close
+                        i += 1
+                        char = exp[i]
+                        if char == '.':
+                            # pass output to next function if dot
+                            scope.append({'scope_type':'.', 'token':'', 'close_char':popped_scope['close_char'], 'args':[func_ret]})
+                            if 'varstore' in popped_scope:
+                                scope[-1]['varstore'] = popped_scope['varstore']
+                        elif char == popped_scope['close_char'] or char == ',' or char == '.':
+                            if popped_scope['close_char'] == '>':
+                                # tags are not output
+                                if 'tags' not in scope[-1]:
+                                    scope[-1]['tags'] = [func_ret]
+                                else:
+                                    scope[-1]['tags'].append(func_ret)
+                            elif popped_scope['close_char'] != ']':
+                                scope[-1]['token'] += func_ret
+                            if 'varstore' in popped_scope:
+                                user_vars[popped_scope['varstore']] = func_ret
+                            # if close was a comma, chain the invocation scope
+                            if char == ',':
+                                scope.append({'scope_type':popped_scope['close_char'], 'token':''})
+                                if popped_scope['close_char'] == '>':
+                                    scope[-1]['scope_type'] = '<'
+                                if popped_scope['close_char'] == ']':
+                                    scope[-1]['scope_type'] = '['
+                        else:
+                            self.raise_parse_error(f"Function call not at end of invocation. Expression: {exp} function call: {popped_scope['close_char']}{args[0]}.{func_name}({str(args)[1:-1]}){char}", scope, user_vars, frame_stack)
+                    else:
+                        scope[-1]['token'] += char
+
+                i += 1
         
         # output to higher level
         # print(f"FRAME EXIT\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\n")
-        return (user_vars, parent_stack, output)
+        if len(scope) != 1:
+            self.raise_parse_error(f"Missing close", scope, user_vars, frame_stack)
+        if scope[0]['scope_type'] != 'output':
+            self.raise_parse_error(f"Impossible: Outermost scope is not output '{scope[-1]['scope_type']}'\ntoken: {scope[-1]['token']}", scope, user_vars, frame_stack)
+        return scope[0]['token']
 
-    def __make_exp_frame(self, exp, scope, output, i):
+    def __make_exp_frame(self, exp, scope, i):
         frame = {}
         frame['exp'] = exp
         frame['scope'] = scope
-        frame['output'] = output
         frame['i'] = i
         return frame
 
-    def raise_parse_error(self, message, output, user_vars, parent_stack):
-        raise AttributeError(f"{message}\ncurrent output: {output}\nuser_vars {user_vars}\nstack:{parent_stack}")
+    def raise_parse_error(self, message, scope, user_vars, parent_stack):
+        if len(parent_stack) > 0 and 'scope' in parent_stack[-1] and len(parent_stack[-1]['scope']) > 0 and 'token' in parent_stack[-1]['scope']:
+            output = parent_stack[-1]['scope'][0]['token']
+        else:
+            output = "<INTERNAL ERR: Output DNE>"
+        raise AttributeError(f"{message}\ncurrent output: {output}\ncurrent scope: {scope}\nuser_vars {user_vars}\nstack:{parent_stack}")
 
 def read_grammar(fileName:str):
     '''
