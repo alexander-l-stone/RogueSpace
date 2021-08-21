@@ -105,7 +105,9 @@ class Grammar:
         
         scope:list = None # it will get clobbered soon, it just needs to exist outside loop scope
         natural_exp_end = False
-        while True: # no do-while syntax in python, there is a break check at the end of the loop
+        first = True
+        if not frame_stack or first:
+            first = False
             # print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
             if natural_exp_end:
                 exp_frame = frame_stack.pop()
@@ -395,10 +397,6 @@ class Grammar:
                         scope[-1]['token'] += char
 
                 i += 1
-            
-            # inverted do-while condition
-            if not frame_stack:
-                break
         
         # output to higher level
         # print(f"FRAME EXIT\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\nOUTPUT {output}\n")
