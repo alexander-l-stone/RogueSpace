@@ -106,7 +106,7 @@ class Grammar:
         scope:list = None # it will get clobbered soon, it just needs to exist outside loop scope
         natural_exp_end = False
         first = True
-        if not frame_stack or first:
+        while first or frame_stack:
             first = False
             # print(f"START FRAME\nUSER_VARS {user_vars}\nPARENT_STACK {parent_stack}\ni={i} EXP {exp}\nSCOPE {scope}\nOUTPUT {output}\n")
             if natural_exp_end:
