@@ -10,7 +10,7 @@ from source.stellar_objects.star import Star
 
 
 class System:
-    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, bgcolor=(0,0,0), **flags):
+    def __init__(self, x:int, y:int, char:str, color:tuple, name:str, system_type:str, hyperlimit:int, hot_zone, bio_zone, cold_zone, gas_zone, frozen_zone, bgcolor=(0,0,0), **flags):
         self.x = x
         self.y = y
         self.char = char
@@ -22,6 +22,12 @@ class System:
         self.entity_list = []
         self.bgcolor = bgcolor
         self.explored = False
+        self.radius = 1
+        self.hot_zone = hot_zone
+        self.bio_zone = bio_zone
+        self.cold_zone = cold_zone
+        self.gas_zone = gas_zone
+        self.frozen_zone = frozen_zone
         self.star = Star(0, 0, 1, self.char, self.color, self.name, self.system_type, self.bgcolor, **flags)
         if self.system_type == 'dwarf-red' or self.system_type == 'dwarf-white':
             self.star.radius = 6
