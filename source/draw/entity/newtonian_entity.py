@@ -12,14 +12,36 @@ class NewtonianMover:
         self.parent = parent
         self.vector = Vector(vector['x'], vector['y'])
         self.flags = flags
+        self.update_interval = 2
 
     def generate_vector_path(self) -> None:
         """Create and add to the area the entities that show the path this object will take.
         """
-        update_rate = 2 * self.vector.magnitude()
+        for entity in self.parent.path:
+            entity.curr_area.delete_entity(entity)
+        self.parent.path = []
 
-    def update_path(self):
-        pass
+        local_time = 0
+        update_rate = 2 * self.vector.magnitude()
+        if(update_rate == 0):
+            return 
+
+        x_increment = self.vector.x / update_rate 
+        y_increment = self.vector.y / update_rate
+        preview_x = 0
+        preview_y = 0
+
+        #TODO: Is_player is currently 'true'. fix this. 
+        while(local_time <= 1):
+            if(abs(preview_x) > 0.5  or abs(preview_y) > 0.5):
+                if(len(self.parent.path) == 0):
+                    self.parent.path.append(Entity(round(preview_x), round(preview_y), '+', (255,255,255), self.parent, curr_area = self.parent.entity_repr.curr_area))                    
+                else:
+                    if(round(preview_x) != self.parent.path[-1].x_offset or round(preview_y) != self.parent.path[-1].get_abs_y()):
+                        self.parent.path.append(Entity(round(preview_x), round(preview_y), '+', (255,255,255), self.parent, curr_area = self.parent.entity_repr.curr_area))
+            preview_x += x_increment
+            preview_y += y_increment
+            local_time += 1 / update_rate
 
     def generate_move_actions(self, time, span) -> list:
         """

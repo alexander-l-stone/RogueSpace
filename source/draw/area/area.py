@@ -129,10 +129,14 @@ class Area:
                 if entities_at_point is not None and len(entities_at_point) > 0:
                     i = animation_frame % len(entities_at_point)
                     if len(entities_at_point) > 1:
-                        if 'priority_draw' in entities_at_point[-1].flags:
-                            drawn_entity = entities_at_point[-1]
-                            entities_at_point.remove(drawn_entity)
-                            drawn_entity.draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame, other_entities=entities_at_point)
+                        priority_entity = False
+                        for entity in entities_at_point[::-1]:
+                            if 'priority_draw' in entity.flags:
+                                priority_entity = entity
+                                break
+                        if priority_entity:
+                            entities_at_point.remove(priority_entity)
+                            priority_entity.draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame, other_entities=entities_at_point)
                         else:
                             drawn_entity = entities_at_point[-i]
                             entities_at_point.remove(drawn_entity)

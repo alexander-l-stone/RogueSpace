@@ -1,9 +1,9 @@
 import tcod
 class Entity:
-    def __init__(self, xoffset:int, yoffset:int, char, color, parent, **flags:dict):
+    def __init__(self, x_offset:int, y_offset:int, char, color, parent, **flags:dict):
         self.parent = parent
-        self.xoffset:int = xoffset
-        self.yoffset:int = yoffset
+        self.x_offset:int = x_offset
+        self.y_offset:int = y_offset
 
         """
         World position of this entity is tracked as relative position from parent, using xoffset and yoffset.
@@ -23,20 +23,26 @@ class Entity:
             self.color = [color]
         else:
             self.color = color
-        self.curr_area = None
+
+        if('curr_area' in flags):
+            self.curr_area = flags['curr_area']
+            flags.pop('curr_area')
+            self.curr_area.add_entity(self)
+        else:
+            self.curr_area = None
         self.flags:dict = flags
 
     def __str__(self):
-        return f"[{self.parent} ({self.parent.x + self.xoffset}, {self.parent.y + self.yoffset})]"
+        return f"[{self.parent} ({self.parent.x + self.x_offset}, {self.parent.y + self.y_offset})]"
     
     def __repr__(self) -> str:
-        return f"[{self.parent} ({self.parent.x + self.xoffset}, {self.parent.y + self.yoffset})]"
+        return f"[{self.parent} ({self.parent.x + self.x_offset}, {self.parent.y + self.y_offset})]"
 
     def get_abs_x(self):
-        return round(self.parent.x) + self.xoffset
+        return round(self.parent.x) + self.x_offset
 
     def get_abs_y(self):
-        return round(self.parent.y) + self.yoffset
+        return round(self.parent.y) + self.y_offset
         
     def update_area_position(self):
         """

@@ -105,7 +105,6 @@ class RenderEngine:
         if self.game.event_engine.global_queue.player_actions_count > 0:
             self.game.event_engine.resolve_actions()
             if(self.game.player.current_ship.engine):
-                self.game.player.current_ship.engine.generate_move_actions(self.game.event_engine.global_time, timeincrement)
                 self.game.player.current_ship.engine.generate_vector_path()
             self.game.event_engine.global_time += timeincrement
         else:

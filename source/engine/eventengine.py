@@ -116,6 +116,8 @@ class EventEngine:
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
                 self.game.render_engine.ui["dev"].visible = True
 
+
+
     def handle_menu_key_presses(self, result) -> dict:
         key_result = {'type': 'none'}
         if result['type'] == 'select':

@@ -49,15 +49,6 @@ class Game:
         self.game_menu.visible = False
 
     def start_new_game(self):
-        #Code to generate player
-        # None,{'x': 1, 'y': 1}
-        self.player = Player()
-        player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
-        self.player.assign_ship(player_ship)
-        self.player.current_ship.engine.vector.x = 1
-        self.player.current_ship.engine.vector.y = 1
-        self.player.current_ship.x = 7.0
-        self.player.current_ship.y = 7.0
         
         #Code to generate initial system
         self.galaxy = Galaxy()
@@ -67,12 +58,19 @@ class Game:
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
         self.current_area:Area = None
         self.generate_current_area()
-        self.current_area.add_entity(self.player.current_entity)
-        self.player.current_ship.engine.generate_vector_path()
         main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
         self.render_engine.add_element_to_ui('game_window', main_game_window)
         self.render_engine.ui['main_menu'].visible = False
         self.render_engine.ui['hud'].visible = True
+
+        #Code to generate player
+        # None,{'x': 1, 'y': 1}
+        self.player = Player()
+        player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True, curr_area = self.current_area)
+        self.player.assign_ship(player_ship)
+        self.player.current_ship.engine.vector.x = 1
+        self.player.current_ship.engine.vector.y = 1
+        self.player.current_ship.relocate(7.0, 7.0)
 
     def start_dev(self):
         self.player = Player()

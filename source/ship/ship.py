@@ -46,4 +46,4 @@ class Ship:
         self.entity_repr.update_area_position()
         print(self.entity_repr.get_abs_x())
         for entity in self.path:
-            entity.update_path()
+            entity.update_area_position()
