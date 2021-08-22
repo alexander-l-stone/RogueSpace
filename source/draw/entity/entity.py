@@ -53,6 +53,19 @@ class Entity:
         self.x = self.get_abs_x()
         self.y = self.get_abs_y()
 
+    
+
+    def move_entity_to_coordinates(self, entity, x, y) -> None:
+        """Moves the entity to x, y by changing it's offset.
+
+        Args:
+            x ([integer]): The X coordinate the entity will end up at
+            y ([integer]): The Y coordinate the entity will end up at
+        """
+        self.x_offset = x - self.parent.x
+        self.y_offset = y - self.parent.y
+        self.update_area_position()
+
     def draw(self, root_console, topx, topy, bgcolor, animation_frame, **flags) -> None:
         """Draw this entity onto the screen.
 

@@ -67,8 +67,8 @@ class Area:
 
             Args:
                 enttity ([Entity): The entity to update
-                x (int): The x coordinate of the entity's current position in the dictionary
-                y (int): The x coordinate of the entity's current position in the dictionary
+                old_x (int): The x coordinate of the entity's current position in the dictionary
+                old_y (int): The x coordinate of the entity's current position in the dictionary
         """
         try:
             if (old_x, old_y) in self.entity_dict:
@@ -77,21 +77,6 @@ class Area:
                 return entity
         except ValueError:
             return None
-
-
-
-    def move_entity_to_coordinates(self, entity, x1, y1, x2, y2) -> None:
-        """Moves the entity at x1, y1 to x2, y2 by changing it's offset.
-
-        Args:
-            x1 ([integer]): The X coordinate the entity is starting at
-            y1 ([integer]): The Y coordinate the entity is starting at
-            x2 ([integer]): The X coordinate the entity will end up at
-            y2 ([integer]): The Y coordinate the entity will end up at
-        """
-        entity.x_offset = x2 - entity.parent.x
-        entity.y_offset = y2 - entity.parent.y
-        self.update_entity_at_coordinates(entity, x1, y1)
 
     def get_entities_at_coordinates(self, x, y) -> list:
         """Get a list of entities at the given coordinates
