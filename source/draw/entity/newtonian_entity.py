@@ -5,8 +5,6 @@ from source.helper_functions.is_negative import is_negative
 from source.vector.vector import Vector
 from source.draw.area.area import Area
 
-#TODO Seperate Newtonian Movement from Entity. Should either be on ship, or more likely, a seperate set of functions that anything with thrust can use.
-
 class NewtonianMover:
     def __init__(self, parent, vector:dict, **flags):
         self.parent = parent
