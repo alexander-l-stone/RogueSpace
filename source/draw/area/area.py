@@ -21,12 +21,13 @@ class Area:
         Args:
             new_entity (Entity): The entity to be added.
         """
-        if (new_entity.x, new_entity.y) in self.entity_dict:
-            self.entity_dict[(new_entity.x, new_entity.y)].append(new_entity)
+        if (new_entity.get_abs_x(), new_entity.get_abs_y()) in self.entity_dict:
+            self.entity_dict[(new_entity.get_abs_x(), new_entity.get_abs_y())].append(new_entity)
         else:
-            self.entity_dict[(new_entity.x, new_entity.y)] = [new_entity]
+            self.entity_dict[(new_entity.get_abs_x(), new_entity.get_abs_y())] = [new_entity]
         new_entity.curr_area = self
-
+ 
+    #TODO verify this function is used
     def add_entity_at_coordinates(self, x, y, new_entity) -> None:
         """Add a new entity to an area at the provided coordinates.
 
@@ -39,12 +40,9 @@ class Area:
             self.entity_dict[(x,y)].append(new_entity)
         else:
             self.entity_dict[(x, y)] = [new_entity]
-        new_entity.x = x
-        new_entity.y = y
         new_entity.curr_area = self
 
-    #TODO: make an actual delete at coordinates but also a generic delete entity maybe?
-    def delete_entity_at_coordinates(self, entity, x, y) -> Entity:
+    def delete_entity(self, entity) -> Entity:
         """[summary]
 
         Args:
@@ -56,16 +54,34 @@ class Area:
             Entity: [description]
         """,
         try:
-            if (x,y) in self.entity_dict:
-                self.entity_dict[(x,y)].remove(entity)
+            if (entity.get_abs_x(), entity.get_abs_y()) in self.entity_dict:
+                self.entity_dict[(entity.get_abs_x(),entity.get_abs_y())].remove(entity)
                 entity.curr_area = None
-            return entity
+                return entity
         except ValueError:
             return None
     
-    #TODO: Add transfer and delete multi tile entity
-    def transfer_entity_between_coordinates(self, entity, x1, y1, x2, y2) -> None:
-        """Moves the entity at x1, y1 to x2, y2
+    def update_entity_at_coordinates(self, entity, old_x, old_y):
+        """
+            Updates the entity's position in the entity dict to match it's position in the system
+
+            Args:
+                enttity ([Entity): The entity to update
+                x (int): The x coordinate of the entity's current position in the dictionary
+                y (int): The x coordinate of the entity's current position in the dictionary
+        """
+        try:
+            if (old_x, old_y) in self.entity_dict:
+                self.entity_dict[(old_x, old_y)].remove(entity)
+                self.add_entity(entity)
+                return entity
+        except ValueError:
+            return None
+
+
+
+    def move_entity_to_coordinates(self, entity, x1, y1, x2, y2) -> None:
+        """Moves the entity at x1, y1 to x2, y2 by changing it's offset.
 
         Args:
             x1 ([integer]): The X coordinate the entity is starting at
@@ -73,8 +89,9 @@ class Area:
             x2 ([integer]): The X coordinate the entity will end up at
             y2 ([integer]): The Y coordinate the entity will end up at
         """
-        transfering_entity = self.delete_entity_at_coordinates(entity, x1, y1)
-        self.add_entity_at_coordinates(x2, y2, transfering_entity)
+        entity.x_offset = x2 - entity.parent.x
+        entity.y_offset = y2 - entity.parent.y
+        self.update_entity_at_coordinates(entity, x1, y1)
 
     def get_entities_at_coordinates(self, x, y) -> list:
         """Get a list of entities at the given coordinates

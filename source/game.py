@@ -4,7 +4,7 @@ import tcod.event
 from typing import Dict
 
 from source.draw.area.area import Area
-from source.draw.entity.newtonian_entity import NewtonianEntity
+from source.draw.entity.newtonian_entity import NewtonianMover
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.ui.menu.generate_menu import generate_main_menu, generate_dev_menu, generate_game_menu, generate_dev_command_menu, generate_spawn_entity_menu
@@ -54,10 +54,10 @@ class Game:
         self.player = Player()
         player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
         self.player.assign_ship(player_ship)
-        self.player.current_entity.vector.x = 1
-        self.player.current_entity.vector.y = 1
-        self.player.current_entity.x = 7
-        self.player.current_entity.y = 7
+        self.player.current_ship.engine.vector.x = 1
+        self.player.current_ship.engine.vector.y = 1
+        self.player.current_ship.x = 7.0
+        self.player.current_ship.y = 7.0
         
         #Code to generate initial system
         self.galaxy = Galaxy()
@@ -68,7 +68,7 @@ class Game:
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(self.player.current_entity)
-        self.player.current_entity.generate_vector_path()
+        self.player.current_ship.engine.generate_vector_path()
         main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
         self.render_engine.add_element_to_ui('game_window', main_game_window)
         self.render_engine.ui['main_menu'].visible = False
@@ -78,10 +78,10 @@ class Game:
         self.player = Player()
         player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
         self.player.assign_ship(player_ship)
-        self.player.current_entity.vector.x = 1
-        self.player.current_entity.vector.y = 1
-        self.player.current_entity.x = 7
-        self.player.current_entity.y = 7
+        self.player.current_ship.engine.vector.x = 1
+        self.player.current_ship.engine.vector.y = 1
+        self.player.current_ship.x = 7.0
+        self.player.current_ship.y = 7.0
         
         #Code to generate dev system
         self.galaxy = Galaxy()
@@ -91,7 +91,7 @@ class Game:
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(self.player.current_entity)
-        self.player.current_entity.generate_vector_path()
+        self.player.current_ship.engine.generate_vector_path()
         self.generate_dev_panel()
         self.render_engine.InputHandler.key_command_dict[tcod.event.K_F10] = {"type": "menu", "value": "dev"}
         main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)

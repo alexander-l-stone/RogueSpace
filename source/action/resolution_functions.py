@@ -23,12 +23,13 @@ def resolve_move_action(originator, flags):
             except:
                 pass
         if not collision:
-            flags['area'].transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
+            originator.relocate(originator.x + flags['dx'], originator.y + flags['dy'])
             result_list.append({"type": "move"})
         return result_list
     else:
-        flags['area'].transfer_entity_between_coordinates(originator, originator.x, originator.y, originator.x + flags['dx'], originator.y + flags['dy'])
+        originator.relocate(originator.x + flags['dx'], originator.y + flags['dy'])
         return [{"type": "move"}]
+    
 
 def resolve_thrust_action(originator, flags):
     return [{"type": "thrust", "value": {"dx": flags['dx'], "dy": flags['dy']}}]

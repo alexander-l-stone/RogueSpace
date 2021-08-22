@@ -3,78 +3,51 @@ from source.action.action import Action
 from source.action.resolution_functions import resolve_move_action
 from source.helper_functions.is_negative import is_negative
 from source.vector.vector import Vector
+from source.draw.area.area import Area
 
 #TODO Seperate Newtonian Movement from Entity. Should either be on ship, or more likely, a seperate set of functions that anything with thrust can use.
 
-class NewtonianEntity(Entity):
-    def __init__(self, x:int, y:int, char:str, color:tuple, parent, area, vector:dict, **flags):
-        """Constructor for the NewtonianObject
-
-        Args:
-            x (int): X coordinate of the object
-            y (int): Y coordinate of the object
-            char (str): Character to display on the screen.
-            color (tuple): Color of the character
-            area (Area): Area the object is in
-            vector (dict): Vector the object is on. Will be of the form {x: int, y: int}
-        """
-        Entity.__init__(self, x, y, char, color, parent, **flags)
-        self.curr_area = area
+class NewtonianMover:
+    def __init__(self, parent, vector:dict, **flags):
+        self.parent = parent
         self.vector = Vector(vector['x'], vector['y'])
-        self.vector_entities = [] #A list of entities that compose this objects vector path
+        self.flags = flags
 
     def generate_vector_path(self) -> None:
         """Create and add to the area the entities that show the path this object will take.
         """
-        #Delete the previous Entities
-        for entity in self.vector_entities:
-            self.curr_area.delete_entity_at_coordinates(entity, entity.x, entity.y)
-        try:
-            #Figure out wich of x or y is greater and store the value of the lesser divided by the greater. This is guaranteed to not be more than 1
-            if abs(self.vector.x) > abs(self.vector.y):
-                normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': abs(self.vector.y/self.vector.x)}
-            else:
-                normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': abs(self.vector.x/self.vector.y)}
-        except ZeroDivisionError:
-            return
-        coordinate_dict = {'x': 0, 'y': 0}
-        for i in range(0, abs(self.vector.get_value(normalized_dict['greater']))):
-            coordinate_dict[normalized_dict['greater']] += 1 * is_negative(self.vector.get_value(normalized_dict['greater']))
-            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector.get_value(normalized_dict['lesser']))
-            vector_entity = Entity(self.x + round(coordinate_dict['x']), self.y + round(coordinate_dict['y']), '+', self.color, self)
-            self.curr_area.add_entity(vector_entity)
-            self.vector_entities.append(vector_entity)
-    
-    def generate_move_actions(self, time) -> list:
+        update_rate = 2 * self.vector.magnitude()
+
+    def update_path(self):
+        pass
+
+    def generate_move_actions(self, time, span) -> list:
         """
             Generates a list of movement Actions based upon this objects vector.
+            Will generate movements with the first occuring immediately, andd the rest occuring in 1/update_rate intervals
+            update_rate is currently set to make all movements .5 tiles in length
 
-            time [int] - The time these move actions should be generated at.
+            time [int] - The time these movements start.
+            span [int] - The amount of time to generate movements over
 
             This should never be called until all the previous move actions from it have been resolved
         """
+        if(self.vector.magnitude() == 0.0):
+            return []
+        
         move_actions = []
-        try:
-            if abs(self.vector.x) > abs(self.vector.y):
-                normalized_dict = {'greater': 'x', 'lesser': 'y', 'low/great': abs(self.vector.y/self.vector.x)}
-            else:
-                normalized_dict = {'greater': 'y', 'lesser': 'x', 'low/great': abs(self.vector.x/self.vector.y)}
-        except ZeroDivisionError:
-            return move_actions
-        coordinate_dict = {'x': 0, 'y': 0}
-        coordinate_dict[normalized_dict['greater']] = 1 * is_negative(self.vector.get_value(normalized_dict['greater']))
-        if 'is_player' in self.flags:
-            is_player = True
-        else:
-            is_player = False
-        for i in range(0, abs(self.vector.get_value(normalized_dict['greater']))):
-            coordinate_dict[normalized_dict['lesser']] += normalized_dict['low/great'] * is_negative(self.vector.get_value(normalized_dict['lesser']))
-            move_actions.append(Action(self, time, resolve_move_action, dx=round(coordinate_dict['x']), dy=round(coordinate_dict['y']), area=self.curr_area, is_player=is_player))
-            if round(coordinate_dict[normalized_dict['lesser']]) >= 1:
-                coordinate_dict[normalized_dict['lesser']] = 0
+        local_time = float(time)
+        update_rate = 2 * self.vector.magnitude()
+        x_increment = self.vector.x / update_rate 
+        y_increment = self.vector.y / update_rate
+        #TODO: Is_player is currently 'true'. fix this. 
+        while(local_time < time + span):
+            move_actions.append(Action(self.parent, local_time, resolve_move_action, dx=x_increment, dy=y_increment, area=self.parent.entity_repr.curr_area, is_player=True))
+            local_time += 1 / update_rate
         return move_actions
 
     def thrust(self, dx:int, dy:int) -> None:
+        #May or may not wish to exist
         """Add values to this object vector.
 
         Args:

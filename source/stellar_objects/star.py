@@ -12,7 +12,8 @@ class Star:
         self.star_type = star_type
         self.flags = flags
         self.bgcolor = bgcolor
-    
+        self.entity_list = []
+        
     def __str__(self):
         return f"[Star]"
     
@@ -29,10 +30,12 @@ class Star:
             return dx**2 + dy**2 < tempradius**2
     
     def generate_entities(self, system_area):
-        for x in range(self.x - self.radius, self.x + self.radius + 1):
-            for y in range(self.y - self.radius, self.y + self.radius + 1):
+        for x in range(-1 * self.radius, self.radius + 1):
+            for y in range(-1 * self.radius, self.radius + 1):
                 if self.point_inside(x, y):
-                    system_area.add_entity(self.generate_entity(x, y))
+                    new = Entity(x,y,self.char,self.color,self)
+                    self.entity_list.append(new)
+                    system_area.add_entity(new)
 
     def generate_entity(self, x, y):
         seed(randint(1, 100) + x + y)

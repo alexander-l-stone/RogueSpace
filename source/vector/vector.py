@@ -1,3 +1,5 @@
+import math
+
 class Vector:
     def __init__(self, x, y):
         self.x = x
@@ -19,3 +21,6 @@ class Vector:
     
     def dot_product(self, vector) -> int:
         return self.x * vector.x + self.y * vector.y
+
+    def magnitude(self) -> float:
+        return math.sqrt(self.x * self.x + self.y * self.y)

@@ -34,7 +34,7 @@ def test_can_delete_entity(area, entity):
     Test that you can delete an entity from an area
     """
     area.add_entity(entity)
-    deleted_entity = area.delete_entity_at_coordinates(entity, entity.x, entity.y)
+    deleted_entity = area.delete_entity(entity)
     assert deleted_entity.curr_area is None
     assert area.entity_dict[(deleted_entity.x, deleted_entity.y)] == []
 
@@ -45,7 +45,7 @@ def test_can_transfer_entity(entity, area):
     new_x = 2
     new_y = 2
     area.add_entity(entity)
-    area.transfer_entity_between_coordinates(entity, entity.x, entity.y, new_x, new_y)
+    area.move_entity_to_coordinates(entity, entity.x, entity.y, new_x, new_y)
     assert entity.x == new_x
     assert entity.y == new_y
     assert area.entity_dict[(new_x, new_y)][0] is entity

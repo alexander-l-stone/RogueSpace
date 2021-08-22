@@ -2,7 +2,7 @@ import tcod
 import time
 import sys
 
-from source.draw.entity.newtonian_entity import NewtonianEntity
+from source.draw.entity.newtonian_entity import NewtonianMover
 from source.handlers.input_handler import InputHandler
 from source.handlers.menu_handler import MenuHandler
 from source.system.system import System
@@ -76,8 +76,8 @@ class RenderEngine:
         hud.elements['bar_fuel'].curr_value = self.game.player.current_ship.fuel
         hud.elements['bar_fuel'].max_value = self.game.player.current_ship.max_fuel
 
-        hud.elements['coordinates'].message = f"({self.game.player.current_entity.x}, {self.game.player.current_entity.y})"
-        hud.elements['vector'].message = f"({self.game.player.current_entity.vector.x}, {self.game.player.current_entity.vector.y})"
+        hud.elements['coordinates'].message = f"({self.game.player.current_ship.get_x()}, {self.game.player.current_ship.get_y()})"
+        hud.elements['vector'].message = f"({self.game.player.current_ship.engine.vector.x}, {self.game.player.current_ship.engine.vector.y})"
 
     def game_loop(self):
         with tcod.context.new_terminal(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, tileset=self.tileset, title="Rogue Expedition", vsync=True) as context:
@@ -90,34 +90,24 @@ class RenderEngine:
                     self.menu_loop(root_console)
                 self.render_console(root_console)
     
-    def handle_key_presses(self, result) -> dict:
-        if event.type == 'KEYDOWN':
-            result = self.MenuHandler.handle_keypress(event)
-            key_result = {'type': 'none'}
-            if result['type'] == 'select':
-                key_result = self.menu_items[self.active_item].kwargs['select']()
-            elif result['type'] == 'up':
-                if self.active_item > 0:
-                    self.active_item -= 1
-                key_result = {'type': 'move', 'value': 'up'}
-            elif result['type'] == 'down':
-                if self.active_item < len(self.menu_items) - 1:
-                    self.active_item += 1
-                key_result = {'type': 'move', 'value': 'down'}
-            return key_result
-        else:
-            return {'type': 'none'}
+
 
     def render_console(self, root_console) -> None:
         root_console.clear()
         self.render(root_console)
 
     def event_loop(self, root_console) -> None:
+        """
+        Rewrite this!
+        We want this to perform many one-step time updates until one "action" worth of time has passed
+        """
+        timeincrement = 1
         if self.game.event_engine.global_queue.player_actions_count > 0:
             self.game.event_engine.resolve_actions()
-            if type(self.game.player.current_entity) is NewtonianEntity:
-                self.game.player.current_entity.generate_vector_path()
-            self.game.event_engine.global_time += 1
+            if(self.game.player.current_ship.engine):
+                self.game.player.current_ship.engine.generate_move_actions(self.game.event_engine.global_time, timeincrement)
+                self.game.player.current_ship.engine.generate_vector_path()
+            self.game.event_engine.global_time += timeincrement
         else:
             for event in tcod.event.get():
                 if event.type == "KEYDOWN":
