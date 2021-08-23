@@ -49,7 +49,7 @@ class Entity:
             update_entity.... will adjust this entity's position in the area dictionary to it's absolute position
             then, we update self.x and self.y accordingly
         """
-        self.curr_area.update_entity_at_coordinates(self, self.x, self.y)
+        self.curr_area.update_entity_in_dict(self, self.x, self.y)
         self.x = self.get_abs_x()
         self.y = self.get_abs_y()
 
