@@ -1,6 +1,7 @@
 from source.action.action_queue import ActionQueue
 from source.action.action import Action
 from source.action.resolution_functions import *
+from source.ship.ship import Ship
 import random
 
 def test_can_instantiate_action():
@@ -117,17 +118,17 @@ def test_multiple_resolve():
         action_queue.resolve_actions(time)
         assert len(action_queue.heap) == length
 
-def test_can_resolve_move_action(area, entity):
+def test_can_resolve_move_action(area):
     """"
     Test that move actions can resolve and move an entity.
     """
     dx = 0
     dy = 1
-    oldx = entity.x
-    oldy = entity.y
-    area.add_entity(entity)
+    new_object = Ship('?', (255, 0, 0), curr_area=area)
+    oldx = new_object.x
+    oldy = new_object.y
     action_queue = ActionQueue()
-    action_queue.push(Action(entity, 1, resolve_move_action, dx=dx, dy=dy, area=area))
+    action_queue.push(Action(new_object, 1, resolve_move_action, dx=dx, dy=dy, area=area))
     results = action_queue.resolve_actions(1)
     assert results[0] == {'type': 'move'}
-    assert (entity.x == oldx + dx) and (entity.y == oldy + dy)
+    assert (new_object.x == oldx + dx) and (new_object.y == oldy + dy)

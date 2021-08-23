@@ -55,7 +55,7 @@ class Entity:
 
     
 
-    def move_entity_to_coordinates(self, entity, x, y) -> None:
+    def move_entity_to_coordinates(self, x, y) -> None:
         """Moves the entity to x, y by changing it's offset.
 
         Args:

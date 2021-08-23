@@ -26,21 +26,6 @@ class Area:
         else:
             self.entity_dict[(new_entity.get_abs_x(), new_entity.get_abs_y())] = [new_entity]
         new_entity.curr_area = self
- 
-    #TODO verify this function is used
-    def add_entity_at_coordinates(self, x, y, new_entity) -> None:
-        """Add a new entity to an area at the provided coordinates.
-
-        Args:
-            x (int): x coordinate to add the entity too
-            y (int): y coordinate to add the entity too
-            new_entity (Entity): The Entity to add to the area.
-        """
-        if (x,y) in self.entity_dict:
-            self.entity_dict[(x,y)].append(new_entity)
-        else:
-            self.entity_dict[(x, y)] = [new_entity]
-        new_entity.curr_area = self
 
     def delete_entity(self, entity) -> Entity:
         """[summary]

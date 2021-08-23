@@ -2,7 +2,7 @@
 from source.draw.area.tilesetarea import TilesetArea
 
 def resolve_jump_action(originator, flags):
-        return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
+    return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
 
 def resolve_no_action(originator, flags):
     return [{"type": 'none'}]

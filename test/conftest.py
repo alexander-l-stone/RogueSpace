@@ -24,17 +24,17 @@ def long_action():
     return Action('long', 2, resolve_no_action)
 
 @pytest.fixture
-def entity():
-    return Entity(1, 1, '@', (255, 255, 255), None)
-
-@pytest.fixture
 def area():
     return Area()
 
 @pytest.fixture
-def area_with_entity():
+def entity(system):
+    return Entity(1, 1, '@', (255, 255, 255), system)
+
+@pytest.fixture
+def area_with_entity(entity):
     area = Area()
-    area.add_entity(Entity(1, 1, '@', (30, 60, 150), None))
+    area.add_entity(entity)
     return area
 
 @pytest.fixture
