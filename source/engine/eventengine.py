@@ -23,19 +23,19 @@ class EventEngine:
                     return
                 self.resolve_jump(result)
             elif result["type"] == "move" and isinstance(self.game.current_location, Galaxy):
-                for key, value in self.game.current_location.check_explored_corners(self.game.player.current_entity.x, self.game.player.current_entity.y, self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
+                for key, value in self.game.current_location.check_explored_corners(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y(), self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
                     if (value == False):
                         self.game.current_location.generate_new_sector(key[0], key[1])
                 if (
-                self.game.player.current_entity.x <= self.game.current_area.flags['center_x'] - self.game.render_engine.SCREEN_WIDTH//2
+                self.game.player.current_ship.get_x() <= self.game.current_area.flags['center_x'] - self.game.render_engine.SCREEN_WIDTH//2
                 or
-                self.game.player.current_entity.x >= self.game.current_area.flags['center_x'] + self.game.render_engine.SCREEN_WIDTH//2
+                self.game.player.current_ship.get_x() >= self.game.current_area.flags['center_x'] + self.game.render_engine.SCREEN_WIDTH//2
                 or
-                self.game.player.current_entity.y <= self.game.current_area.flags['center_y'] - self.game.render_engine.SCREEN_HEIGHT//2
+                self.game.player.current_ship.get_y() <= self.game.current_area.flags['center_y'] - self.game.render_engine.SCREEN_HEIGHT//2
                 or
-                self.game.player.current_entity.y >= self.game.current_area.flags['center_y'] - self.game.render_engine.SCREEN_HEIGHT//2
+                self.game.player.current_ship.get_y() >= self.game.current_area.flags['center_y'] - self.game.render_engine.SCREEN_HEIGHT//2
                 ):
-                    self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_entity.x, self.game.player.current_entity.y)
+                    self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y())
                     self.game.current_area.add_entity(self.game.player.current_entity)
                     self.game.render_engine.ui['game_window'].area = self.game.current_area
     
@@ -68,36 +68,38 @@ class EventEngine:
         if(not isinstance(self.game.current_location, System) ==True):
             return False
         else:
-            if (((self.game.player.current_entity.x**2) + (self.game.player.current_entity.y**2))**(1/2)) > self.game.current_location.hyperlimit:
+            if (((self.game.player.current_ship.get_x()**2) + (self.game.player.current_ship.get_y()**2))**(1/2)) > self.game.current_location.hyperlimit:
                 delta = convert_theta_to_delta(convert_delta_to_theta(result['x'], result['y']))
                 new_x = self.game.current_location.x + delta[0]
                 new_y = self.game.current_location.y + delta[1]
                 self.game.current_location = self.game.galaxy
-                self.game.player.current_entity.x = new_x
-                self.game.player.current_entity.y = new_y
-                for key, value in self.game.current_location.check_explored_corners(self.game.player.current_entity.x, self.game.player.current_entity.y, self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
+                self.game.player.current_ship.x = new_x
+                self.game.player.current_ship.y = new_y
+                for key, value in self.game.current_location.check_explored_corners(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y(), self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
                         if (value == False):
                             self.game.current_location.generate_new_sector(key[0], key[1])
-                self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_entity.x, self.game.player.current_entity.y)
+                self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y())
                 self.game.current_area.add_entity(self.game.player.current_entity)
                 self.game.render_engine.ui['game_window'].area = self.game.current_area
                 return True
             else:
                 return False
 
+
+
     def resolve_keyboard_input(self, result):
         if(result["type"] == "move"):
-            self.global_queue.push(Action(self.game.player.current_entity, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.game.current_area, is_player=True))
+            self.global_queue.push(Action(self.game.player.current_ship, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.game.current_area, is_player=True))
         elif(result["type"] == "jump"):
-            self.global_queue.push(Action(self.game.player.current_entity, self.global_time+1, resolve_jump_action, y=self.game.player.current_entity.x, x=self.game.player.current_entity.y, area=self.game.current_area, is_player=True))
+            self.global_queue.push(Action(self.game.player.current_ship, self.global_time+1, resolve_jump_action, y=self.game.player.current_ship.get_x(), x=self.game.player.current_ship.get_y(), area=self.game.current_area, is_player=True))
         elif(result["type"] == "wait"):
-            actions = self.game.player.current_entity.generate_move_actions(self.global_time+1)
+            actions = self.game.player.current_ship.engine.generate_move_actions(self.global_time, 1)
             for action in actions:
                 self.global_queue.push(action)
-            self.global_queue.push(Action(self.game.player.current_entity, self.global_time+1, resolve_wait_action, is_player=True))
+            self.global_queue.push(Action(self.game.player.current_ship, self.global_time+1, resolve_wait_action, is_player=True))
         elif(result["type"] == "thrust"):
             self.game.player.current_ship.thrust(result["value"][0], result["value"][1])
-            actions = self.game.player.current_entity.generate_move_actions(self.global_time+1)
+            actions = self.game.player.current_ship.engine.generate_move_actions(self.global_time,1)
             for action in actions:
                 self.global_queue.push(action)
         elif(result["type"] == "cheat-fuel"):
@@ -113,6 +115,8 @@ class EventEngine:
                 self.game.game_state = "menu_command_menu_render"
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
                 self.game.render_engine.ui["dev"].visible = True
+
+
 
     def handle_menu_key_presses(self, result) -> dict:
         key_result = {'type': 'none'}

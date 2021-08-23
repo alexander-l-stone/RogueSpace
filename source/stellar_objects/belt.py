@@ -10,6 +10,8 @@ class Belt:
         self.color = color
         self.flags = flags
         self.seed = seed
+        self.x = 0
+        self.y = 0
     
     def generate_entities(self, area):
         seed(self.seed)

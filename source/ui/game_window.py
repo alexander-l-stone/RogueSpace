@@ -19,11 +19,11 @@ class GameWindow:
         if not self.visible:
             return
         if 'center_x' not in flags:
-            center_x = self.game.player.current_entity.x
+            center_x = self.game.player.current_ship.get_x()
         else:
             center_x = flags['center_x']
         if 'center_y' not in flags:
-            center_y = self.game.player.current_entity.y
+            center_y = self.game.player.current_ship.get_y()
         else:
             center_y = flags['center_y']
         self.area.draw(root_console, center_x, center_y, tick_count, self.width, self.height, corner_l_x=self.x, corner_b_y=self.y)

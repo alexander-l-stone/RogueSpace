@@ -36,14 +36,18 @@ class Planet:
         return {'type': 'stop'}
     
     def generate_entities(self, area):
-        for x in range(self.x - self.planetary_radius, self.x + self.planetary_radius + 1):
-            for y in range(self.y - self.planetary_radius, self.y + self.planetary_radius + 1):
+        for x in range(-1 * self.planetary_radius, self.planetary_radius + 1):
+            for y in range(-1 * self.planetary_radius, self.planetary_radius + 1):
                 if self.point_inside(x, y):
-                    area.add_entity(Entity(x, y, self.char, self.color, self))
-        for moon in self.moons:
-            area.add_entity(moon.generate_offset_entity(self.x, self.y))
+                    new = Entity(x,y,self.char,self.color,self)
+                    self.entity_list.append(new)
+                    area.add_entity(new)
+    #    for moon in self.moons:
+    #        area.add_entity(moon.generate_offset_entity(self.x, self.y))
+    """
         for planetary_entity in self.entity_list:
             if (isinstance(planetary_entity, Ring)):
                 planetary_entity.generate_offset_entities(area, self.x, self.y)
             else:
                 area.add_entity(planetary_entity)
+"""
