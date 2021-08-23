@@ -3,9 +3,9 @@ class Action:
     """
     Class for holding an action, extend this to make new actions
     """
-    def __init__(self, originator, time_remaining:int, resolution_function=resolve_no_action, **flags):
+    def __init__(self, originator, time:int, resolution_function=resolve_no_action, **flags):
         self.originator = originator
-        self.time:int = time_remaining
+        self.time:int = time
         self.resolution_function = resolution_function
         self.flags:dict = flags
     
@@ -53,4 +53,4 @@ class Action:
             Resolution functions will take in the originator and a set of flags. They will output a list of dictionaries(in addition to any other actions they have to take to resolve the action).
             Those dictionaries will at a minimum have a type field.
         """
-        return self.resolution_function(self.originator, self.flags)
+        return self.resolution_function(self.originator, **self.flags)

@@ -19,6 +19,8 @@ class Ship:
         self.heat = 36
         self.path = []
         self.engine = NewtonianMover(self, {'x':0, 'y':0})
+
+        self.charging_jump = False
     
     def __str__(self):
         return f"[Ship]"
