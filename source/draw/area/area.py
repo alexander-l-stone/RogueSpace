@@ -61,7 +61,7 @@ class Area:
         except ValueError:
             return None
     
-    def update_entity_in_dict(self, entity, old_x, old_y):
+    def update_coords_for_entity(self, entity, old_x, old_y):
         """
             Updates the entity's position in the entity dict to match it's position in the system
 
