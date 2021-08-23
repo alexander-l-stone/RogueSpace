@@ -2,7 +2,7 @@ import tcod
 import time
 import sys
 
-from source.draw.entity.newtonian_entity import NewtonianEntity
+from source.ship.ship_components.newtonian_mover import NewtonianMover
 from source.handlers.input_handler import InputHandler
 from source.handlers.menu_handler import MenuHandler
 from source.system.system import System
@@ -76,8 +76,8 @@ class RenderEngine:
         hud.elements['bar_fuel'].curr_value = self.game.player.current_ship.fuel
         hud.elements['bar_fuel'].max_value = self.game.player.current_ship.max_fuel
 
-        hud.elements['coordinates'].message = f"({self.game.player.current_entity.x}, {self.game.player.current_entity.y})"
-        hud.elements['vector'].message = f"({self.game.player.current_entity.vector.x}, {self.game.player.current_entity.vector.y})"
+        hud.elements['coordinates'].message = f"({self.game.player.current_ship.get_x()}, {self.game.player.current_ship.get_y()})"
+        hud.elements['vector'].message = f"({self.game.player.current_ship.engine.vector.x}, {self.game.player.current_ship.engine.vector.y})"
 
     def game_loop(self):
         with tcod.context.new_terminal(self.SCREEN_HEIGHT, self.SCREEN_WIDTH, tileset=self.tileset, title="Rogue Expedition", vsync=True) as context:
@@ -95,11 +95,12 @@ class RenderEngine:
         self.render(root_console)
 
     def event_loop(self, root_console) -> None:
+        timeincrement = 1
         if self.game.event_engine.global_queue.player_actions_count > 0:
             self.game.event_engine.resolve_actions()
-            if type(self.game.player.current_entity) is NewtonianEntity:
-                self.game.player.current_entity.generate_vector_path()
-            self.game.event_engine.global_time += 1
+            if(self.game.player.current_ship.engine):
+                self.game.player.current_ship.engine.generate_vector_path()
+            self.game.event_engine.global_time += timeincrement
         else:
             for event in tcod.event.get():
                 if event.type == "KEYDOWN":

@@ -98,11 +98,12 @@ class Cloud:
                                         cloud_dict[(x,y)] -= 1
                                     else:
                                         cloud_dict[(x,y)] = -1
+        #TODO: Rewrite so we are computing the offset in the walk, rather than computing coord andd subtracting origin        
         for coord,dense in cloud_dict.items():
             if dense == 1 or dense == 2:
-                area.add_entity(Entity(coord[0], coord[1], self.char, self.flags['thin_color'], self, bg_color=self.flags['thin_color']))
+                area.add_entity(Entity(coord[0]-self.x, coord[1]-self.y, self.char, self.flags['thin_color'], self, bg_color=self.flags['thin_color']))
             elif dense >= 3:
-                area.add_entity(Entity(coord[0], coord[1], self.char, self.color, self, bg_color=self.color))
+                area.add_entity(Entity(coord[0] - self.x, coord[1] - self.y, self.char, self.color, self, bg_color=self.color))
 
     def yinyang_seeds(self, area):
         seed(self.seed)
@@ -130,7 +131,7 @@ class Cloud:
                         if (x,y) in area.entity_dict:
                             for entity in area.entity_dict[(x,y)]:
                                 if entity.parent == self:
-                                    area.delete_entity_at_coordinates(entity, x, y)
+                                    area.delete_entity(entity)
     
     def bubblewalk(self, area):
         seed(self.seed)

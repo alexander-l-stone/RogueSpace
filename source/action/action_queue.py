@@ -4,6 +4,7 @@ import heapq
 class ActionQueue:
     """
     Class for holding all the actions characters currently want to execute
+    heapq is a minheap sorted by time
     """
     def __init__(self):
         self.heap:list = []
