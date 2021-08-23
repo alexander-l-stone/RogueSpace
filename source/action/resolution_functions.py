@@ -1,6 +1,6 @@
 #TODO: move the area, x, and y of the resolve jump action into a value dict
 def resolve_jump_action(originator, flags):
-        return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
+    return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
 
 def resolve_no_action(originator, flags):
     return [{"type": 'none'}]
