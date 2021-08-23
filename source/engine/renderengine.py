@@ -89,24 +89,6 @@ class RenderEngine:
                 else:
                     self.menu_loop(root_console)
                 self.render_console(root_console)
-    
-    def handle_key_presses(self, result) -> dict:
-        if event.type == 'KEYDOWN':
-            result = self.MenuHandler.handle_keypress(event)
-            key_result = {'type': 'none'}
-            if result['type'] == 'select':
-                key_result = self.menu_items[self.active_item].kwargs['select']()
-            elif result['type'] == 'up':
-                if self.active_item > 0:
-                    self.active_item -= 1
-                key_result = {'type': 'move', 'value': 'up'}
-            elif result['type'] == 'down':
-                if self.active_item < len(self.menu_items) - 1:
-                    self.active_item += 1
-                key_result = {'type': 'move', 'value': 'down'}
-            return key_result
-        else:
-            return {'type': 'none'}
 
     def render_console(self, root_console) -> None:
         root_console.clear()

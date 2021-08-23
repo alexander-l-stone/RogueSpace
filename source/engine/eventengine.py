@@ -109,10 +109,12 @@ class EventEngine:
                 self.game.render_engine.ui['game_menu'].visible = True
                 self.game.render_engine.ui['game_window'].visible = False
                 self.game.render_engine.ui['hud'].visible = False
-            elif result["value"] == 'dev':
+            elif result["value"] == 'dev-system':
                 self.game.game_state = "menu_command_menu_render"
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
                 self.game.render_engine.ui["dev"].visible = True
+            elif result["value"] == "dev-tileset":
+                
 
     def handle_menu_key_presses(self, result) -> dict:
         key_result = {'type': 'none'}

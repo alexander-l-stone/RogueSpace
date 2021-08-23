@@ -2,8 +2,8 @@ import tcod
 import numpy
 
 from typing import Dict
-from source.area.area import Area
-from source.entity.entity import Entity
+from source.draw.area.area import Area
+from source.draw.entity.entity import Entity
 from source.tileset.tileset import Tileset
 
 class TilesetArea(Area):
