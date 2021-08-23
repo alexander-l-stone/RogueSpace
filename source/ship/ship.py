@@ -1,4 +1,4 @@
-from source.draw.entity.newtonian_entity import NewtonianMover
+from source.ship.ship_components.newtonian_mover import NewtonianMover
 from source.draw.entity.entity import Entity
 from source.ui.ui_bar import UIBar
 from source.ui.ui_message import UIMessage
@@ -44,6 +44,5 @@ class Ship:
         self.x = new_x
         self.y = new_y
         self.entity_repr.update_area_position()
-        print(self.entity_repr.get_abs_x())
         for entity in self.path:
             entity.update_area_position()

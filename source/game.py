@@ -4,7 +4,7 @@ import tcod.event
 from typing import Dict
 
 from source.draw.area.area import Area
-from source.draw.entity.newtonian_entity import NewtonianMover
+from source.ship.ship_components.newtonian_mover import NewtonianMover
 from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.ui.menu.generate_menu import generate_main_menu, generate_dev_menu, generate_game_menu, generate_dev_command_menu, generate_spawn_entity_menu

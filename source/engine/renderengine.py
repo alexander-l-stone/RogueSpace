@@ -2,7 +2,7 @@ import tcod
 import time
 import sys
 
-from source.draw.entity.newtonian_entity import NewtonianMover
+from source.ship.ship_components.newtonian_mover import NewtonianMover
 from source.handlers.input_handler import InputHandler
 from source.handlers.menu_handler import MenuHandler
 from source.system.system import System
@@ -97,10 +97,6 @@ class RenderEngine:
         self.render(root_console)
 
     def event_loop(self, root_console) -> None:
-        """
-        Rewrite this!
-        We want this to perform many one-step time updates until one "action" worth of time has passed
-        """
         timeincrement = 1
         if self.game.event_engine.global_queue.player_actions_count > 0:
             self.game.event_engine.resolve_actions()
