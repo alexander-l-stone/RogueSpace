@@ -12,13 +12,15 @@ class Tileset:
             etc ...
         """
         self.tiles = tiles
+        self.x = 0
+        self.y = 0
     
     def add_tile(self, tile) -> None:
         """
         Adds a tile to the tileset at the lowest unused positive integer.
 
         Args:
-            tile (any): [description]
+            tile (any): the tile to be added.
         """
         i = 0
         while True:
