@@ -97,19 +97,12 @@ class RenderEngine:
         self.render(root_console)
 
     def event_loop(self, root_console) -> None:
-        timeincrement = 1
-        if self.game.event_engine.global_queue.player_actions_count > 0:
-            self.game.event_engine.resolve_actions()
-            if(self.game.player.current_ship.engine):
-                self.game.player.current_ship.engine.generate_vector_path()
-            self.game.event_engine.global_time += timeincrement
-        else:
-            for event in tcod.event.get():
-                if event.type == "KEYDOWN":
-                    result = self.InputHandler.handle_keypress(event)
-                    self.game.event_engine.resolve_keyboard_input(result)
-                if event.type == "QUIT":
-                    raise SystemExit()
+        for event in tcod.event.get():
+            if event.type == "KEYDOWN":
+                result = self.InputHandler.handle_keypress(event)
+                self.game.event_engine.resolve_keyboard_input(result)
+            if event.type == "QUIT":
+                raise SystemExit()
 
 
     def menu_loop(self, root_console):

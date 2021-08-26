@@ -15,6 +15,9 @@ class EventEngine:
         self.game = game
     
     def cancel_actions(self, actiontype, originator, start_time, final_time):
+        """
+        Cancels all queued actions of specified type and originator that are slated to occur within the specified time bounds.
+        """
         for action in self.global_queue.heap:
             if(action.originator == originator and start_time < action.time < final_time and action.flags['actiontype'] == actiontype):
                 self.global_queue.heap.remove(action)
@@ -105,6 +108,13 @@ class EventEngine:
                 self.game.game_state = "menu_command_menu_render"
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
                 self.game.render_engine.ui["dev"].visible = True
+        if("time" in result):
+            self.global_time += result["time"]
+            if self.game.event_engine.global_queue.player_actions_count > 0:
+                self.game.event_engine.resolve_actions()
+                #TODO Consider moving the below
+                if(self.game.player.current_ship.engine):
+                    self.game.player.current_ship.engine.generate_vector_path()
 
 
 
