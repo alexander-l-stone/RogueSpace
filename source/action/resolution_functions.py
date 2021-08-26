@@ -5,10 +5,10 @@ def resolve_jump_charge_action(originator, **flags):
     if(originator.fuel >= 4):
         originator.charging_jump = True
         originator.fuel -= 4
-        return [{'type': 'charge', 'succeeded': True, 'x': originator.x, 'y': originator.y}]
+        return [{'type': 'charge', 'succeeded': True, 'originator':originator}]
     else:
         originator.charging_jump = False
-        return [{'type': 'charge', 'succeeded': False, 'x': originator.x, 'y': originator.y}]
+        return [{'type': 'charge', 'succeeded': False, 'originator':originator}]
     
 
 def resolve_jump_action(originator, **flags):

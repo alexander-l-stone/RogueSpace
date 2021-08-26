@@ -28,8 +28,8 @@ class EventEngine:
         for result in results:
             if result["type"] == "enter":
                 self.resolve_enter(result)
-            elif result["type"] == "jump":
-                self.resolve_jump(result)
+            elif result["type"] == "charge":
+                self.resolve_charge(result)
             elif result["type"] == "move" and isinstance(self.game.current_location, Galaxy):
                 for key, value in self.game.current_location.check_explored_corners(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y(), self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
                     if (value == False):
@@ -72,7 +72,7 @@ class EventEngine:
             self.game.generate_current_area()
             self.game.current_area.add_entity(self.game.player.current_entity)
     
-    def resolve_jump(self, result):
+    def resolve_charge(self, result):
         if(not result['succeeded']):
             self.cancel_actions('jump', result['originator'], 0, math.inf)
 
