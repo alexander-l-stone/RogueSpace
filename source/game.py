@@ -24,8 +24,8 @@ class Game:
         #set up font
         self.render_engine = RenderEngine(
             tcod.tileset.load_tilesheet("terminal12x12_gs_ro.png", 16, 16, tcod.tileset.CHARMAP_CP437),
-            50,
-            50,
+            75,
+            75,
             self)
         self.event_engine = EventEngine(self)
         self.InputHandler:InputHandler = InputHandler()

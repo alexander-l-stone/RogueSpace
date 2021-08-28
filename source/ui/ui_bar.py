@@ -1,5 +1,5 @@
 class UIBar:
-    def __init__(self, parent, x, y, width, height, color_full, color_empty, text_color, curr_value, max_value):
+    def __init__(self, parent, x, y, width, height, color_full, color_empty, text_color, curr_value, max_value, offset = 0):
         self.parent = parent
         self.x = parent.x + x
         self.y = parent.y + y

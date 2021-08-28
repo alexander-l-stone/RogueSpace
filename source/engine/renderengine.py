@@ -28,17 +28,20 @@ class RenderEngine:
         self.ui = {}
         self.draw_order = []
 
-        STATUS_LABEL_WIDTH = 8
-        STATUS_BAR_WIDTH = 10
+        STATUS_LABEL_WIDTH = 13
+        STATUS_BAR_WIDTH = 12
         STATUS_WIDTH = STATUS_LABEL_WIDTH + STATUS_BAR_WIDTH
-        panel = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20, 20, 20))
-        panel.elements['label_health'] = UIMessage(panel, 1, 1, 'Health', (255,255,255))
+        panel = UIPanel(0, self.SCREEN_HEIGHT - 8, 5, self.SCREEN_WIDTH, (20, 20, 20))
+        panel.elements['label_health'] = UIMessage(panel, 1, 1, 'Hull+Shield', (255,255,255))
         panel.elements['bar_health'] = UIBar(panel, STATUS_LABEL_WIDTH, 1, STATUS_BAR_WIDTH, 1, (0, 255, 0), (0, 120, 0), (0, 0, 0), 45, 100)
         panel.elements['label_heat'] = UIMessage(panel, 1, 2, 'Heat', (255,255,255))
         panel.elements['bar_heat'] = UIBar(panel, STATUS_LABEL_WIDTH, 2, STATUS_BAR_WIDTH, 1, (255, 0, 0), (120, 0, 0), (0, 0, 0), 33, 100)
         panel.elements['label_fuel'] = UIMessage(panel, 1, 3, 'Fuel', (255,255,255))
         panel.elements['bar_fuel'] = UIBar(panel, STATUS_LABEL_WIDTH, 3, STATUS_BAR_WIDTH, 1, (255, 255, 0), (120, 120, 0), (0, 0, 0), 77, 100)
-
+        panel.elements['label_jump'] = UIMessage(panel, 1, 3, 'JUMPING:', (255,255,255))
+        panel.elements['label_jump'].visible = False
+        panel.elements['bar_jump'] = UIBar(panel, STATUS_LABEL_WIDTH, 3, STATUS_BAR_WIDTH, 1, (255, 255, 0), (120, 120, 0), (0, 0, 0), 20, 20)
+        panel.elements['bar_jump'].visible = False   
         MESSAGE_CENTER = (screen_width - STATUS_WIDTH) / 2 + STATUS_WIDTH
         MESSAGE_LEFT = int(MESSAGE_CENTER - 3)
         panel.elements['coordinates'] = UIMessage(panel, MESSAGE_LEFT, 2, '(0, 0)', (255, 255, 255))
@@ -75,6 +78,11 @@ class RenderEngine:
         hud.elements['bar_heat'].max_value = self.game.player.current_ship.max_heat
         hud.elements['bar_fuel'].curr_value = self.game.player.current_ship.fuel
         hud.elements['bar_fuel'].max_value = self.game.player.current_ship.max_fuel
+        hud.elements['bar_jump'].curr_value = self.game.player.current_ship.jump_charge
+        hud.elements['bar_jump'].max_value = self.game.player.current_ship.jump_charge_cost
+        if(self.game.player.current_ship.charging_jump):
+            hud.elements['label_jump'].visible = True
+            hud.elements['bar_jump'].visible = True
 
         hud.elements['coordinates'].message = f"({self.game.player.current_ship.get_x()}, {self.game.player.current_ship.get_y()})"
         hud.elements['vector'].message = f"({self.game.player.current_ship.engine.vector.x}, {self.game.player.current_ship.engine.vector.y})"
