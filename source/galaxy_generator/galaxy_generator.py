@@ -116,7 +116,7 @@ class GalaxyGenerator:
             elif planet_radius < (system.frozen_zone * self.system_scalar):
                 planet = self.grammar.generate('planet<frozen>')
             else:
-                pass
+                continue
             planet_array.append({'radius': planet_radius, 'angle': current_angle, 'planet': planet})
         for planet in planet_array:
             parts_of_planet_string = planet['planet'].split(' ')
