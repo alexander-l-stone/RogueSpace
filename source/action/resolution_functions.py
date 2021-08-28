@@ -15,9 +15,8 @@ def resolve_jump_action(originator, **flags):
     if(not isinstance(flags['current_location'], System) ==True):
         return [{'type': 'jump', 'succeeded': False, 'originator':originator}]
     else:
-        delta = convert_theta_to_delta(convert_delta_to_theta(originator.get_x(), originator.get_y()))
-        new_x = flags['current_location'].x + delta[0]
-        new_y = flags['current_location'].y + delta[1]
+        new_x = flags['current_location'].x
+        new_y = flags['current_location'].y
         flags['game'].current_location = flags['game'].galaxy
         originator.relocate(new_x, new_y)
         for key, value in flags['game'].current_location.check_explored_corners(originator.get_x(), originator.get_y(), flags['game'].render_engine.SCREEN_WIDTH, flags['game'].render_engine.SCREEN_HEIGHT).items():

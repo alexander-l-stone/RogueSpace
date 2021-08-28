@@ -49,11 +49,13 @@ class EventEngine:
     
     def resolve_enter(self, result):
     #TODO: figure out what to do for non-player entities
+    #TODO: Consider how/if to relocate to resolution functions
         if (result['entering_entity'].flags['is_player']) is True:
             self.game.current_location = result['target_entity']
             dx, dy = result['entering_entity'].x - result['target_entity'].x, result['entering_entity'].y - result['target_entity'].y
             theta = convert_delta_to_theta(dx, dy)
-            self.game.current_location.entity_list.append(result['entering_entity'])
+            self.game.player.current_ship.x = dx
+            self.game.player.current_ship.y = dy           
             if (isinstance(self.game.current_location, System)):
                 if(self.game.current_location.explored == False):
                     self.game.galaxy.galaxy_generator.generate_planets(self.game.current_location)

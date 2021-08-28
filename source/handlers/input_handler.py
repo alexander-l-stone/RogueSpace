@@ -6,7 +6,26 @@ from typing import Dict
 
 class InputHandler:
     def __init__(self):
-        self.key_command_dict = {
+        self.galaxy_command_dict = {
+            tcod.event.K_UP: {"type": "navigate", "value": (0, -1), "time":1},
+            tcod.event.K_w: {"type": "navigate", "value": (0, -1), "time":1},
+            tcod.event.K_KP_8: {"type": "navigate", "value": (0, -1), "time":1},
+            tcod.event.K_DOWN: {"type": "navigate", "value": (0, 1), "time":1},
+            tcod.event.K_s: {"type": "navigate", "value": (0, 1), "time":1},
+            tcod.event.K_KP_2: {"type": "navigate", "value": (0, 1), "time":1},
+            tcod.event.K_LEFT: {"type": "navigate", "value": (-1, 0), "time":1},
+            tcod.event.K_a: {"type": "navigate", "value": (-1, 0), "time":1},
+            tcod.event.K_KP_4: {"type": "navigate", "value": (-1, 0), "time":1},
+            tcod.event.K_RIGHT: {"type": "navigate", "value": (1, 0), "time":1},
+            tcod.event.K_d: {"type": "navigate", "value": (1, 0), "time":1},
+            tcod.event.K_KP_6: {"type": "navigate", "value": (1, 0), "time":1},
+            tcod.event.K_KP_9: {"type": "navigate", "value": (1, -1), "time":1},
+            tcod.event.K_KP_7: {"type": "navigate", "value": (-1, -1), "time":1},
+            tcod.event.K_KP_1: {"type": "navigate", "value": (-1, 1), "time":1},
+            tcod.event.K_KP_3: {"type": "navigate", "value": (1, 1), "time":1},
+        }
+
+        self.system_command_dict = {
             tcod.event.K_UP: {"type": "thrust", "value": (0, -1), "time":1},
             tcod.event.K_w: {"type": "thrust", "value": (0, -1), "time":1},
             tcod.event.K_KP_8: {"type": "thrust", "value": (0, -1), "time":1},
@@ -31,7 +50,7 @@ class InputHandler:
         }
     
     def handle_keypress(self, event) -> Dict[str,str]:
-        if event.sym in self.key_command_dict:
-            return self.key_command_dict[event.sym]
+        if event.sym in self.system_command_dict:
+            return self.system_command_dict[event.sym]
         else:
             return {'type': "none"}
