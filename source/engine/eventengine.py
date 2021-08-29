@@ -1,9 +1,11 @@
+import heapq
 import math
 
 from source.action.action_queue import ActionQueue
 from source.action.action import Action
 from source.action.resolution_functions import *
 from source.helper_functions.circle_conversions import *
+from source.ui.ui_bar.bar_segment import BarSegment
 from source.galaxy.galaxy import Galaxy
 from source.system.system import System
 
@@ -13,15 +15,22 @@ class EventEngine:
         self.global_queue = ActionQueue()
         self.game = game
     
+    def cancel_actions(self, actiontype, originator, start_time, final_time):
+        """
+        Cancels all queued actions of specified type and originator that are slated to occur within the specified time bounds.
+        """
+        for action in self.global_queue.heap:
+            if(action.originator == originator and start_time < action.time < final_time and action.flags['actiontype'] == actiontype):
+                self.global_queue.heap.remove(action)
+        heapq.heapify(self.global_queue.heap)
+
     def resolve_actions(self):
         results = self.global_queue.resolve_actions(self.global_time)
         for result in results:
             if result["type"] == "enter":
                 self.resolve_enter(result)
-            elif result["type"] == "jump":
-                if ('no-jump' in self.game.state_flags):
-                    return
-                self.resolve_jump(result)
+            elif result["type"] == "charge":
+                self.resolve_charge(result)
             elif result["type"] == "move" and isinstance(self.game.current_location, Galaxy):
                 for key, value in self.game.current_location.check_explored_corners(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y(), self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
                     if (value == False):
@@ -41,11 +50,13 @@ class EventEngine:
     
     def resolve_enter(self, result):
     #TODO: figure out what to do for non-player entities
+    #TODO: Consider how/if to relocate to resolution functions
         if (result['entering_entity'].flags['is_player']) is True:
             self.game.current_location = result['target_entity']
             dx, dy = result['entering_entity'].x - result['target_entity'].x, result['entering_entity'].y - result['target_entity'].y
             theta = convert_delta_to_theta(dx, dy)
-            self.game.current_location.entity_list.append(result['entering_entity'])
+            self.game.player.current_ship.x = dx
+            self.game.player.current_ship.y = dy           
             if (isinstance(self.game.current_location, System)):
                 if(self.game.current_location.explored == False):
                     self.game.galaxy.galaxy_generator.generate_planets(self.game.current_location)
@@ -64,26 +75,9 @@ class EventEngine:
             self.game.generate_current_area()
             self.game.current_area.add_entity(self.game.player.current_entity)
     
-    def resolve_jump(self, result):
-        if(not isinstance(self.game.current_location, System) ==True):
-            return False
-        else:
-            if (((self.game.player.current_ship.get_x()**2) + (self.game.player.current_ship.get_y()**2))**(1/2)) > self.game.current_location.hyperlimit:
-                delta = convert_theta_to_delta(convert_delta_to_theta(result['x'], result['y']))
-                new_x = self.game.current_location.x + delta[0]
-                new_y = self.game.current_location.y + delta[1]
-                self.game.current_location = self.game.galaxy
-                self.game.player.current_ship.x = new_x
-                self.game.player.current_ship.y = new_y
-                for key, value in self.game.current_location.check_explored_corners(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y(), self.game.render_engine.SCREEN_WIDTH, self.game.render_engine.SCREEN_HEIGHT).items():
-                        if (value == False):
-                            self.game.current_location.generate_new_sector(key[0], key[1])
-                self.game.current_area = self.game.current_location.generate_local_area(self.game.player.current_ship.get_x(), self.game.player.current_ship.get_y())
-                self.game.current_area.add_entity(self.game.player.current_entity)
-                self.game.render_engine.ui['game_window'].area = self.game.current_area
-                return True
-            else:
-                return False
+    def resolve_charge(self, result):
+        if(not result['succeeded']):
+            self.cancel_actions('jump', result['originator'], 0, math.inf)
 
 
 
@@ -91,7 +85,10 @@ class EventEngine:
         if(result["type"] == "move"):
             self.global_queue.push(Action(self.game.player.current_ship, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.game.current_area, is_player=True))
         elif(result["type"] == "jump"):
-            self.global_queue.push(Action(self.game.player.current_ship, self.global_time+1, resolve_jump_action, y=self.game.player.current_ship.get_x(), x=self.game.player.current_ship.get_y(), area=self.game.current_area, is_player=True))
+            self.game.render_engine.ui['hud'].elements['bar_fuel'].contractive_segments.append(BarSegment(self, (255, 55, 0), self.game.player.current_ship, 'jump_charge'))
+            for i in range(5):
+                self.global_queue.push(Action(self.game.player.current_ship, self.global_time+i, resolve_jump_charge_action,actiontype = 'charge', x=self.game.player.current_ship.get_x(), y=self.game.player.current_ship.get_y(), current_location=self.game.current_location, game=self.game, is_player=True))
+            self.global_queue.push(Action(self.game.player.current_ship, self.global_time+6, resolve_jump_action,actiontype = 'jump', x=self.game.player.current_ship.get_x(), y=self.game.player.current_ship.get_y(), current_location=self.game.current_location, game=self.game, is_player=True))
         elif(result["type"] == "wait"):
             actions = self.game.player.current_ship.engine.generate_move_actions(self.global_time, 1)
             for action in actions:
@@ -115,6 +112,13 @@ class EventEngine:
                 self.game.game_state = "menu_command_menu_render"
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
                 self.game.render_engine.ui["dev"].visible = True
+        if("time" in result):
+            self.global_time += result["time"]
+            if self.game.event_engine.global_queue.player_actions_count > 0:
+                self.game.event_engine.resolve_actions()
+                #TODO Consider moving the below
+                if(self.game.player.current_ship.engine):
+                    self.game.player.current_ship.engine.generate_vector_path()
 
 
 

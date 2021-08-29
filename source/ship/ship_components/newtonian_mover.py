@@ -62,7 +62,7 @@ class NewtonianMover:
         y_increment = self.vector.y / update_rate
         #TODO: Is_player is currently 'true'. fix this. 
         while(local_time < time + span):
-            move_actions.append(Action(self.parent, local_time, resolve_move_action, dx=x_increment, dy=y_increment, area=self.parent.entity_repr.curr_area, is_player=True))
+            move_actions.append(Action(self.parent, local_time, resolve_move_action, actiontype = 'move', dx=x_increment, dy=y_increment, area=self.parent.entity_repr.curr_area, is_player=True))
             local_time += 1 / update_rate
         return move_actions
 

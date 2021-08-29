@@ -8,7 +8,8 @@ from source.handlers.menu_handler import MenuHandler
 from source.system.system import System
 from source.ui.menu.menu import Menu
 from source.ui.menu.menu_item import MenuItem
-from source.ui.ui_bar import UIBar
+from source.ui.ui_bar.ui_bar import UIBar
+from source.ui.ui_bar.bar_segment import BarSegment
 from source.ui.ui_message import UIMessage
 from source.ui.ui_panel import UIPanel
 
@@ -27,26 +28,28 @@ class RenderEngine:
         self.MenuHandler = MenuHandler()
         self.ui = {}
         self.draw_order = []
+        self.tick_count = 0
+    
 
-        STATUS_LABEL_WIDTH = 8
-        STATUS_BAR_WIDTH = 10
+
+    def construct_HUD(self, ship):
+        STATUS_LABEL_WIDTH = 13
+        STATUS_BAR_WIDTH = 20
         STATUS_WIDTH = STATUS_LABEL_WIDTH + STATUS_BAR_WIDTH
-        panel = UIPanel(0, self.SCREEN_HEIGHT - 8, 8, self.SCREEN_WIDTH, (20, 20, 20))
-        panel.elements['label_health'] = UIMessage(panel, 1, 1, 'Health', (255,255,255))
-        panel.elements['bar_health'] = UIBar(panel, STATUS_LABEL_WIDTH, 1, STATUS_BAR_WIDTH, 1, (0, 255, 0), (0, 120, 0), (0, 0, 0), 45, 100)
+        panel = UIPanel(0, self.SCREEN_HEIGHT - 8, 5, self.SCREEN_WIDTH, (20, 20, 20))
+        panel.elements['label_health'] = UIMessage(panel, 1, 1, 'Hull+Shield', (255,255,255))
+        panel.elements['bar_health'] = UIBar(panel, STATUS_LABEL_WIDTH, 1, STATUS_BAR_WIDTH, 1, (0, 255, 0), (0, 120, 0), (0, 0, 0), ship, 'health', 'max_health')
         panel.elements['label_heat'] = UIMessage(panel, 1, 2, 'Heat', (255,255,255))
-        panel.elements['bar_heat'] = UIBar(panel, STATUS_LABEL_WIDTH, 2, STATUS_BAR_WIDTH, 1, (255, 0, 0), (120, 0, 0), (0, 0, 0), 33, 100)
+        panel.elements['bar_heat'] = UIBar(panel, STATUS_LABEL_WIDTH, 2, STATUS_BAR_WIDTH, 1, (255, 0, 0), (120, 0, 0), (0, 0, 0), ship, 'heat', 'max_heat')
         panel.elements['label_fuel'] = UIMessage(panel, 1, 3, 'Fuel', (255,255,255))
-        panel.elements['bar_fuel'] = UIBar(panel, STATUS_LABEL_WIDTH, 3, STATUS_BAR_WIDTH, 1, (255, 255, 0), (120, 120, 0), (0, 0, 0), 77, 100)
-
-        MESSAGE_CENTER = (screen_width - STATUS_WIDTH) / 2 + STATUS_WIDTH
+        panel.elements['bar_fuel'] = UIBar(panel, STATUS_LABEL_WIDTH, 3, STATUS_BAR_WIDTH, 1, (255, 255, 0), (120, 120, 0), (0, 0, 0), ship, 'fuel', 'max_fuel')
+        MESSAGE_CENTER = (self.SCREEN_WIDTH - STATUS_WIDTH) / 2 + STATUS_WIDTH
         MESSAGE_LEFT = int(MESSAGE_CENTER - 3)
         panel.elements['coordinates'] = UIMessage(panel, MESSAGE_LEFT, 2, '(0, 0)', (255, 255, 255))
         panel.elements['vector'] = UIMessage(panel, MESSAGE_LEFT, 3, '(0, 0)', (255, 255, 255))
 
         self.add_element_to_ui('hud', panel)
-        self.tick_count = 0
-        self.ui['hud'].visible = False
+        self.ui['hud'].visible = True
 
     #TODO: Change the center of the screen that the player character knows to be the center of the visible area not taken up by ui.
     # Probably make a seprate UI element that is the game panel?
@@ -69,13 +72,6 @@ class RenderEngine:
     def update_hud(self) -> None:
         hud = self.ui['hud']
         # TODO if the player becomes not a ship, make this a switch
-        hud.elements['bar_health'].curr_value = self.game.player.current_ship.health
-        hud.elements['bar_health'].max_value = self.game.player.current_ship.max_health
-        hud.elements['bar_heat'].curr_value = self.game.player.current_ship.heat
-        hud.elements['bar_heat'].max_value = self.game.player.current_ship.max_heat
-        hud.elements['bar_fuel'].curr_value = self.game.player.current_ship.fuel
-        hud.elements['bar_fuel'].max_value = self.game.player.current_ship.max_fuel
-
         hud.elements['coordinates'].message = f"({self.game.player.current_ship.get_x()}, {self.game.player.current_ship.get_y()})"
         hud.elements['vector'].message = f"({self.game.player.current_ship.engine.vector.x}, {self.game.player.current_ship.engine.vector.y})"
 
@@ -97,19 +93,12 @@ class RenderEngine:
         self.render(root_console)
 
     def event_loop(self, root_console) -> None:
-        timeincrement = 1
-        if self.game.event_engine.global_queue.player_actions_count > 0:
-            self.game.event_engine.resolve_actions()
-            if(self.game.player.current_ship.engine):
-                self.game.player.current_ship.engine.generate_vector_path()
-            self.game.event_engine.global_time += timeincrement
-        else:
-            for event in tcod.event.get():
-                if event.type == "KEYDOWN":
-                    result = self.InputHandler.handle_keypress(event)
-                    self.game.event_engine.resolve_keyboard_input(result)
-                if event.type == "QUIT":
-                    raise SystemExit()
+        for event in tcod.event.get():
+            if event.type == "KEYDOWN":
+                result = self.InputHandler.handle_keypress(event)
+                self.game.event_engine.resolve_keyboard_input(result)
+            if event.type == "QUIT":
+                raise SystemExit()
 
 
     def menu_loop(self, root_console):

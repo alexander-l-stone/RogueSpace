@@ -17,9 +17,12 @@ class System:
         self.color = color
         self.name = name
         self.system_type = system_type
+        self.hyperlinks = []
+        self.entities = [] #Used for hyperlink paths
+        #TODO verify hyperlimit is necessary, or delete
         self.hyperlimit = hyperlimit
         self.planet_list = []
-        self.entity_list = []
+        self.cloud_list = []
         self.bgcolor = bgcolor
         self.explored = False
         self.radius = 1
@@ -44,11 +47,8 @@ class System:
 
     def generate_area(self, entity_list=[]):
         system_area = Area(self.bgcolor, name=self.name, generate_background=True)
-        for entity in self.entity_list:
-            if isinstance(entity, Cloud):
-                entity.generate_entities(system_area)
-            else:
-                system_area.add_entity(entity)
+        for cloud in self.cloud_list:
+            cloud.generate_entities(system_area)
         for planet in self.planet_list:
             if (isinstance(planet, Ring) or isinstance(planet, Belt)):
                 planet.generate_entities(system_area)
@@ -79,4 +79,4 @@ class System:
         return {'type': 'stop'}
 
     def generate_star_entity(self):
-        return Entity(self.x, self.y, self.char, self.color, self, on_collide=self.on_collide_sector_level, bg_color=self.bgcolor)
+        return Entity(0, 0, self.char, self.color, self, on_collide=self.on_collide_sector_level, bg_color=self.bgcolor)

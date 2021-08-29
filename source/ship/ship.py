@@ -1,6 +1,6 @@
 from source.ship.ship_components.newtonian_mover import NewtonianMover
 from source.draw.entity.entity import Entity
-from source.ui.ui_bar import UIBar
+from source.ui.ui_bar.ui_bar import UIBar
 from source.ui.ui_message import UIMessage
 
 class Ship:
@@ -14,12 +14,15 @@ class Ship:
         self.max_fuel = 100
         self.max_health = 50
         self.max_heat = 50
+        self.jump_charge_cost = 20 #TODO this will want to be reworked; likely moved to jump drive
         self.fuel = self.max_fuel
-        self.health = 4
+        self.health = 43
         self.heat = 36
         self.path = []
         self.engine = NewtonianMover(self, {'x':0, 'y':0})
-    
+        self.jump_charge = 20 #Counts down from chahrge cost to 0
+        self.charging_jump = False
+
     def __str__(self):
         return f"[Ship]"
     

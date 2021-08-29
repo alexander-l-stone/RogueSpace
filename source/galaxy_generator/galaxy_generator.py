@@ -49,9 +49,12 @@ class GalaxyGenerator:
                 galaxy.system_dict[(system_x, system_y)] = self.generate_solar_system(system_x, system_y)
         return (rounded_x, rounded_y)
 
+
+    #TODO Generation needs redo to account for hyperlinks. Current implementation is ASS
     def generate_cluster(self, galaxy, x, y, radius):
         cluster_area = int(math.pi*radius**2)
         num_system_to_generate = randint(1, max(2,cluster_area//120))
+        previous = None
         for i in range(0, num_system_to_generate):
             randtheta = randint(0,360)*math.pi/180
             randradius = randint(0, radius)
@@ -59,6 +62,11 @@ class GalaxyGenerator:
             randy = int(randradius*math.sin(randtheta)) + y
             if ((randx, randy not in galaxy.system_dict)):
                 galaxy.system_dict[(randx, randy)] = self.generate_solar_system(randx, randy)
+                if(previous is not None):
+                    galaxy.system_dict[(randx, randy)].hyperlinks.append(previous)
+                    previous.hyperlinks.append(galaxy.system_dict[(randx, randy)])
+                previous = galaxy.system_dict[(randx, randy)]
+
 
     def generate_solar_system(self, x, y):
 
@@ -150,22 +158,21 @@ class GalaxyGenerator:
                 if not planet_datatype is Ring and not planet_datatype is Belt:
                     if abs(planet.x - xy['x'])**2 + abs(planet.y - xy['y'])**2 <= (planet.planetary_radius + cloudradius)**2:
                         overlap = True
-            for entity in system.entity_list:
-                if type(entity) is Cloud:
-                    if abs(entity.x - xy['x'])**2 + abs(entity.y - xy['y'])**2 <= (entity.radius + cloudradius)**2:
-                        overlap = True
+            for cloud in system.cloud_list:
+                if abs(cloud.x - xy['x'])**2 + abs(cloud.y - xy['y'])**2 <= (cloud.radius + cloudradius)**2:
+                    overlap = True
             if not overlap:
                 d15 = randint(1, 15)
                 if d15 < 4:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'purple-gas', thin_color=(88, 0, 88)))
+                    system.cloud_list.append(Cloud(xy['x'], xy['y'], ' ', (128, 0, 128), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'purple-gas', thin_color=(88, 0, 88)))
                 elif d15 < 7:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'green-gas', thin_color=(0, 100, 0)))
+                    system.cloud_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'green-gas', thin_color=(0, 100, 0)))
                 elif d15 < 9:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 150), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'cyan-gas', thin_color=(0, 100, 100)))
+                    system.cloud_list.append(Cloud(xy['x'], xy['y'], ' ', (0, 150, 150), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'cyan-gas', thin_color=(0, 100, 100)))
                 elif d15 < 12:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (150, 0, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'red-gas', thin_color=(60, 0, 0)))
+                    system.cloud_list.append(Cloud(xy['x'], xy['y'], ' ', (150, 0, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'red-gas', thin_color=(60, 0, 0)))
                 else:
-                    system.entity_list.append(Cloud(xy['x'], xy['y'], ' ', (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'gold-dust', thin_color=(80, 45, 0)))
+                    system.cloud_list.append(Cloud(xy['x'], xy['y'], ' ', (160, 99, 0), cloudradius, randint(0, cloudradius + abs(xy['x']) + abs(xy['y'])), 'gold-dust', thin_color=(80, 45, 0)))
         return True
 
 
