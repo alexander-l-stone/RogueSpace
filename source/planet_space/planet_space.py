@@ -23,17 +23,18 @@ class PlanetSpace:
     def generate_area(self) -> TilesetArea:
         import tcod
         #This is code to fill the tileset area with random entities
+        #TODO: Remove this when we actually know how to generate areas
         new_area = TilesetArea(self.tileset, self.height, self.width, **self.flags)
         new_area.init_area()
         noise = tcod.noise.Noise(dimensions = 2)
         samples = noise[tcod.noise.grid(shape=(new_area.width, new_area.height), scale=0.25, origin=(new_area.width//2, new_area.height//2))]
-        samples = (samples + 1) * 256
+        samples = (samples + 1) * 128
         for x in range(new_area.width):
             for y in range(new_area.height):
                 area_value = samples[x][y]
-                if area_value < 96:
+                if area_value < 124:
                     val = 0
-                elif area_value < 164:
+                elif area_value < 212:
                     val = 1
                 else:
                     val = 2

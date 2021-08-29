@@ -58,9 +58,11 @@ class TilesetArea(Area):
                     else:
                         entities_at_point[-1].draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame)
                 else:
+                    # print(self.entity_array[drawx])
+                    # print(self.entity_array[drawx][drawy])
                     #TODO Check if tile is visible. If not draw some shitty explored but out of vision version
-                    if drawx in self.entity_array:
-                        if drawy in self.entity_array[drawx]:
+                    if drawx >= 0 and drawx < len(self.entity_array):
+                        if drawy >= 0 and drawy < len(self.entity_array[drawx]):
                             #grab the tile and set its coordinates to the proper coordinats
                             #This assumes tile is an Entity
                             tile = self.tileset.tiles[self.entity_array[drawx][drawy]]
