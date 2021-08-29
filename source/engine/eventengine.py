@@ -5,6 +5,7 @@ from source.action.action_queue import ActionQueue
 from source.action.action import Action
 from source.action.resolution_functions import *
 from source.helper_functions.circle_conversions import *
+from source.ui.ui_bar.bar_segment import BarSegment
 from source.galaxy.galaxy import Galaxy
 from source.system.system import System
 
@@ -84,6 +85,7 @@ class EventEngine:
         if(result["type"] == "move"):
             self.global_queue.push(Action(self.game.player.current_ship, self.global_time+1, resolve_move_action, dx=result["value"][0], dy=result["value"][1], area=self.game.current_area, is_player=True))
         elif(result["type"] == "jump"):
+            self.game.render_engine.ui['hud'].elements['bar_fuel'].contractive_segments.append(BarSegment(self, (255, 55, 0), self.game.player.current_ship, 'jump_charge'))
             for i in range(5):
                 self.global_queue.push(Action(self.game.player.current_ship, self.global_time+i, resolve_jump_charge_action,actiontype = 'charge', x=self.game.player.current_ship.get_x(), y=self.game.player.current_ship.get_y(), current_location=self.game.current_location, game=self.game, is_player=True))
             self.global_queue.push(Action(self.game.player.current_ship, self.global_time+6, resolve_jump_action,actiontype = 'jump', x=self.game.player.current_ship.get_x(), y=self.game.player.current_ship.get_y(), current_location=self.game.current_location, game=self.game, is_player=True))

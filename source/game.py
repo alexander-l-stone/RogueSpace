@@ -61,7 +61,6 @@ class Game:
         main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
         self.render_engine.add_element_to_ui('game_window', main_game_window)
         self.render_engine.ui['main_menu'].visible = False
-        self.render_engine.ui['hud'].visible = True
 
         #Code to generate player
         # None,{'x': 1, 'y': 1}
@@ -71,6 +70,7 @@ class Game:
         self.player.current_ship.engine.vector.x = 1
         self.player.current_ship.engine.vector.y = 1
         self.player.current_ship.relocate(7.0, 7.0)
+        self.render_engine.construct_HUD(player_ship)
 
     def start_dev(self):
         self.player = Player()
@@ -96,7 +96,6 @@ class Game:
         self.state_flags['no-jump'] = True
         self.render_engine.add_element_to_ui('game_window', main_game_window)
         self.render_engine.ui['main_menu'].visible = False
-        self.render_engine.ui['hud'].visible = True
 
     def generate_dev_panel(self):
         dev_panel = UIPanel(0, 0, self.render_engine.SCREEN_HEIGHT - 8, 15, (0, 0, 50))
