@@ -69,4 +69,4 @@ class TilesetArea(Area):
                             tile.y = drawy
                             tile.x_offset = drawx
                             tile.y_offset = drawy
-                            self.entity_array[drawx][drawy].draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame)
+                            self.tileset.tiles[self.entity_array[drawx][drawy]].draw(root_console, centerx - screen_width//2 - corner_l_x, centery - screen_height//2 - corner_b_y, self.background_color, animation_frame)

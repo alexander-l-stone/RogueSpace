@@ -9,6 +9,7 @@ from source.galaxy.galaxy import Galaxy
 from source.handlers.input_handler import InputHandler
 from source.ui.menu.generate_menu import generate_main_menu, generate_dev_menu, generate_game_menu, generate_dev_command_menu, generate_spawn_entity_menu
 from source.stellar_objects.planet import Planet
+from source.planet_space.planet_space import PlanetSpace
 from source.player.player import Player
 from source.engine.renderengine import RenderEngine
 from source.engine.eventengine import EventEngine
@@ -72,7 +73,8 @@ class Game:
         self.player.current_ship.engine.vector.y = 1
         self.player.current_ship.relocate(7.0, 7.0)
 
-    def start_dev(self):
+    #TODO: Move the dev code somewhere that isn't game.
+    def start_dev_system(self):
         self.player = Player()
         player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
         self.player.assign_ship(player_ship)
@@ -83,9 +85,34 @@ class Game:
         
         #Code to generate dev system
         self.galaxy = Galaxy()
-        self.current_location = System(0, 0, 'O', (0, 255, 0), 'DevStar', 'dev-system', 30)
+        self.current_location = P(0, 0, 'O', (0, 255, 0), 'DevStar', 'dev-system', 30)
         self.current_location.explored = True
         self.galaxy.system_dict[(self.current_location.x, self.current_location.y)] = self.current_location
+        self.current_area:Area = None
+        self.generate_current_area()
+        self.current_area.add_entity(self.player.current_entity)
+        self.player.current_ship.engine.generate_vector_path()
+        self.generate_dev_panel()
+        self.render_engine.InputHandler.key_command_dict[tcod.event.K_F10] = {"type": "menu", "value": "dev"}
+        main_game_window = GameWindow(0, 0, self.render_engine.SCREEN_HEIGHT - 8, self.render_engine.SCREEN_WIDTH, self.current_area, self)
+        self.state_flags['no-jump'] = True
+        self.render_engine.add_element_to_ui('game_window', main_game_window)
+        self.render_engine.ui['main_menu'].visible = False
+        self.render_engine.ui['hud'].visible = True
+    
+    def start_dev_tileset(self):
+        self.player = Player()
+        player_ship = Ship('@', (255,255,255), is_player=True, priority_draw=True)
+        self.player.assign_ship(player_ship)
+        self.player.current_ship.engine.vector.x = 1
+        self.player.current_ship.engine.vector.y = 1
+        self.player.current_ship.x = 7.0
+        self.player.current_ship.y = 7.0
+        
+        #Code to generate dev system
+        self.galaxy = Galaxy()
+        self.current_location = PlanetSpace('debug', 'debug', 200, 200, 69420)
+        self.current_location.explored = True
         self.current_area:Area = None
         self.generate_current_area()
         self.current_area.add_entity(self.player.current_entity)

@@ -17,12 +17,7 @@ def resolve_move_action(originator, flags):
     if type(flags['area']) is TilesetArea:
         result_list = []
         collision = False
-        for target_entity in entities_at_target:
-            try:
-                result_list.append(target_entity.flags["on_collide"](target_entity, originator))
-                collision = True
-            except:
-                pass
+        #TODO: Do collisons maybe at some point???
         if not collision:
             originator.relocate(originator.x + flags['dx'], originator.y + flags['dy'])
             result_list.append({"type": "move"})

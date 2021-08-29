@@ -115,10 +115,6 @@ class EventEngine:
                 self.game.game_state = "menu_command_menu_render"
                 self.game.current_menu = self.game.render_engine.ui["dev"].elements["command_menu"]
                 self.game.render_engine.ui["dev"].visible = True
-            elif result["value"] == "dev-tileset":
-                
-
-
 
     def handle_menu_key_presses(self, result) -> dict:
         key_result = {'type': 'none'}
@@ -142,8 +138,10 @@ class EventEngine:
                 self.game.start_new_game()
             elif result['value'] == 'load':
                 self.game.load_game()
-            elif result['value'] == 'dev':
-                self.game.start_dev()
+            elif result['value'] == 'dev-system':
+                self.game.start_dev_system()
+            elif result['value'] == 'dev-tileset':
+                self.game.start_dev_tileset()
             self.game.game_state = 'game'
         elif result['type'] == 'close':
             self.game.game_state = 'game'
