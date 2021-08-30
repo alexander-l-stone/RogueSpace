@@ -1,4 +1,6 @@
 #TODO: move the area, x, and y of the resolve jump action into a value dict
+from source.draw.area.tilesetarea import TilesetArea
+
 def resolve_jump_action(originator, flags):
     return [{'type': 'jump', 'area': flags['area'], 'x': originator.x, 'y': originator.y}]
 
@@ -12,16 +14,10 @@ def resolve_move_action(originator, flags):
     """
     Resolve this action by running any collision functions entities in the new sqaure have. Otherwise just send move.
     """
-    entities_at_target = flags['area'].get_entities_at_coordinates(originator.x + flags['dx'], originator.y + flags['dy'])
-    if entities_at_target is not None and len(entities_at_target) > 0:
+    if type(flags['area']) is TilesetArea:
         result_list = []
         collision = False
-        for target_entity in entities_at_target:
-            try:
-                result_list.append(target_entity.flags["on_collide"](target_entity, originator))
-                collision = True
-            except:
-                pass
+        #TODO: Do collisons maybe at some point???
         if not collision:
             originator.relocate(originator.x + flags['dx'], originator.y + flags['dy'])
             result_list.append({"type": "move"})

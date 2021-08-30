@@ -12,9 +12,10 @@ def generate_main_menu(x, y):
 
 def generate_dev_menu(x, y):
     dev_menu = Menu(x, y)
-    dev_mode = MenuItem('Start Dev Mode', select=lambda: {'type': 'game', 'value': 'dev'})
+    dev_mode_system = MenuItem('Start Dev Mode in a System', select=lambda: {'type': 'game', 'value': 'dev-system'})
+    dev_mode_tileset = MenuItem('Star Dev Mode in a tileset sarea', select=lambda: {'type': 'game', 'value': 'dev-tileset'})
     exit_game = MenuItem('Exit', select=lambda: {'type': 'exit'})
-    dev_menu.menu_items.extend([dev_mode, exit_game])
+    dev_menu.menu_items.extend([dev_mode_system, dev_mode_tileset, exit_game])
     return dev_menu
 
 def generate_game_menu(x, y):

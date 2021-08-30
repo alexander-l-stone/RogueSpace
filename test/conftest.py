@@ -10,6 +10,7 @@ from source.system.system import System
 from source.action.action_queue import ActionQueue
 from source.action.resolution_functions import resolve_no_action
 from source.vector.vector import Vector
+from source.tileset.tileset import Tileset
 
 #TODO: go through tests and see where we are repeating data(for example ActionQueue) and make those fixtures
 #TODO: Figure out ways to test heavily tcod dependent classes(UI for example)
@@ -46,11 +47,17 @@ def system():
     system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50, 0, 0, 0, 0, 0)
     return system
 
+@pytest.fixture
+def tileset():
+    return Tileset({0: '#'})
+
+@pytest.fixture
 def system_with_planet():
     system = System(0, 0, 'O', (255, 0, 0), 'test system', 'test', 50, 0, 0, 0, 0, 0)
     planet = Planet(4, 5, 'o', (0, 0, 200), 'Test Planet', 'test', None, 5)
     system.add_planet(planet)
-    
+    return system
+
 @pytest.fixture
 def action_queue():
     return ActionQueue()

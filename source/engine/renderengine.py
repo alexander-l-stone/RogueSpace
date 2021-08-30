@@ -89,8 +89,6 @@ class RenderEngine:
                 else:
                     self.menu_loop(root_console)
                 self.render_console(root_console)
-    
-
 
     def render_console(self, root_console) -> None:
         root_console.clear()
